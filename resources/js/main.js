@@ -584,3 +584,76 @@ function autoPlayYouTubeModal() {
 jQuery(document).ready(function () {
     autoPlayYouTubeModal();
 });
+
+jQuery('#background').off('click').on('click', function () {
+    if (canvas.getActiveObject() != contentImage && canvas.getActiveObject() != logo) {
+        canvas.sendBackwards(canvas.getActiveObject(),true)
+    }
+})
+
+jQuery('#foreground').off('click').on('click', function () {
+    if (canvas.getActiveObject() != contentImage && canvas.getActiveObject() != logo) {
+        canvas.bringForward(canvas.getActiveObject(),true)
+    }
+})
+
+document.addEventListener('keydown', function(event){
+    //Delete
+    if(event.which == 46) {
+        if (canvas.getActiveObject() != contentImage && canvas.getActiveObject() != logo) {
+            canvas.remove(canvas.getActiveObject())
+        }
+    }
+
+    //Arrow Left
+    if(event.which == 38) {
+        if (canvas.getActiveObject() != contentImage && canvas.getActiveObject() != logo) {
+
+            var xCoord = canvas.getActiveObject().aCoords.tl.x;
+            var yCoord = canvas.getActiveObject().aCoords.tl.y;
+
+            var pt = new fabric.Point(xCoord, yCoord - 10);
+            canvas.getActiveObject().setPositionByOrigin(pt, 'left', 'top');
+            canvas.renderAll();
+        }
+    }
+
+    //Arrow Up
+    if(event.which == 37) {
+        if (canvas.getActiveObject() != contentImage && canvas.getActiveObject() != logo) {
+
+            var xCoord = canvas.getActiveObject().aCoords.tl.x;
+            var yCoord = canvas.getActiveObject().aCoords.tl.y;
+
+            var pt = new fabric.Point(xCoord - 10, yCoord);
+            canvas.getActiveObject().setPositionByOrigin(pt, 'left', 'top');
+            canvas.renderAll();
+        }
+    }
+
+    //Arrow Right
+    if(event.which == 39) {
+        if (canvas.getActiveObject() != contentImage && canvas.getActiveObject() != logo) {
+
+            var xCoord = canvas.getActiveObject().aCoords.tl.x;
+            var yCoord = canvas.getActiveObject().aCoords.tl.y;
+
+            var pt = new fabric.Point(xCoord + 10, yCoord);
+            canvas.getActiveObject().setPositionByOrigin(pt, 'left', 'top');
+            canvas.renderAll();
+        }
+    }
+
+    //Arrow Down
+    if(event.which == 40) {
+        if (canvas.getActiveObject() != contentImage && canvas.getActiveObject() != logo) {
+
+            var xCoord = canvas.getActiveObject().aCoords.tl.x;
+            var yCoord = canvas.getActiveObject().aCoords.tl.y;
+
+            var pt = new fabric.Point(xCoord, yCoord + 10);
+            canvas.getActiveObject().setPositionByOrigin(pt, 'left', 'top');
+            canvas.renderAll();
+        }
+    }
+});
