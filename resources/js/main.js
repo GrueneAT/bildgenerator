@@ -38,8 +38,8 @@ var template_values = {
         logoTextTop: 0.9
     },
     facebook_header: {
-        width: 820,
-        height: 312,
+        width: 1958,
+        height: 745,
         topBorderMultiplier: 1,
         border: 20,
         logoTop: 0.6,
