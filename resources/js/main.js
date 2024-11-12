@@ -43,7 +43,7 @@ var template_values = {
         topBorderMultiplier: 1,
         border: 20,
         logoTop: 0.6,
-        logoTextTop: 0.862
+        logoTextTop: 0.872
     },
     a2: {
         width: 4961,
