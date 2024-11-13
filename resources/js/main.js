@@ -12,6 +12,15 @@ if (typeof generatorApplicationURL == 'undefined') {
     var generatorApplicationURL = "";
 }
 
+const isValidJSON = str => {
+  try {
+    JSON.parse(str);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+
 var template_values = {
     story: {
         width: 1080,
@@ -553,20 +562,39 @@ function positionBackgroundImage() {
     }
 }
 
-function addLogoSelection() {
-    jQuery.getJSON(generatorApplicationURL + "resources/images/logos/index.json", function (data) {
-        jQuery.each(data, function (index, names) {
-            var items = [];
-            jQuery.each(names.sort(), function (index, name) {
-                items.push('<option value="' + name.toUpperCase() + '">' + name.replace('%', ' ').toUpperCase() + "</option>");
-            });
-            jQuery("#logo-selection").append('<optgroup label="' + index + '">' + items.join("") + '</optgroup>');
-            jQuery('#logo-selection').selectpicker('refresh');
+function generateLogoSelection(data) {
+    jQuery.each(data, function (index, names) {
+        var items = [];
+        jQuery.each(names.sort(), function (index, name) {
+            items.push('<option value="' + name.toUpperCase() + '">' + name.replace('%', ' ').toUpperCase() + "</option>");
         });
+        jQuery("#logo-selection").append('<optgroup label="' + index + '">' + items.join("") + '</optgroup>');
+        jQuery('#logo-selection').selectpicker('refresh');
     });
 }
 
-addLogoSelection()
+function loadLogoSelection() {
+    const defaultIndex = generatorApplicationURL + "resources/images/logos/index.json"
+    
+    if (typeof logoDataOverride !== "undefined") {
+        if (isValidJSON(logoDataOverride)){
+            generateLogoSelection(jQuery.parseJSON(logoDataOverride))
+            return
+        }
+    }
+    
+    if (typeof logoIndexOverride !== "undefined") {
+        logoIndex = logoIndexOverride
+    }else{
+        logoIndex = defaultIndex
+    }
+
+    jQuery.getJSON(logoIndex, function (data) {
+        generateLogoSelection(data)
+    });
+}
+
+loadLogoSelection()
 
 
 function autoPlayYouTubeModal() {
