@@ -487,6 +487,17 @@ jQuery('#add-pink-circle').off('click').on('click', function () {
 })
 
 
+jQuery('#add-cross').off('click').on('click', function () {
+    fabric.Image.fromURL(generatorApplicationURL + "resources/images/Ankreuzen.png", function (image) {
+    image.scaleToWidth(canvas.width / 2)
+    canvas.add(image);
+    canvas.centerObject(image);
+    canvas.bringToFront(image);
+    // canvas.sendToBack(image)
+    });
+})
+
+
 fabric.Object.prototype.set({
     transparentCorners: false,
     cornerColor: 'yellow',
