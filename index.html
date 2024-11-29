@@ -55,184 +55,186 @@
             </div>
         </div>
     </div>
-    <div class="container edit-section pt-2">
-        <div class="row d-lg-none d-md-none">
-            <div class="col">
-                <p>Auf mobilen Endgeräten funktionieren nicht alle Vorlagen gut, bitte in dem Fall auf einem
-                    größeren Bildschirm bearbeiten.</p>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6">
-                <div>
-                    <div class="grid memes-container">
-                        <div class="grid-sizer"></div>
-                    </div>
-                </div>
-                <div class="meme-preview">
-                    <div class="fabric-canvas-wrapper"><canvas id="meme-canvas"></canvas></div>
-                </div>
-                <div class="form-group">
-                    <label for="scale">Skalierung:</label>
-                    <input type="range" class="form-control-range" id="scale" min="0.1" step="0.01" , max="2">
+    <div id="generator">
+        <div class="container edit-section pt-2">
+            <div class="row d-lg-none d-md-none">
+                <div class="col">
+                    <p>Auf mobilen Endgeräten funktionieren nicht alle Vorlagen gut, bitte in dem Fall auf einem
+                        größeren Bildschirm bearbeiten.</p>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="row mb-3">
-                    <div class="col">
-                        <label for="canvas-template">Vorlage:</label>
-                        <span class="input-group-append">
-                            <select class="form-control text-method" name="canvas-template" id="canvas-template"
-                                data-live-search="true">
-                                <optgroup label="Social Media">
-                                    <option value="post">Post</option>
-                                    <option value="story">Story</option>
-                                    <option value="event">Veranstaltung</option>
-                                    <option value="facebook_header">Facebook Header</option>
-                                </optgroup>
-                                <optgroup label="Druck">
-                                    <option value="a2">A2</option>
-                                    <option value="a2_quer">A2 Querformat</option>
-                                    <option value="a3">A3</option>
-                                    <option value="a3_quer">A3 Querformat</option>
-                                    <option value="a4">A4</option>
-                                    <option value="a4_quer">A4 Querformat</option>
-                                    <option value="a5">A5</option>
-                                    <option value="a5_quer">A5 Querformat</option>
-                                </optgroup>
-                            </select>
-                        </span>
+            <div class="row">
+                <div class="col-md-6">
+                    <div>
+                        <div class="grid memes-container">
+                            <div class="grid-sizer"></div>
+                        </div>
                     </div>
-                    <div class="col">
-                        <label for="logo">Logo für:</label>
-                        <span class="input-group-append">
-                            <select class="form-control text-method" name="logo-selection" id="logo-selection"
-                                data-live-search="true">
-                                <optgroup label="Allgemein">
-                                    <option value="">Logo Auswählen</option>
-                                </optgroup>
-                            </select>
-                        </span>
+                    <div class="meme-preview">
+                        <div class="fabric-canvas-wrapper"><canvas id="meme-canvas"></canvas></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="scale">Skalierung:</label>
+                        <input type="range" class="form-control-range" id="scale" min="0.1" step="0.01" , max="2">
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col">
-                        <input type="file" class="d-none" id="meme-input">
-                        <label class="btn btn-success btn-block" for="meme-input">Hintergrundbild aussuchen</label>
+                <div class="col-md-6">
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="canvas-template">Vorlage:</label>
+                            <span class="input-group-append">
+                                <select class="form-control text-method" name="canvas-template" id="canvas-template"
+                                    data-live-search="true">
+                                    <optgroup label="Social Media">
+                                        <option value="post">Post</option>
+                                        <option value="story">Story</option>
+                                        <option value="event">Veranstaltung</option>
+                                        <option value="facebook_header">Facebook Header</option>
+                                    </optgroup>
+                                    <optgroup label="Druck">
+                                        <option value="a2">A2</option>
+                                        <option value="a2_quer">A2 Querformat</option>
+                                        <option value="a3">A3</option>
+                                        <option value="a3_quer">A3 Querformat</option>
+                                        <option value="a4">A4</option>
+                                        <option value="a4_quer">A4 Querformat</option>
+                                        <option value="a5">A5</option>
+                                        <option value="a5_quer">A5 Querformat</option>
+                                    </optgroup>
+                                </select>
+                            </span>
+                        </div>
+                        <div class="col">
+                            <label for="logo">Logo für:</label>
+                            <span class="input-group-append">
+                                <select class="form-control text-method" name="logo-selection" id="logo-selection"
+                                    data-live-search="true">
+                                    <optgroup label="Allgemein">
+                                        <option value="">Logo Auswählen</option>
+                                    </optgroup>
+                                </select>
+                            </span>
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label for="text">Text: </label>
-                    <div class="input-group cp" id="cp-text">
-                        <textarea class="form-control text-method" id="text" placeholder="Type your text here"
-                            rows="2"></textarea>
+                    <div class="row">
+                        <div class="col">
+                            <input type="file" class="d-none" id="meme-input">
+                            <label class="btn btn-success btn-block" for="meme-input">Hintergrundbild aussuchen</label>
+                        </div>
                     </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col">
-                        <label for="text-color">Schriftfarbe: </label>
-                        <span class="input-group-append">
-                            <select class="form-control text-method" name="text-color" id="text-color">
-                                <option value="rgb(255,240,0)">Gelb</option>
-                                <option value="rgb(255,255,255)">Weiß</option>
-                            </select>
-                        </span>
+                    <div class="form-group">
+                        <label for="text">Text: </label>
+                        <div class="input-group cp" id="cp-text">
+                            <textarea class="form-control text-method" id="text" placeholder="Type your text here"
+                                rows="2"></textarea>
+                        </div>
                     </div>
-                    <div class="col">
-                        <label for="shadow-depth">Schlagschatten: </label>
-                        <input class="form-control text-method" type="number" value="3" id="shadow-depth" min="0"
-                            max="30" placeholder="0">
-                    </div>
-                    <div class="col">
-                        <label>Text Ausrichtung: </label>
-                        <div>
-                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                <label class="btn btn-success active align">
-                                    <input type="radio" value="left" name="align" id="left" checked> <i
-                                        class="fas fa-align-left"></i>
-                                </label>
-                                <label class="btn btn-success align">
-                                    <input type="radio" value="center" name="align" id="center"> <i
-                                        class="fas fa-align-center"></i>
-                                </label>
-                                <label class="btn btn-success align">
-                                    <input type="radio" value="right" name="align" id="right"> <i
-                                        class="fas fa-align-right"></i>
-                                </label>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="text-color">Schriftfarbe: </label>
+                            <span class="input-group-append">
+                                <select class="form-control text-method" name="text-color" id="text-color">
+                                    <option value="rgb(255,240,0)">Gelb</option>
+                                    <option value="rgb(255,255,255)">Weiß</option>
+                                </select>
+                            </span>
+                        </div>
+                        <div class="col">
+                            <label for="shadow-depth">Schlagschatten: </label>
+                            <input class="form-control text-method" type="number" value="3" id="shadow-depth" min="0"
+                                max="30" placeholder="0">
+                        </div>
+                        <div class="col">
+                            <label>Text Ausrichtung: </label>
+                            <div>
+                                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                    <label class="btn btn-success active align">
+                                        <input type="radio" value="left" name="align" id="left" checked> <i
+                                            class="fas fa-align-left"></i>
+                                    </label>
+                                    <label class="btn btn-success align">
+                                        <input type="radio" value="center" name="align" id="center"> <i
+                                            class="fas fa-align-center"></i>
+                                    </label>
+                                    <label class="btn btn-success align">
+                                        <input type="radio" value="right" name="align" id="right"> <i
+                                            class="fas fa-align-right"></i>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col">
-                        <button class="btn btn-success btn-block" id="add-text">Text einfügen</button>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <button class="btn btn-success btn-block" id="add-text">Text einfügen</button>
+                        </div>
                     </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col">
-                        <button class="btn-block btn btn-success" id="add-pink-circle">Rosa Kreis einfügen</button>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <button class="btn-block btn btn-success" id="add-pink-circle">Rosa Kreis einfügen</button>
+                        </div>
                     </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col">
-                        <button class="btn-block btn btn-success" id="add-cross">Kreuz einfügen</button>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <button class="btn-block btn btn-success" id="add-cross">Kreuz einfügen</button>
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <input type="file" class="d-none" id="add-image">
-                        <label class="btn btn-success btn-block" for="add-image">Bild einfügen</label>
+                    <div class="row">
+                        <div class="col">
+                            <input type="file" class="d-none" id="add-image">
+                            <label class="btn btn-success btn-block" for="add-image">Bild einfügen</label>
+                        </div>
                     </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col">
-                        <button class="btn btn-success btn-block" id="add-circle">Kreis Rand an/aus</button>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <button class="btn btn-success btn-block" id="add-circle">Kreis Rand an/aus</button>
+                        </div>
+                        <div class="col">
+                            <label for="circle-radius" class="d-inline">Kreis Größe:</label>
+                            <select class="d-inline form-inline" name="circle-radius" id="circle-radius">
+                                <option value="2">Groß</option>
+                                <option value="3">Mittel</option>
+                                <option value="4">Klein</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="col">
-                        <label for="circle-radius" class="d-inline">Kreis Größe:</label>
-                        <select class="d-inline form-inline" name="circle-radius" id="circle-radius">
-                            <option value="2">Groß</option>
-                            <option value="3">Mittel</option>
-                            <option value="4">Klein</option>
-                        </select>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <button class="btn-block btn btn-danger" id="remove-element">Text/Bild löschen</button>
+                        </div>
                     </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col">
-                        <button class="btn-block btn btn-danger" id="remove-element">Text/Bild löschen</button>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <label for="image-format">Download Format: </label>
-                        <select class="form-control text-method" name="image-format" id="image-format">
-                            <option value="jpeg">JPEG</option>
-                            <option value="png">PNG</option>
-                        </select>
-                    </div>
-                    <div class="col">
-                        <label for="font-size">Qualität(bei JPEG): </label>
-                        <select class="form-control text-method" name="image-quality" id="image-quality">
-                            <option value="1.0">Groß</option>
-                            <option value="0.5">Mittel</option>
-                            <option value="0.1">Klein</option>
-                        </select>
-                    </div>
-                    <div class="col">
-                        <button class="btn btn-success" id="generate-meme">Download</button>
+                    <div class="row">
+                        <div class="col">
+                            <label for="image-format">Download Format: </label>
+                            <select class="form-control text-method" name="image-format" id="image-format">
+                                <option value="jpeg">JPEG</option>
+                                <option value="png">PNG</option>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <label for="font-size">Qualität(bei JPEG): </label>
+                            <select class="form-control text-method" name="image-quality" id="image-quality">
+                                <option value="1.0">Groß</option>
+                                <option value="0.5">Mittel</option>
+                                <option value="0.1">Klein</option>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <button class="btn btn-success" id="generate-meme">Download</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <div class="col-12 alert-container alert alert-danger" style="display: none;"></div>
+
+        <script id="meme-template" type="x-tmpl-mustache">
+            <div class="grid-item">
+                <img src="{{url}}" crossorigin alt="{{name}}" img-height="{{height}}" img-width="{{width}}"/>
+            </div>
+        </script>
     </div>
-
-    <div class="col-12 alert-container alert alert-danger" style="display: none;"></div>
-
-    <script id="meme-template" type="x-tmpl-mustache">
-        <div class="grid-item">
-            <img src="{{url}}" crossorigin alt="{{name}}" img-height="{{height}}" img-width="{{width}}"/>
-        </div>
-    </script>
 
     <script src="vendors/jquery/jquery-3.7.1.min.js"></script>
     <script src="vendors/popper/popper.min.js"></script>
