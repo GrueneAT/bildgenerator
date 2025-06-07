@@ -1,80 +1,83 @@
-// Handle custom fonts
+// Font management
 function loadFont(font) {
-    const customFonts = ['Gotham Narrow']
-    var text = canvas.getActiveObject()
+    const customFonts = ['Gotham Narrow'];
+    const text = canvas.getActiveObject();
+    
+    if (!text) return;
+    
     if (customFonts.includes(font)) {
-        var myfont = new FontFaceObserver(font)
-        myfont.load().then(function () {
+        const fontObserver = new FontFaceObserver(font);
+        fontObserver.load().then(function () {
             text.set("fontFamily", "");
             text.set("fontFamily", font);
             canvas.renderAll();
-            jQuery('#font-family').selectpicker('refresh')
-        })
+            refreshSelectPicker();
+        });
     } else {
         text.set("fontFamily", font);
         canvas.renderAll();
-        jQuery('#font-family').selectpicker('refresh')
+        refreshSelectPicker();
     }
 }
 
-// Update edit methods values to the selected canvas text
+// UI state management
 function updateInputs() {
-    var activeObject = canvas.getActiveObject()
+    const activeObject = canvas.getActiveObject();
 
-    if (activeObject.get('type') == "text") {
-        enableTextMethods()
-        jQuery('#text').val(activeObject.text)
-        jQuery('#text-color').val(activeObject.fill).selectpicker('refresh')
-        jQuery(`input[value="${activeObject.textAlign}"]`).parent().trigger('update-status')
-        updateScale(activeObject)
+    if (activeObject && activeObject.get('type') === "text") {
+        enableTextMethods();
+        jQuery('#text').val(activeObject.text);
+        jQuery('#text-color').val(activeObject.fill).selectpicker('refresh');
+        jQuery(`input[value="${activeObject.textAlign}"]`).parent().trigger('update-status');
+        updateScale(activeObject);
     }
 }
 
 function updateScale(activeObject) {
-    scale = Number(parseFloat(activeObject.scaleX)).toFixed(2)
-    // jQuery('#scale-value').val(scale)
-    jQuery('#scale').val(scale)
+    const scale = Number(parseFloat(activeObject.scaleX)).toFixed(2);
+    jQuery('#scale').val(scale);
 }
 
+// Event handler utility
+function bindHandler(selector, event, handler) {
+    jQuery(selector).off(event).on(event, handler);
+}
 
+// Canvas object event handlers
 function loadObjectHandlers() {
-    // Interactive edit methods with canvas text 
-    jQuery('#text').off('input').on('input', function () {
-        setValue("text", jQuery(this).val())
-    })
+    bindHandler('#text', 'input', function () {
+        setValue("text", jQuery(this).val());
+    });
 
-    jQuery('#scale').off('input').on('input', function () {
-        var activeObject = canvas.getActiveObject()
-        if (activeObject != null && activeObject != contentImage) {
+    bindHandler('#scale', 'input', function () {
+        const activeObject = canvas.getActiveObject();
+        if (activeObject && activeObject !== contentImage) {
             activeObject.scale(parseFloat(this.value)).setCoords();
             canvas.renderAll();
-            updateScale(activeObject)
+            updateScale(activeObject);
         }
-    })
+    });
 
-    jQuery('#text-color').off('change').on('change', function () {
-        jQuery('#text-color').selectpicker('refresh')
-        if (canvas.getActiveObject() != null && canvas.getActiveObject().get('type') == "text") {
-            setValue("fill", jQuery(this).find(":selected").attr('value'))
+    bindHandler('#text-color', 'change', function () {
+        refreshSelectPicker();
+        const activeObject = canvas.getActiveObject();
+        if (activeObject && activeObject.get('type') === "text") {
+            setValue("fill", jQuery(this).find(":selected").attr('value'));
         }
-    })
+    });
 
-    jQuery('input[name="align"]').off('change').on('change', function () {
-        setValue("textAlign", jQuery(this).attr('id'))
-    })
+    bindHandler('input[name="align"]', 'change', function () {
+        setValue("textAlign", jQuery(this).attr('id'));
+    });
 
-    jQuery('#stroke-width').off('input').on('input', function () {
-        var actualWidth = jQuery(this).val()
-        if (actualWidth == 0) {
-            actualWidth = null
-        }
-        setValue("strokeWidth", actualWidth)
-    })
+    bindHandler('#stroke-width', 'input', function () {
+        const width = jQuery(this).val();
+        setValue("strokeWidth", width == 0 ? null : width);
+    });
 
-    jQuery('#shadow-depth').off('input').on('input', function () {
-        setValue("shadow", createShadow('black', jQuery('#shadow-depth').val()))
-    })
-
+    bindHandler('#shadow-depth', 'input', function () {
+        setValue("shadow", createShadow('black', jQuery(this).val()));
+    });
 }
 
 /*****************************

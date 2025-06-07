@@ -1,4 +1,7 @@
-// Intialize font-family select
-jQuery('select').selectpicker({
-    style: 'new-select',
-})
+// Initialize UI components
+jQuery(function() {
+    // Initialize selectpicker for all select elements
+    jQuery('select').selectpicker({
+        style: 'new-select',
+    });
+});

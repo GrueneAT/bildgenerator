@@ -1,44 +1,46 @@
 jQuery(function () {
-    // Eevnt: Choice meme from top 100
+    // Event: Choice meme from gallery
     jQuery('.memes-container').delegate('img', 'click', function () {
-        var $img = jQuery(this)
+        var $img = jQuery(this);
         var imgInfo = {
             url: $img.attr('src'),
             height: $img.attr('img-height'),
             width: $img.attr('img-width'),
-        }
-
-        jQuery('.choice-section').trigger('choice-done', imgInfo)
-    })
+        };
+        processMeme(imgInfo);
+    });
 
     // Event: Upload local image
     jQuery('#meme-input').on('change', function () {
         const file = this.files[0];
-        const fileType = file['type'];
+        if (!file) return;
+        
+        const fileType = file.type;
+        jQuery('#meme-input').val(''); // Reset file input
 
-        // Reset file input
-        jQuery('#meme-input').val('')
-
-        // Validate this is image
         if (!isImage(fileType)) {
-            showAlert('Error! Invalid Image')
-            return
+            showAlert('Error! Invalid Image');
+            return;
         }
 
-        const reader = new FileReader()
+        const reader = new FileReader();
         reader.onload = function () {
-            var meme = new Image()
-            meme.src = reader.result
+            var meme = new Image();
             meme.onload = function () {
-                var imgInfo = {
+                processMeme({
                     url: reader.result,
                     height: meme.height,
                     width: meme.width,
-                }
-                // jQuery('.choice-section').trigger('choice-done', imgInfo)
-                processMeme(imgInfo)
-            }
-        }
-        reader.readAsDataURL(file)
-    })
-})
+                });
+            };
+            meme.onerror = function () {
+                showAlert('Error loading image');
+            };
+            meme.src = reader.result;
+        };
+        reader.onerror = function () {
+            showAlert('Error reading file');
+        };
+        reader.readAsDataURL(file);
+    });
+});

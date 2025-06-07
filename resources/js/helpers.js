@@ -1,70 +1,87 @@
-// Update attribute of the current canvas object
+// Constants
+const CONSTANTS = {
+    FILENAME_LENGTH: 6,
+    ALERT_DURATION: 3000,
+    VALID_IMAGE_TYPES: ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml']
+};
+
+// Canvas utilities
 function setValue(key, value) {
-    if (canvas.getActiveObject() != null) {
-        var activeText = canvas.getActiveObject()
-        activeText.set(key, value)
+    const activeObject = canvas.getActiveObject();
+    if (activeObject) {
+        activeObject.set(key, value);
         canvas.renderAll();
     }
 }
 
-// Return current background color
 function getBackgroundColor(color) {
-    if (jQuery('#bg-option').hasClass('active')) {
-        return color
-    } else {
-        return ''
-    }
-}
-
-function disableTextMethods() {
-    jQuery('.text-method').attr('disabled', 'disabled')
-    jQuery('#font-family').selectpicker('refresh')
-    jQuery('.align').addClass('disabled')
-}
-
-function enableTextMethods() {
-    jQuery('.text-method').attr('disabled', false)
-    jQuery('#font-family').selectpicker('refresh')
-    jQuery('.align').removeClass('disabled')
-}
-
-function createShadow(color, width) {
-    return `${color} 2px 2px ${width}`
+    return jQuery('#bg-option').hasClass('active') ? color : '';
 }
 
 function setBackgroundColor(color) {
-    setValue("textBackgroundColor", getBackgroundColor(color))
+    setValue("textBackgroundColor", getBackgroundColor(color));
 }
 
+function createShadow(color, width) {
+    return `${color} 2px 2px ${width}`;
+}
+
+// UI utilities
+function refreshSelectPicker() {
+    jQuery('#font-family').selectpicker('refresh');
+}
+
+function toggleTextMethods(enable) {
+    const $textMethods = jQuery('.text-method');
+    const $alignButtons = jQuery('.align');
+    
+    if (enable) {
+        $textMethods.attr('disabled', false);
+        $alignButtons.removeClass('disabled');
+    } else {
+        $textMethods.attr('disabled', 'disabled');
+        $alignButtons.addClass('disabled');
+    }
+    refreshSelectPicker();
+}
+
+function disableTextMethods() {
+    toggleTextMethods(false);
+}
+
+function enableTextMethods() {
+    toggleTextMethods(true);
+}
+
+// Validation utilities
 function isImage(fileType) {
-    const validImageTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'];
-    if (validImageTypes.includes(fileType)) {
-        return true
-    }
-    return false
+    return CONSTANTS.VALID_IMAGE_TYPES.includes(fileType);
 }
 
-// Generate a random 6-character name
+// File utilities
 function createImgName() {
-    var result = '';
-    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    var charactersLength = characters.length;
-    for (var i = 0; i < 6; i++) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    
+    for (let i = 0; i < CONSTANTS.FILENAME_LENGTH; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-    var format = jQuery('#image-format').find(":selected").attr('value')
+    
+    const format = jQuery('#image-format').find(":selected").attr('value');
     return `${result}.${format}`;
 }
 
-// Show alert message
+// Alert utilities
 function showAlert(message) {
-    jQuery('.alert-container')
+    const $alertContainer = jQuery('.alert-container');
+    
+    $alertContainer
         .html(`<p class="text-center mb-0"><strong>${message}</strong></p>`)
         .fadeIn('normal', function () {
             setTimeout(function () {
-                jQuery('.alert-container').fadeOut('normal', function () {
-                    jQuery('.alert-container').html('')
-                })
-            }, 3000)
-        })
+                $alertContainer.fadeOut('normal', function () {
+                    $alertContainer.html('');
+                });
+            }, CONSTANTS.ALERT_DURATION);
+        });
 }

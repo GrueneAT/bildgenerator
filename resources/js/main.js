@@ -1,24 +1,26 @@
-var canvas;
-// Meme process
+// Application state
+let canvas;
+let contentRect;
+let contentImage;
+let logo;
+let logoName;
+let logoText;
+let scaleMax;
+let template;
 
-var contentRect;
-var contentImage;
-var logo;
-var logoName;
-var logoText
-var scaleMax;
-
-if (typeof generatorApplicationURL == 'undefined') {
+// Application URL fallback
+if (typeof generatorApplicationURL === 'undefined') {
     var generatorApplicationURL = "";
 }
 
+// Utility functions
 const isValidJSON = str => {
-  try {
-    JSON.parse(str);
-    return true;
-  } catch (e) {
-    return false;
-  }
+    try {
+        JSON.parse(str);
+        return true;
+    } catch (e) {
+        return false;
+    }
 };
 
 var template_values = {
@@ -137,43 +139,47 @@ function currentTemplate() {
 }
 
 function replaceCanvas() {
-    template = jQuery('#canvas-template').find(":selected").attr('value')
-    if (canvas != null) {
+    template = jQuery('#canvas-template').find(":selected").attr('value');
+    
+    // Cleanup existing canvas
+    if (canvas) {
         canvas.dispose();
     }
-    current_template = currentTemplate();
-    var width = current_template.width;
-    var height = current_template.height;
-    var topBorderMultiplier = current_template.topBorderMultiplier;
-    var border = current_template.border;
+    
+    const currentTemplate = template_values[template];
+    const { width, height, topBorderMultiplier, border } = currentTemplate;
 
-    jQuery(window).resize(resizeCanvas)
+    // Setup responsive canvas container
     function resizeCanvas() {
-        var wrapperWidth = jQuery('.fabric-canvas-wrapper').width()
-        jQuery('.canvas-container').css('width', wrapperWidth)
-        jQuery('.canvas-container').css('height', wrapperWidth * height / width)
+        const wrapperWidth = jQuery('.fabric-canvas-wrapper').width();
+        const $container = jQuery('.canvas-container');
+        $container.css({
+            'width': wrapperWidth,
+            'height': wrapperWidth * height / width
+        });
     }
 
-    // Intialize fabric canvas
+    jQuery(window).off('resize.canvas').on('resize.canvas', resizeCanvas);
+
+    // Initialize fabric canvas
     canvas = new fabric.Canvas('meme-canvas', {
-        width: width,
-        height: height,
+        width,
+        height,
         selection: false,
         allowTouchScrolling: true,
-        // objectCaching: false,
         backgroundColor: "rgba(138, 180, 20)",
         preserveObjectStacking: true,
     });
 
-    scaleMax = canvas.width * 0.0020
-    jQuery('#scale').attr('max', scaleMax)
+    // Setup scale limits
+    scaleMax = canvas.width * 0.0020;
+    jQuery('#scale').attr('max', scaleMax);
 
-    resizeCanvas();
-    canvas.renderAll();
+    // Calculate border distances
+    const borderDistance = canvas.width / border;
+    const topDistance = borderDistance * topBorderMultiplier;
 
-    topDistance = (canvas.width / border) * topBorderMultiplier
-    borderDistance = (canvas.width / border)
-
+    // Create content rectangle
     contentRect = new fabric.Rect({
         top: topDistance,
         left: borderDistance,
@@ -183,11 +189,16 @@ function replaceCanvas() {
         selectable: false,
     });
 
-    canvas.add(contentRect)
+    canvas.add(contentRect);
+    
+    // Initialize canvas features
+    resizeCanvas();
     enableSnap();
     enablePictureMove();
     enableScalingUpdates();
     addLogo();
+    
+    canvas.renderAll();
 }
 
 function addLogo() {
