@@ -399,7 +399,12 @@ jQuery('#add-text').off('click').on('click', function () {
 jQuery('#generate-meme').off('click').on('click', function () {
     if (logoText != "") {
         if (confirm("Hast du das Copyright bei Fotos überprüft und angegeben und das Impressum wo notwendig hinzugefügt?")) {
-            var dataURL = canvas.toDataURL({ format: jQuery('#image-format').find(":selected").attr('value'), quality: parseFloat(jQuery('#image-quality').find(":selected").attr('value')) });
+            var dataURL = canvas.toDataURL({ 
+                format: jQuery('#image-format').find(":selected").attr('value'), 
+                quality: parseFloat(jQuery('#image-quality').find(":selected").attr('value')),
+                multiplier: 300 / 72
+            });
+            
             var link = document.createElement('a');
             link.href = dataURL;
             link.download = createImgName();
