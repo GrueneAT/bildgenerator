@@ -28,7 +28,8 @@ var template_values = {
         topBorderMultiplier: 2,
         border: 10,
         logoTop: 0.830,
-        logoTextTop: 0.9423
+        logoTextTop: 0.9423,
+        dpi: 200
     },
     post: {
         width: 1080,
@@ -36,7 +37,8 @@ var template_values = {
         topBorderMultiplier: 1,
         border: 20,
         logoTop: 0.789,
-        logoTextTop: 0.947
+        logoTextTop: 0.947,
+        dpi: 200
     },
     event: {
         width: 1200,
@@ -44,7 +46,8 @@ var template_values = {
         topBorderMultiplier: 1,
         border: 20,
         logoTop: 0.678,
-        logoTextTop: 0.9
+        logoTextTop: 0.9,
+        dpi: 200
     },
     facebook_header: {
         width: 1958,
@@ -52,7 +55,8 @@ var template_values = {
         topBorderMultiplier: 1,
         border: 20,
         logoTop: 0.6,
-        logoTextTop: 0.872
+        logoTextTop: 0.872,
+        dpi: 150
     },
     a2: {
         width: 4961,
@@ -60,7 +64,8 @@ var template_values = {
         topBorderMultiplier: 1,
         border: 20,
         logoTop: 0.826,
-        logoTextTop: 0.964
+        logoTextTop: 0.964,
+        dpi: 150
     },
     a2_quer: {
         width: 7016,
@@ -68,7 +73,8 @@ var template_values = {
         topBorderMultiplier: 1,
         border: 20,
         logoTop: 0.739,
-        logoTextTop: 0.9257
+        logoTextTop: 0.9257,
+        dpi: 150
     },
     a3: {
         width: 3508,
@@ -76,7 +82,8 @@ var template_values = {
         topBorderMultiplier: 1,
         border: 20,
         logoTop: 0.826,
-        logoTextTop: 0.964
+        logoTextTop: 0.964,
+        dpi: 200
     },
     a3_quer: {
         width: 4961,
@@ -84,7 +91,8 @@ var template_values = {
         topBorderMultiplier: 1,
         border: 20,
         logoTop: 0.739,
-        logoTextTop: 0.9257
+        logoTextTop: 0.9257,
+        dpi: 200
     },
     a4: {
         width: 2480,
@@ -92,7 +100,8 @@ var template_values = {
         topBorderMultiplier: 1,
         border: 20,
         logoTop: 0.826,
-        logoTextTop: 0.964
+        logoTextTop: 0.964,
+        dpi: 250
     },
     a4_quer: {
         width: 3508,
@@ -100,7 +109,8 @@ var template_values = {
         topBorderMultiplier: 1,
         border: 20,
         logoTop: 0.739,
-        logoTextTop: 0.9257
+        logoTextTop: 0.9257,
+        dpi: 250
     },
     a5: {
         width: 1748,
@@ -108,7 +118,8 @@ var template_values = {
         topBorderMultiplier: 1,
         border: 20,
         logoTop: 0.826,
-        logoTextTop: 0.964
+        logoTextTop: 0.964,
+        dpi: 300
     },
     a5_quer: {
         width: 2480,
@@ -116,7 +127,8 @@ var template_values = {
         topBorderMultiplier: 1,
         border: 20,
         logoTop: 0.739,
-        logoTextTop: 0.9257
+        logoTextTop: 0.9257,
+        dpi: 300
     }
 }
 
@@ -399,16 +411,48 @@ jQuery('#add-text').off('click').on('click', function () {
 jQuery('#generate-meme').off('click').on('click', function () {
     if (logoText != "") {
         if (confirm("Hast du das Copyright bei Fotos überprüft und angegeben und das Impressum wo notwendig hinzugefügt?")) {
-            var dataURL = canvas.toDataURL({ 
-                format: jQuery('#image-format').find(":selected").attr('value'), 
-                quality: parseFloat(jQuery('#image-quality').find(":selected").attr('value')),
-                multiplier: 300 / 72
-            });
+            var currentTemplate = template_values[template];
+            var targetDPI = currentTemplate.dpi || 200; // Use template DPI or default 200
+            var screenDPI = 72;
+            var maxPixels = 250000000; // 250MP browser limit with safety margin
             
-            var link = document.createElement('a');
-            link.href = dataURL;
-            link.download = createImgName();
-            link.click();
+            var baseMultiplier = targetDPI / screenDPI;
+            var finalWidth = canvas.width * baseMultiplier;
+            var finalHeight = canvas.height * baseMultiplier;
+            var totalPixels = finalWidth * finalHeight;
+            
+            var actualMultiplier = baseMultiplier;
+            var actualDPI = targetDPI;
+            
+            if (totalPixels > maxPixels) {
+                actualMultiplier = Math.sqrt(maxPixels / (canvas.width * canvas.height));
+                actualDPI = Math.round(actualMultiplier * screenDPI);
+                console.warn(`Canvas too large for ${targetDPI} DPI. Reduced to ${actualDPI} DPI for format ${template}`);
+            }
+            
+            try {
+                var dataURL = canvas.toDataURL({ 
+                    format: jQuery('#image-format').find(":selected").attr('value'), 
+                    quality: parseFloat(jQuery('#image-quality').find(":selected").attr('value')),
+                    multiplier: actualMultiplier
+                });
+                
+                if (dataURL === "data:,") {
+                    throw new Error("Canvas export failed - empty result");
+                }
+                
+                var link = document.createElement('a');
+                link.href = dataURL;
+                link.download = createImgName();
+                link.click();
+                
+                if (actualDPI < targetDPI) {
+                    alert(`Download erfolgreich mit ${actualDPI} DPI (reduziert von ${targetDPI} DPI für Kompatibilität)`);
+                }
+            } catch (error) {
+                console.error("Canvas export error:", error);
+                alert("Fehler beim Erstellen des Bildes. Das Format ist möglicherweise zu groß für diesen Browser.");
+            }
         }
     } else {
         alert("Wähle bitte ein Logo aus vor dem Download!")
