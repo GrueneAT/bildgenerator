@@ -59,7 +59,6 @@ function loadObjectHandlers() {
     });
 
     bindHandler('#text-color', 'change', function () {
-        refreshSelectPicker();
         const activeObject = canvas.getActiveObject();
         if (activeObject && activeObject.get('type') === "text") {
             setValue("fill", jQuery(this).find(":selected").attr('value'));
@@ -67,7 +66,12 @@ function loadObjectHandlers() {
     });
 
     bindHandler('input[name="align"]', 'change', function () {
-        setValue("textAlign", jQuery(this).attr('id'));
+        const alignValue = jQuery(this).attr('id');
+        console.log('Text alignment changed to:', alignValue);
+        setValue("textAlign", alignValue);
+        
+        // Also trigger visual update
+        jQuery(this).parent().trigger('update-status');
     });
 
     bindHandler('#stroke-width', 'input', function () {

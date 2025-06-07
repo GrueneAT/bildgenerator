@@ -8,9 +8,14 @@ const CONSTANTS = {
 // Canvas utilities
 function setValue(key, value) {
     const activeObject = canvas.getActiveObject();
+    console.log('setValue called:', key, '=', value, 'on object:', activeObject);
+    
     if (activeObject) {
         activeObject.set(key, value);
         canvas.renderAll();
+        console.log('Value set successfully. New value:', activeObject.get(key));
+    } else {
+        console.log('No active object to set value on');
     }
 }
 
@@ -28,7 +33,8 @@ function createShadow(color, width) {
 
 // UI utilities
 function refreshSelectPicker() {
-    jQuery('#font-family').selectpicker('refresh');
+    // No longer needed with Tailwind CSS
+    // Bootstrap-select has been removed
 }
 
 function toggleTextMethods(enable) {
@@ -72,16 +78,6 @@ function createImgName() {
 }
 
 // Alert utilities
-function showAlert(message) {
-    const $alertContainer = jQuery('.alert-container');
-    
-    $alertContainer
-        .html(`<p class="text-center mb-0"><strong>${message}</strong></p>`)
-        .fadeIn('normal', function () {
-            setTimeout(function () {
-                $alertContainer.fadeOut('normal', function () {
-                    $alertContainer.html('');
-                });
-            }, CONSTANTS.ALERT_DURATION);
-        });
+function showAlert(message, type = 'danger') {
+    showTailwindAlert(message, type);
 }

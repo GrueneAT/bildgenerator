@@ -140,12 +140,12 @@ function currentTemplate() {
 
 function replaceCanvas() {
     template = jQuery('#canvas-template').find(":selected").attr('value');
-    
+
     // Cleanup existing canvas
     if (canvas) {
         canvas.dispose();
     }
-    
+
     const currentTemplate = template_values[template];
     const { width, height, topBorderMultiplier, border } = currentTemplate;
 
@@ -190,14 +190,14 @@ function replaceCanvas() {
     });
 
     canvas.add(contentRect);
-    
+
     // Initialize canvas features
     resizeCanvas();
     enableSnap();
     enablePictureMove();
     enableScalingUpdates();
     addLogo();
-    
+
     canvas.renderAll();
 }
 
@@ -377,15 +377,12 @@ function enableSnap() {
 
 replaceCanvas();
 jQuery('#canvas-template').off('change').on('change', function () {
-    jQuery('#canvas-template').selectpicker('refresh');
     replaceCanvas();
 })
 jQuery('#logo-selection').off('change').on('change', function () {
-    jQuery('#logo-selection').selectpicker('refresh');
     addLogo();
 })
 jQuery('#scale-direction').off('change').on('change', function () {
-    jQuery('#scale-direction').selectpicker('refresh');
     positionBackgroundImage();
 })
 jQuery('#add-text').off('click').on('click', function () {
@@ -426,37 +423,37 @@ jQuery('#generate-meme').off('click').on('click', function () {
             var targetDPI = currentTemplate.dpi || 200; // Use template DPI or default 200
             var screenDPI = 72;
             var maxPixels = 250000000; // 250MP browser limit with safety margin
-            
+
             var baseMultiplier = targetDPI / screenDPI;
             var finalWidth = canvas.width * baseMultiplier;
             var finalHeight = canvas.height * baseMultiplier;
             var totalPixels = finalWidth * finalHeight;
-            
+
             var actualMultiplier = baseMultiplier;
             var actualDPI = targetDPI;
-            
+
             if (totalPixels > maxPixels) {
                 actualMultiplier = Math.sqrt(maxPixels / (canvas.width * canvas.height));
                 actualDPI = Math.round(actualMultiplier * screenDPI);
                 console.warn(`Canvas too large for ${targetDPI} DPI. Reduced to ${actualDPI} DPI for format ${template}`);
             }
-            
+
             try {
-                var dataURL = canvas.toDataURL({ 
-                    format: jQuery('#image-format').find(":selected").attr('value'), 
+                var dataURL = canvas.toDataURL({
+                    format: jQuery('#image-format').find(":selected").attr('value'),
                     quality: parseFloat(jQuery('#image-quality').find(":selected").attr('value')),
                     multiplier: actualMultiplier
                 });
-                
+
                 if (dataURL === "data:,") {
                     throw new Error("Canvas export failed - empty result");
                 }
-                
+
                 var link = document.createElement('a');
                 link.href = dataURL;
                 link.download = createImgName();
                 link.click();
-                
+
                 if (actualDPI < targetDPI) {
                     alert(`Download erfolgreich mit ${actualDPI} DPI (reduziert von ${targetDPI} DPI für Kompatibilität)`);
                 }
@@ -506,22 +503,85 @@ jQuery('#remove-element').off('click').on('click', function () {
 })
 
 jQuery('#add-circle').off('click').on('click', function () {
-    jQuery('#circle-radius').selectpicker('refresh');
     var active_image = canvas.getActiveObject();
-    size = parseInt(jQuery('#circle-radius').find(":selected").attr('value'))
-    if (active_image != contentImage) {
-        var radius = Math.min(active_image.height, active_image.width) / size
-        var clipPath = new fabric.Circle({
-            radius: radius,
-            top: radius * -1,
-            left: radius * -1
-        });
-        if (active_image.clipPath != null) {
-            active_image.clipPath = null;
-        } else {
-            active_image.clipPath = clipPath;
+    var sizeString = jQuery('#circle-radius').val();
+    var size = parseInt(sizeString) || 2;
+
+    console.log('=== BUTTON CLICK DEBUG ===');
+    console.log('Raw size value from dropdown:', sizeString);
+    console.log('Parsed size value:', size);
+    console.log('Size type:', typeof size);
+
+    // Check if we have a valid object selected
+    if (!active_image) {
+        showAlert('Bitte wählen Sie zuerst ein Objekt aus', 'warning');
+        return;
+    }
+
+    // Check if it's a valid object type for circle clipping
+    var isValidForCircle = active_image &&
+        active_image !== contentImage &&
+        active_image !== contentRect &&
+        active_image !== logo &&
+        active_image !== logoName &&
+        (active_image.type === 'image' || active_image.type === 'rect' || active_image.type === 'circle');
+
+    if (isValidForCircle) {
+        // Get actual object dimensions
+        var objectWidth = active_image.getScaledWidth();
+        var objectHeight = active_image.getScaledHeight();
+        var smallestDimension = Math.min(objectHeight, objectWidth);
+
+        console.log('=== CIRCLE DEBUG ===');
+        console.log('Selected size value:', size);
+        console.log('Object dimensions:', objectWidth, 'x', objectHeight);
+        console.log('Smallest dimension:', smallestDimension);
+
+        // Map size values to much larger percentages for dramatic effect
+        var sizeMultiplier;
+        switch (size) {
+            case 2: sizeMultiplier = 1.0; break;   // Groß - full size circle
+            case 3: sizeMultiplier = 0.85; break;  // Mittel - large circle
+            case 4: sizeMultiplier = 0.7; break;   // Klein - medium circle
+            default: sizeMultiplier = 0.85; break; // Default to Mittel
         }
+
+        console.log('Size multiplier:', sizeMultiplier);
+
+        // Calculate radius - this should be MUCH larger now
+        var radius = (smallestDimension * sizeMultiplier);
+
+        console.log('Calculated radius:', radius);
+        console.log('Radius as % of smallest dimension:', (radius / (smallestDimension / 2) * 100).toFixed(1) + '%');
+
+        if (active_image.clipPath) {
+            // Remove existing circle overlay
+            active_image.clipPath = null;
+            showAlert('Kreis entfernt', 'success');
+        } else {
+            // Create circle clip path with simple positioning
+            var clipPath = new fabric.Circle({
+                radius: radius,
+                top: -radius,
+                left: -radius
+            });
+
+            console.log('Final clipPath circle - radius:', radius);
+            console.log('Expected circle diameter:', radius * 2);
+            console.log('Object smallest dimension:', smallestDimension);
+            console.log('Circle coverage:', ((radius * 2) / smallestDimension * 100).toFixed(1) + '%');
+
+            active_image.clipPath = clipPath;
+
+            var sizeLabel = (size === 2 ? 'Groß' : size === 3 ? 'Mittel' : 'Klein');
+            showAlert('Kreis hinzugefügt - Größe: ' + sizeLabel + ' (Radius: ' + Math.round(radius) + 'px, Durchmesser: ' + Math.round(radius * 2) + 'px)', 'success');
+        }
+
         canvas.renderAll();
+    } else if (active_image === contentImage) {
+        showAlert('Kreis kann nicht auf das Hintergrundbild angewendet werden. Fügen Sie zuerst ein Bild ein.', 'warning');
+    } else {
+        showAlert('Kreis kann nur auf eingefügte Bilder angewendet werden', 'warning');
     }
 })
 
@@ -549,11 +609,11 @@ jQuery('#add-pink-circle').off('click').on('click', function () {
 
 jQuery('#add-cross').off('click').on('click', function () {
     fabric.Image.fromURL(generatorApplicationURL + "resources/images/Ankreuzen.png", function (image) {
-    image.scaleToWidth(canvas.width / 2)
-    canvas.add(image);
-    canvas.centerObject(image);
-    canvas.bringToFront(image);
-    // canvas.sendToBack(image)
+        image.scaleToWidth(canvas.width / 2)
+        canvas.add(image);
+        canvas.centerObject(image);
+        canvas.bringToFront(image);
+        // canvas.sendToBack(image)
     });
 })
 
@@ -634,29 +694,36 @@ function positionBackgroundImage() {
 }
 
 function generateLogoSelection(data) {
+    const $logoSelect = jQuery("#logo-selection");
+
     jQuery.each(data, function (index, names) {
         var items = [];
         jQuery.each(names.sort(), function (index, name) {
             items.push('<option value="' + name.toUpperCase() + '">' + name.replace('%', ' ').toUpperCase() + "</option>");
         });
-        jQuery("#logo-selection").append('<optgroup label="' + index + '">' + items.join("") + '</optgroup>');
-        jQuery('#logo-selection').selectpicker('refresh');
+        $logoSelect.append('<optgroup label="' + index + '">' + items.join("") + '</optgroup>');
     });
+
+    // Refresh the searchable select component
+    const searchableSelect = $logoSelect.data('searchable-select');
+    if (searchableSelect) {
+        searchableSelect.refresh();
+    }
 }
 
 function loadLogoSelection() {
     const defaultIndex = generatorApplicationURL + "resources/images/logos/index.json"
-    
+
     if (typeof logoDataOverride !== "undefined") {
-        if (isValidJSON(logoDataOverride)){
+        if (isValidJSON(logoDataOverride)) {
             generateLogoSelection(jQuery.parseJSON(logoDataOverride))
             return
         }
     }
-    
+
     if (typeof logoIndexOverride !== "undefined") {
         logoIndex = logoIndexOverride
-    }else{
+    } else {
         logoIndex = defaultIndex
     }
 

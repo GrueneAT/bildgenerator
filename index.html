@@ -14,57 +14,69 @@
     <meta name="theme-color" content="#ffffff">
     <!-- Fontawesome -->
     <link rel="stylesheet" href="vendors/fontawesome/css/all.css">
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="vendors/bootstrap/bootstrap.min.css">
-    <!-- Bootstrap select-->
-    <link rel="stylesheet" href="vendors/bootstrap-select/bootstrap-select.min.css">
+    <!-- Tailwind CSS -->
+    <link rel="stylesheet" href="resources/css/output.css">
     <!-- Fonts -->
     <link rel="stylesheet" type="text/css" href="resources/css/fonts.css">
-    <!-- Style -->
+    <!-- Custom styles -->
     <link rel='stylesheet' type='text/css' media='screen' href='resources/css/style.css'>
 </head>
 
-<body>
-    <div class="container col-12">
-        <div class="header row">
-            <div class="col-12 text-center">
-                <h1 class="text-dark display-5"><img src="resources/images/gruene-logo.svg" width=50 />rüner
-                    Bildgenerator
+<body class="bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="header py-6">
+            <div class="text-center">
+                <h1 class="text-gray-900 text-4xl font-bold flex items-center justify-center gap-2">
+                    <img src="resources/images/gruene-logo.svg" width="50" alt="GRÜNE Logo" />
+                    rüner Bildgenerator
                 </h1>
-                <span class="text-muted discription mb-2 ">
-
-                    <p>Bild Generator, basierend auf Meme-it. <a href="https://github.com/GrueneAT/bildgenerator"
-                            target="_blank" class="badge badge-dark"><i class="fab fa-github mr-1"></i>GitHub</a></p>
-                    <p>Fragen, Wünsche oder Ideen bitte an <a href="mailto:florian.motlik@gruene.at" target="_blank"
-                            class="badge badge-dark">florian.motlik@gruene.at</a></p>
-                    <a href="#" class="btn btn-success" data-toggle="modal" data-target="#videoModal"
-                        data-theVideo="https://www.youtube.com/embed/ukLWMNFAei0">Erklärungsvideo anzeigen</a>
-                </span>
+                <div class="text-gray-600 mt-4 space-y-2">
+                    <p>Bild Generator, basierend auf Meme-it. 
+                        <a href="https://github.com/GrueneAT/bildgenerator" target="_blank" 
+                           class="badge badge-dark inline-flex items-center gap-1">
+                            <i class="fab fa-github"></i>GitHub
+                        </a>
+                    </p>
+                    <p>Fragen, Wünsche oder Ideen bitte an 
+                        <a href="mailto:florian.motlik@gruene.at" target="_blank" class="badge badge-dark">
+                            florian.motlik@gruene.at
+                        </a>
+                    </p>
+                    <button type="button" class="btn-primary" id="video-modal-btn"
+                            data-video="https://www.youtube.com/embed/ukLWMNFAei0">
+                        Erklärungsvideo anzeigen
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-    <div class="modal fade" id="videoModal" tabindex="-1" role="dialog" aria-labelledby="videoModal" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <div>
-                        <iframe width="100%" height="350" src=""></iframe>
-                    </div>
-                </div>
+    <!-- Video Modal -->
+    <div id="videoModal" class="modal-overlay hidden">
+        <div class="modal-container max-w-3xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Erklärungsvideo</h3>
+                <button type="button" class="text-gray-400 hover:text-gray-600" id="close-modal">
+                    <span class="sr-only">Schließen</span>
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="aspect-video">
+                <iframe id="video-iframe" width="100%" height="100%" src="" frameborder="0" allowfullscreen></iframe>
             </div>
         </div>
     </div>
     <div id="generator">
-        <div class="container edit-section pt-2">
-            <div class="row d-lg-none d-md-none">
-                <div class="col">
-                    <p>Auf mobilen Endgeräten funktionieren nicht alle Vorlagen gut, bitte in dem Fall auf einem
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="block lg:hidden md:hidden">
+                <div class="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-4">
+                    <p class="text-yellow-800">Auf mobilen Endgeräten funktionieren nicht alle Vorlagen gut, bitte in dem Fall auf einem
                         größeren Bildschirm bearbeiten.</p>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-md-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4">
                     <div>
                         <div class="grid memes-container">
                             <div class="grid-sizer"></div>
@@ -73,161 +85,133 @@
                     <div class="meme-preview">
                         <div class="fabric-canvas-wrapper"><canvas id="meme-canvas"></canvas></div>
                     </div>
-                    <div class="form-group">
-                        <label for="scale">Skalierung:</label>
-                        <input type="range" class="form-control-range" id="scale" min="0.1" step="0.01" , max="2">
+                    <div class="space-y-2">
+                        <label for="scale" class="block text-sm font-medium text-gray-700">Skalierung:</label>
+                        <input type="range" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" 
+                               id="scale" min="0.1" step="0.01" max="2">
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="row mb-3">
-                        <div class="col">
-                            <label for="canvas-template">Vorlage:</label>
-                            <span class="input-group-append">
-                                <select class="form-control text-method" name="canvas-template" id="canvas-template"
-                                    data-live-search="true">
-                                    <optgroup label="Social Media">
-                                        <option value="post">Post</option>
-                                        <option value="story">Story</option>
-                                        <option value="event">Veranstaltung</option>
-                                        <option value="facebook_header">Facebook Header</option>
-                                    </optgroup>
-                                    <optgroup label="Druck">
-                                        <option value="a2">A2</option>
-                                        <option value="a2_quer">A2 Querformat</option>
-                                        <option value="a3">A3</option>
-                                        <option value="a3_quer">A3 Querformat</option>
-                                        <option value="a4">A4</option>
-                                        <option value="a4_quer">A4 Querformat</option>
-                                        <option value="a5">A5</option>
-                                        <option value="a5_quer">A5 Querformat</option>
-                                    </optgroup>
-                                </select>
-                            </span>
+                <div class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="canvas-template" class="block text-sm font-medium text-gray-700 mb-1">Vorlage:</label>
+                            <select class="form-select text-method" name="canvas-template" id="canvas-template">
+                                <optgroup label="Social Media">
+                                    <option value="post">Post</option>
+                                    <option value="story">Story</option>
+                                    <option value="event">Veranstaltung</option>
+                                    <option value="facebook_header">Facebook Header</option>
+                                </optgroup>
+                                <optgroup label="Druck">
+                                    <option value="a2">A2</option>
+                                    <option value="a2_quer">A2 Querformat</option>
+                                    <option value="a3">A3</option>
+                                    <option value="a3_quer">A3 Querformat</option>
+                                    <option value="a4">A4</option>
+                                    <option value="a4_quer">A4 Querformat</option>
+                                    <option value="a5">A5</option>
+                                    <option value="a5_quer">A5 Querformat</option>
+                                </optgroup>
+                            </select>
                         </div>
-                        <div class="col">
-                            <label for="logo">Logo für:</label>
-                            <span class="input-group-append">
-                                <select class="form-control text-method" name="logo-selection" id="logo-selection"
-                                    data-live-search="true">
-                                    <optgroup label="Allgemein">
-                                        <option value="">Logo Auswählen</option>
-                                    </optgroup>
-                                </select>
-                            </span>
+                        <div>
+                            <label for="logo-selection" class="block text-sm font-medium text-gray-700 mb-1">Logo für:</label>
+                            <select class="form-select text-method" name="logo-selection" id="logo-selection">
+                                <optgroup label="Allgemein">
+                                    <option value="">Logo Auswählen</option>
+                                </optgroup>
+                            </select>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col">
-                            <input type="file" class="d-none" id="meme-input">
-                            <label class="btn btn-success btn-block" for="meme-input">Hintergrundbild aussuchen</label>
-                        </div>
+                    <div>
+                        <input type="file" class="hidden" id="meme-input">
+                        <label class="btn-primary btn-block cursor-pointer" for="meme-input">Hintergrundbild aussuchen</label>
                     </div>
-                    <div class="form-group">
-                        <label for="text">Text: </label>
-                        <div class="input-group cp" id="cp-text">
-                            <textarea class="form-control text-method" id="text" placeholder="Type your text here"
-                                rows="2"></textarea>
-                        </div>
+                    
+                    <div>
+                        <label for="text" class="block text-sm font-medium text-gray-700 mb-1">Text:</label>
+                        <textarea class="form-input text-method" id="text" placeholder="Type your text here" rows="2"></textarea>
                     </div>
-                    <div class="row mb-3">
-                        <div class="col">
-                            <label for="text-color">Schriftfarbe: </label>
-                            <span class="input-group-append">
-                                <select class="form-control text-method" name="text-color" id="text-color">
-                                    <option value="rgb(255,240,0)">Gelb</option>
-                                    <option value="rgb(255,255,255)">Weiß</option>
-                                </select>
-                            </span>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label for="text-color" class="block text-sm font-medium text-gray-700 mb-1">Schriftfarbe:</label>
+                            <select class="form-select text-method" name="text-color" id="text-color">
+                                <option value="rgb(255,240,0)">Gelb</option>
+                                <option value="rgb(255,255,255)">Weiß</option>
+                            </select>
                         </div>
-                        <div class="col">
-                            <label for="shadow-depth">Schlagschatten: </label>
-                            <input class="form-control text-method" type="number" value="3" id="shadow-depth" min="0"
-                                max="30" placeholder="0">
+                        <div>
+                            <label for="shadow-depth" class="block text-sm font-medium text-gray-700 mb-1">Schlagschatten:</label>
+                            <input class="form-input text-method" type="number" value="3" id="shadow-depth" min="0" max="30" placeholder="0">
                         </div>
-                        <div class="col">
-                            <label>Text Ausrichtung: </label>
-                            <div>
-                                <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                    <label class="btn btn-success active align">
-                                        <input type="radio" value="left" name="align" id="left" checked> <i
-                                            class="fas fa-align-left"></i>
-                                    </label>
-                                    <label class="btn btn-success align">
-                                        <input type="radio" value="center" name="align" id="center"> <i
-                                            class="fas fa-align-center"></i>
-                                    </label>
-                                    <label class="btn btn-success align">
-                                        <input type="radio" value="right" name="align" id="right"> <i
-                                            class="fas fa-align-right"></i>
-                                    </label>
-                                </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Text Ausrichtung:</label>
+                            <div class="btn-group">
+                                <label class="btn-primary active align cursor-pointer">
+                                    <input type="radio" value="left" name="align" id="left" checked class="sr-only">
+                                    <i class="fas fa-align-left"></i>
+                                </label>
+                                <label class="btn-primary align cursor-pointer">
+                                    <input type="radio" value="center" name="align" id="center" class="sr-only">
+                                    <i class="fas fa-align-center"></i>
+                                </label>
+                                <label class="btn-primary align cursor-pointer">
+                                    <input type="radio" value="right" name="align" id="right" class="sr-only">
+                                    <i class="fas fa-align-right"></i>
+                                </label>
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
-                        <div class="col">
-                            <button class="btn btn-success btn-block" id="add-text">Text einfügen</button>
-                        </div>
+                    <button class="btn-primary btn-block" id="add-text">Text einfügen</button>
+                    
+                    <button class="btn-primary btn-block" id="add-pink-circle">Rosa Kreis einfügen</button>
+                    
+                    <button class="btn-primary btn-block" id="add-cross">Kreuz einfügen</button>
+                    
+                    <div>
+                        <input type="file" class="hidden" id="add-image">
+                        <label class="btn-primary btn-block cursor-pointer" for="add-image">Bild einfügen</label>
                     </div>
-                    <div class="row mb-3">
-                        <div class="col">
-                            <button class="btn-block btn btn-success" id="add-pink-circle">Rosa Kreis einfügen</button>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col">
-                            <button class="btn-block btn btn-success" id="add-cross">Kreuz einfügen</button>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            <input type="file" class="d-none" id="add-image">
-                            <label class="btn btn-success btn-block" for="add-image">Bild einfügen</label>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col">
-                            <button class="btn btn-success btn-block" id="add-circle">Kreis Rand an/aus</button>
-                        </div>
-                        <div class="col">
-                            <label for="circle-radius" class="d-inline">Kreis Größe:</label>
-                            <select class="d-inline form-inline" name="circle-radius" id="circle-radius">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <button class="btn-primary" id="add-circle">Kreis Rand an/aus</button>
+                        <div>
+                            <label for="circle-radius" class="block text-sm font-medium text-gray-700 mb-1">Kreis Größe:</label>
+                            <select class="form-select" name="circle-radius" id="circle-radius">
                                 <option value="2">Groß</option>
                                 <option value="3">Mittel</option>
                                 <option value="4">Klein</option>
                             </select>
                         </div>
                     </div>
-                    <div class="row mb-3">
-                        <div class="col">
-                            <button class="btn-block btn btn-danger" id="remove-element">Text/Bild löschen</button>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            <label for="image-format">Download Format: </label>
-                            <select class="form-control text-method" name="image-format" id="image-format">
+                    
+                    <button class="btn-danger btn-block" id="remove-element">Text/Bild löschen</button>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label for="image-format" class="block text-sm font-medium text-gray-700 mb-1">Download Format:</label>
+                            <select class="form-select text-method" name="image-format" id="image-format">
                                 <option value="jpeg">JPEG</option>
                                 <option value="png">PNG</option>
                             </select>
                         </div>
-                        <div class="col">
-                            <label for="font-size">Qualität(bei JPEG): </label>
-                            <select class="form-control text-method" name="image-quality" id="image-quality">
+                        <div>
+                            <label for="image-quality" class="block text-sm font-medium text-gray-700 mb-1">Qualität(bei JPEG):</label>
+                            <select class="form-select text-method" name="image-quality" id="image-quality">
                                 <option value="1.0">Groß</option>
                                 <option value="0.5">Mittel</option>
                                 <option value="0.1">Klein</option>
                             </select>
                         </div>
-                        <div class="col">
-                            <button class="btn btn-success" id="generate-meme">Download</button>
+                        <div class="flex items-end">
+                            <button class="btn-primary w-full" id="generate-meme">Download</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-12 alert-container alert alert-danger" style="display: none;"></div>
+        <div class="alert-container max-w-7xl mx-auto px-4 mt-4 hidden"></div>
 
         <script id="meme-template" type="x-tmpl-mustache">
             <div class="grid-item">
@@ -237,19 +221,14 @@
     </div>
 
     <script src="vendors/jquery/jquery-3.7.1.min.js"></script>
-    <script src="vendors/popper/popper.min.js"></script>
-    <script src="vendors/bootstrap/bootstrap.min.js"></script>
-
     <script src="vendors/mustache/mustache.js"></script>
     <script src="vendors/imagesloaded/imagesloaded.pkgd.min.js"></script>
     <script src="vendors/masonry/masonry.pkgd.min.js"></script>
-
     <script src="vendors/fabric-js/fabric.min.js"></script>
-
-    <script src="vendors/bootstrap-select/bootstrap-select.min.js"></script>
-
     <script src="vendors/fontfaceobserver/fontfaceobserver.standalone.js"></script>
 
+    <script src="resources/js/modal.js"></script>
+    <script src="resources/js/searchable-select.js"></script>
     <script src="resources/js/initialization.js"></script>
     <script src="resources/js/helpers.js"></script>
     <script src="resources/js/choice-image.js"></script>
