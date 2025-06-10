@@ -502,6 +502,16 @@ jQuery('#remove-element').off('click').on('click', function () {
     }
 })
 
+jQuery('#bring-to-front').off('click').on('click', function () {
+    var activeObject = canvas.getActiveObject();
+    if (activeObject && activeObject != contentImage && activeObject != contentRect) {
+        canvas.bringToFront(activeObject);
+        // Keep logo always on top
+        logo_to_front();
+        canvas.renderAll();
+    }
+})
+
 jQuery('#add-circle').off('click').on('click', function () {
     var active_image = canvas.getActiveObject();
     var sizeString = jQuery('#circle-radius').val();
@@ -615,6 +625,67 @@ jQuery('#add-cross').off('click').on('click', function () {
         canvas.bringToFront(image);
         // canvas.sendToBack(image)
     });
+})
+
+jQuery('#add-qr-code').off('click').on('click', function () {
+    const qrText = jQuery('#qr-text').val().trim();
+    
+    if (qrText === '') {
+        showAlert('Error! QR Code Text field is empty')
+        return;
+    }
+    
+    // Check if QRCode library is available
+    if (typeof QRCode === 'undefined') {
+        showAlert('Error! QR Code library not loaded')
+        return;
+    }
+    
+    // Create a temporary div to generate QR code
+    const tempDiv = document.createElement('div');
+    tempDiv.style.display = 'none';
+    document.body.appendChild(tempDiv);
+    
+    try {
+        // Calculate optimal QR code size based on canvas dimensions
+        // Target QR size should be proportional to canvas size for sharpness
+        const targetQRSize = Math.max(512, Math.min(2048, Math.floor(canvas.width / 4)));
+        
+        // Generate QR code using qrcodejs library
+        const qr = new QRCode(tempDiv, {
+            text: qrText,
+            width: targetQRSize,
+            height: targetQRSize,
+            colorDark: '#000000',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.M
+        });
+        
+        // Wait a moment for QR code to be generated, then extract the image
+        setTimeout(function() {
+            const qrImg = tempDiv.querySelector('img');
+            if (qrImg) {
+                // Add QR code image to canvas
+                fabric.Image.fromURL(qrImg.src, function (qrImage) {
+                    qrImage.scaleToWidth(canvas.width / 4);
+                    relativeScalingControlsOnly(qrImage);
+                    canvas.add(qrImage).setActiveObject(qrImage);
+                    canvas.centerObject(qrImage);
+                    updateScale(qrImage);
+                    logo_to_front();
+                    
+                    // Clean up
+                    document.body.removeChild(tempDiv);
+                });
+            } else {
+                showAlert('Error generating QR Code image');
+                document.body.removeChild(tempDiv);
+            }
+        }, 100);
+    } catch (error) {
+        showAlert('Error generating QR Code: ' + error.message);
+        document.body.removeChild(tempDiv);
+    }
 })
 
 
