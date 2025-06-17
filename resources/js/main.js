@@ -199,6 +199,13 @@ function replaceCanvas() {
     addLogo();
 
     canvas.renderAll();
+    
+    // Update dimensions display if the function exists (from wizard.js)
+    if (typeof updateCanvasDimensions === 'function') {
+        setTimeout(() => {
+            updateCanvasDimensions();
+        }, 50);
+    }
 }
 
 function addLogo() {
@@ -378,6 +385,12 @@ function enableSnap() {
 replaceCanvas();
 jQuery('#canvas-template').off('change').on('change', function () {
     replaceCanvas();
+    // Update dimensions display if the function exists (from wizard.js)
+    if (typeof updateCanvasDimensions === 'function') {
+        setTimeout(() => {
+            updateCanvasDimensions();
+        }, 100);
+    }
 })
 jQuery('#logo-selection').off('change').on('change', function () {
     addLogo();
@@ -524,7 +537,7 @@ jQuery('#add-circle').off('click').on('click', function () {
 
     // Check if we have a valid object selected
     if (!active_image) {
-        showAlert('Bitte wählen Sie zuerst ein Objekt aus', 'warning');
+        showAlert('Bitte wählen Sie zuerst ein Element aus, um einen Kreis-Ausschnitt anzuwenden.', 'warning');
         return;
     }
 
@@ -537,61 +550,64 @@ jQuery('#add-circle').off('click').on('click', function () {
         (active_image.type === 'image' || active_image.type === 'rect' || active_image.type === 'circle');
 
     if (isValidForCircle) {
-        // Get actual object dimensions
-        var objectWidth = active_image.getScaledWidth();
-        var objectHeight = active_image.getScaledHeight();
-        var smallestDimension = Math.min(objectHeight, objectWidth);
+        // Get the original (unscaled) dimensions of the image
+        var originalWidth = active_image.width;
+        var originalHeight = active_image.height;
+        var smallestOriginalDimension = Math.min(originalHeight, originalWidth);
 
         console.log('=== CIRCLE DEBUG ===');
         console.log('Selected size value:', size);
-        console.log('Object dimensions:', objectWidth, 'x', objectHeight);
-        console.log('Smallest dimension:', smallestDimension);
+        console.log('Original image dimensions:', originalWidth, 'x', originalHeight);
+        console.log('Current scale factors:', active_image.scaleX, active_image.scaleY);
+        console.log('Smallest original dimension:', smallestOriginalDimension);
 
-        // Map size values to much larger percentages for dramatic effect
-        var sizeMultiplier;
+        // Map size values to percentages (90%, 70%, 50%)
+        var sizePercentage;
         switch (size) {
-            case 2: sizeMultiplier = 1.0; break;   // Groß - full size circle
-            case 3: sizeMultiplier = 0.85; break;  // Mittel - large circle
-            case 4: sizeMultiplier = 0.7; break;   // Klein - medium circle
-            default: sizeMultiplier = 0.85; break; // Default to Mittel
+            case 2: sizePercentage = 0.9; break;   // Groß - 90%
+            case 3: sizePercentage = 0.7; break;   // Mittel - 70%  
+            case 4: sizePercentage = 0.5; break;   // Klein - 50%
+            default: sizePercentage = 0.7; break;  // Default to Mittel
         }
 
-        console.log('Size multiplier:', sizeMultiplier);
+        console.log('Size percentage:', (sizePercentage * 100) + '%');
 
-        // Calculate radius - this should be MUCH larger now
-        var radius = (smallestDimension * sizeMultiplier);
+        // Calculate radius based on original dimensions (not scaled)
+        // This ensures consistent circle sizes regardless of image scaling
+        var radius = (smallestOriginalDimension * sizePercentage) / 2;
 
-        console.log('Calculated radius:', radius);
-        console.log('Radius as % of smallest dimension:', (radius / (smallestDimension / 2) * 100).toFixed(1) + '%');
+        console.log('Calculated radius (original scale):', radius);
+        console.log('Circle diameter (original scale):', radius * 2);
+        console.log('Circle coverage of original image:', (sizePercentage * 100).toFixed(0) + '%');
 
         if (active_image.clipPath) {
             // Remove existing circle overlay
             active_image.clipPath = null;
-            showAlert('Kreis entfernt', 'success');
         } else {
-            // Create circle clip path with simple positioning
+            // Create circle clip path centered on the object
+            // For Fabric.js clipPath, the coordinates are relative to the object's local coordinate system
+            // Center the circle at (0,0) which is the object's origin
             var clipPath = new fabric.Circle({
                 radius: radius,
-                top: -radius,
-                left: -radius
+                left: 0,
+                top: 0,
+                originX: 'center',
+                originY: 'center'
             });
 
             console.log('Final clipPath circle - radius:', radius);
-            console.log('Expected circle diameter:', radius * 2);
-            console.log('Object smallest dimension:', smallestDimension);
-            console.log('Circle coverage:', ((radius * 2) / smallestDimension * 100).toFixed(1) + '%');
+            console.log('ClipPath centered at object origin (0,0)');
 
             active_image.clipPath = clipPath;
-
-            var sizeLabel = (size === 2 ? 'Groß' : size === 3 ? 'Mittel' : 'Klein');
-            showAlert('Kreis hinzugefügt - Größe: ' + sizeLabel + ' (Radius: ' + Math.round(radius) + 'px, Durchmesser: ' + Math.round(radius * 2) + 'px)', 'success');
         }
 
         canvas.renderAll();
     } else if (active_image === contentImage) {
-        showAlert('Kreis kann nicht auf das Hintergrundbild angewendet werden. Fügen Sie zuerst ein Bild ein.', 'warning');
+        showAlert('Kreis-Ausschnitt kann nicht auf das Hintergrundbild angewendet werden. Fügen Sie zuerst ein eigenes Bild über "Bild hinzufügen" ein.', 'warning');
+    } else if (active_image === logo || active_image === logoName) {
+        showAlert('Kreis-Ausschnitt kann nicht auf das Logo angewendet werden. Wählen Sie ein eingefügtes Bild aus.', 'warning');
     } else {
-        showAlert('Kreis kann nur auf eingefügte Bilder angewendet werden', 'warning');
+        showAlert('Kreis-Ausschnitt kann nur auf eingefügte Bilder und Elemente angewendet werden. Wählen Sie zuerst ein Element aus.', 'warning');
     }
 })
 

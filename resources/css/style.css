@@ -168,5 +168,550 @@ canvas {
 .alert-container {
     position: fixed;
     top: 0;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 99999;
+    padding: 1rem;
+    max-width: 32rem;
+    width: 90%;
+}
+
+/* Alert close button styling */
+.alert button[type="button"] {
+    padding: 0.25rem;
+    border-radius: 0.25rem;
+    transition: all 0.2s ease;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.alert button[type="button"]:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    transform: scale(1.1);
+}
+
+.alert button[type="button"]:focus {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2);
+}
+
+.alert button[type="button"] i {
+    font-size: 0.75rem;
+}
+
+/* Step Indicator Styles */
+.step-indicator {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.125rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: 3px solid transparent;
+}
+
+.step-indicator.active {
+    background-color: #8ab414;
+    color: white;
+    border-color: #8ab414;
+    transform: scale(1.1);
+}
+
+.step-indicator:not(.active) {
+    background-color: #e5e7eb;
+    color: #9ca3af;
+    border-color: #e5e7eb;
+}
+
+.step-content {
+    transition: all 0.3s ease-in-out;
+}
+
+/* Enhanced Button Styles */
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.375rem;
+    background-color: #6b7280;
+    padding: 0.625rem 1.25rem;
+    font-weight: 600;
+    color: white;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    min-height: 2.5rem;
+}
+
+.btn-secondary:hover {
+    background-color: #4b5563;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.btn-secondary:focus {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px rgb(107 114 128 / 0.3);
+}
+
+.btn-secondary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Primary button enhancements */
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.5rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Button sizing variants */
+.btn-block {
+    width: 100%;
+}
+
+.btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+    min-height: 2rem;
+}
+
+.btn-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    min-height: 3rem;
+}
+
+/* Enhanced Form Styles */
+.form-input, .form-select {
+    border-radius: 0.375rem;
+    border: 1px solid #d1d5db;
+    transition: all 0.2s;
+}
+
+.form-input:focus, .form-select:focus {
+    border-color: #8ab414;
+    box-shadow: 0 0 0 3px rgb(138 180 20 / 0.1);
+}
+
+/* Canvas Preview Enhancements */
+.meme-preview {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background: #f9fafb;
+    position: relative;
+}
+
+/* Canvas dimensions display */
+#canvas-dimensions {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    border: 1px solid #d1d5db;
+}
+
+.fabric-canvas-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+    padding: 1rem;
+}
+
+/* Progress Steps Visual Enhancement */
+.step-indicator:not(.active) {
+    background-color: #d1d5db;
+    color: #6b7280;
+}
+
+/* Navigation improvements */
+.step-indicator {
+    position: relative;
+    z-index: 1;
+}
+
+/* Step Header Styling */
+.step-header-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+}
+
+.step-header-icon {
+    width: 3rem;
+    height: 3rem;
+    background-color: #16a34a;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    font-weight: bold;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.step-header-content {
+    flex: 1;
+    padding-top: 0.5rem;
+}
+
+.step-header-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #111827;
+    margin-bottom: 0.75rem;
+    line-height: 1.2;
+}
+
+.step-header-description {
+    color: #6b7280;
+    font-size: 1.125rem;
+    line-height: 1.6;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+    .step-indicator {
+        width: 1.5rem;
+        height: 1.5rem;
+        font-size: 0.75rem;
+    }
+    
+    .grid.grid-cols-2,
+    .grid.grid-cols-3 {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    /* Mobile-specific layout adjustments */
+    .lg\:col-span-2 {
+        order: -1;
+        margin-bottom: 1rem;
+    }
+    
+    /* Mobile step indicators */
+    .step-indicator {
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 1rem;
+    }
+    
+    /* Mobile step headers */
+    .step-header-container {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .step-header-icon {
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 1rem;
+    }
+    
+    .step-header-title {
+        font-size: 1.5rem;
+        line-height: 1.3;
+    }
+    
+    .step-header-description {
+        font-size: 1rem;
+    }
+    
+    .step-content {
+        padding: 1rem;
+    }
+    
+    .fabric-canvas-wrapper {
+        min-height: 200px;
+        padding: 0.5rem;
+    }
+    
+    /* Touch-friendly buttons */
+    .btn-primary, .btn-secondary, .element-button {
+        min-height: 44px;
+        padding: 0.75rem 1rem;
+    }
+    
+    /* Mobile alert adjustments */
+    .alert-container {
+        width: 95%;
+        max-width: 100%;
+        padding: 0.5rem;
+    }
+    
+    .alert {
+        font-size: 0.875rem;
+    }
+    
+    /* Mobile element buttons */
+    .element-buttons-grid {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+    
+    .element-button {
+        min-height: 3.5rem;
+        font-size: 0.875rem;
+    }
+    
+    /* Simplified progress steps for mobile */
+    .flex.items-center.space-x-5 {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        justify-content: center;
+    }
+    
+    .flex.items-center.space-x-5 li {
+        margin: 0;
+    }
+}
+
+/* Hover Effects for Interactive Elements */
+.btn-secondary.cursor-pointer:hover,
+.cursor-pointer:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Advanced Options Collapsible */
+#advanced-options {
+    transition: all 0.3s ease-in-out;
+}
+
+#toggle-advanced i {
+    transition: transform 0.2s;
+}
+
+#toggle-advanced[aria-expanded="true"] i {
+    transform: rotate(180deg);
+}
+
+/* Better Visual Hierarchy */
+.step-content h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 1rem;
+}
+
+.step-content h4 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.75rem;
+}
+
+/* QR Section Animation */
+#qr-section {
+    transition: all 0.3s ease-in-out;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+}
+
+#qr-section:not(.hidden) {
+    opacity: 1;
+    max-height: 200px;
+}
+
+/* Better Grid Item Styling */
+.grid-item {
+    border-radius: 0.375rem;
+    overflow: hidden;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.grid-item:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Step 3 Content Enhancements */
+.step-content .border-b {
+    border-color: #e5e7eb;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+}
+
+.step-content .border-b:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+/* Element buttons grid styling */
+.element-buttons-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+}
+
+.element-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: 2px solid #e5e7eb;
+    background-color: #f9fafb;
+    color: #374151;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    text-decoration: none;
+    min-height: 3rem;
+}
+
+.element-button:hover {
+    border-color: #8ab414;
+    background-color: #f0f9e8;
+    color: #4d7c0f;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.element-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+}
+
+.element-button i {
+    margin-right: 0.5rem;
+    width: 1rem;
+    text-align: center;
+}
+
+/* Section headers in step 3 */
+.step-section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.step-section-header h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+}
+
+.step-section-header i {
+    margin-right: 0.75rem;
+    color: #8ab414;
+    width: 1.25rem;
+    text-align: center;
+}
+
+/* Enhanced element controls */
+.element-controls {
+    background-color: #f8fafc;
+    border-radius: 0.5rem;
+    padding: 1rem;
+}
+
+.element-controls .grid {
+    gap: 0.75rem;
+}
+
+.element-controls label {
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.25rem;
+}
+
+/* QR section styling */
+#qr-section {
+    background-color: #fef3cd;
+    border: 1px solid #fbbf24;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    transition: all 0.3s ease-in-out;
+}
+
+#qr-section.hidden {
+    opacity: 0;
+    max-height: 0;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+}
+
+#qr-section:not(.hidden) {
+    opacity: 1;
+    max-height: 200px;
+}
+
+/* Text alignment button group */
+.btn-group {
+    display: inline-flex;
+    border-radius: 0.375rem;
+    overflow: hidden;
+    border: 1px solid #d1d5db;
+}
+
+.btn-group .btn-primary {
+    border-radius: 0;
+    border: none;
+    margin: 0;
+    min-height: 2.25rem;
+}
+
+.btn-group .btn-primary:not(:last-child) {
+    border-right: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-group .btn-primary.active {
+    background-color: #8ab414;
+    color: white;
+}
+
+.btn-group .btn-primary:not(.active) {
+    background-color: #f3f4f6;
+    color: #6b7280;
+}
+
+.btn-group .btn-primary:not(.active):hover {
+    background-color: #e5e7eb;
+    transform: none;
+    box-shadow: none;
 }

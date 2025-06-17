@@ -70,166 +70,453 @@
     </div>
     <div id="generator">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div class="block lg:hidden md:hidden">
-                <div class="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-4">
-                    <p class="text-yellow-800">Auf mobilen Endgeräten funktionieren nicht alle Vorlagen gut, bitte in
-                        dem Fall auf einem
-                        größeren Bildschirm bearbeiten.</p>
+            <!-- Progress Steps -->
+            <div class="mb-16">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 py-12 px-8">
+                    <nav aria-label="Progress" class="max-w-6xl mx-auto">
+                        <!-- Desktop Layout -->
+                        <div class="hidden md:block">
+                            <div class="flex items-center justify-between relative">
+                                <!-- Step 1 -->
+                                <div class="flex flex-col items-center text-center flex-1">
+                                    <div id="step-1-indicator" class="step-indicator active bg-green-600 text-white shadow-lg mb-4">
+                                        <i class="fas fa-layer-group"></i>
+                                    </div>
+                                    <div class="space-y-1">
+                                        <p class="text-sm font-bold text-gray-900">Schritt 1</p>
+                                        <p class="text-sm text-gray-600">Vorlage wählen</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Progress Line 1-2 -->
+                                <div class="flex-1 px-8">
+                                    <div class="h-2 bg-gray-200 rounded-full relative">
+                                        <div id="progress-1-2" class="h-2 bg-green-600 rounded-full transition-all duration-500 absolute top-0 left-0" style="width: 100%;"></div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Step 2 -->
+                                <div class="flex flex-col items-center text-center flex-1">
+                                    <div id="step-2-indicator" class="step-indicator bg-gray-300 text-gray-600 mb-4">
+                                        <i class="fas fa-image"></i>
+                                    </div>
+                                    <div class="space-y-1">
+                                        <p class="text-sm font-bold text-gray-500">Schritt 2</p>
+                                        <p class="text-sm text-gray-500">Hintergrundbild</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Progress Line 2-3 -->
+                                <div class="flex-1 px-8">
+                                    <div class="h-2 bg-gray-200 rounded-full relative">
+                                        <div id="progress-2-3" class="h-2 bg-green-600 rounded-full transition-all duration-500 absolute top-0 left-0" style="width: 0%;"></div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Step 3 -->
+                                <div class="flex flex-col items-center text-center flex-1">
+                                    <div id="step-3-indicator" class="step-indicator bg-gray-300 text-gray-600 mb-4">
+                                        <i class="fas fa-edit"></i>
+                                    </div>
+                                    <div class="space-y-1">
+                                        <p class="text-sm font-bold text-gray-500">Schritt 3</p>
+                                        <p class="text-sm text-gray-500">Inhalte hinzufügen</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Progress Line 3-4 -->
+                                <div class="flex-1 px-8">
+                                    <div class="h-2 bg-gray-200 rounded-full relative">
+                                        <div id="progress-3-4" class="h-2 bg-green-600 rounded-full transition-all duration-500 absolute top-0 left-0" style="width: 0%;"></div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Step 4 -->
+                                <div class="flex flex-col items-center text-center flex-1">
+                                    <div id="step-4-indicator" class="step-indicator bg-gray-300 text-gray-600 mb-4">
+                                        <i class="fas fa-download"></i>
+                                    </div>
+                                    <div class="space-y-1">
+                                        <p class="text-sm font-bold text-gray-500">Schritt 4</p>
+                                        <p class="text-sm text-gray-500">Download</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Mobile Layout -->
+                        <div class="md:hidden space-y-6">
+                            <!-- Step 1 -->
+                            <div class="flex items-center space-x-4 p-4 rounded-lg bg-green-50 border border-green-200">
+                                <div id="step-1-indicator-mobile" class="step-indicator active bg-green-600 text-white shadow-lg flex-shrink-0">
+                                    <i class="fas fa-layer-group"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-base font-bold text-gray-900">Schritt 1</p>
+                                    <p class="text-base text-gray-600">Vorlage wählen</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Step 2 -->
+                            <div class="flex items-center space-x-4 p-4 rounded-lg">
+                                <div id="step-2-indicator-mobile" class="step-indicator bg-gray-300 text-gray-600 flex-shrink-0">
+                                    <i class="fas fa-image"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-base font-bold text-gray-500">Schritt 2</p>
+                                    <p class="text-base text-gray-500">Hintergrundbild</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Step 3 -->
+                            <div class="flex items-center space-x-4 p-4 rounded-lg">
+                                <div id="step-3-indicator-mobile" class="step-indicator bg-gray-300 text-gray-600 flex-shrink-0">
+                                    <i class="fas fa-edit"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-base font-bold text-gray-500">Schritt 3</p>
+                                    <p class="text-base text-gray-500">Inhalte hinzufügen</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Step 4 -->
+                            <div class="flex items-center space-x-4 p-4 rounded-lg">
+                                <div id="step-4-indicator-mobile" class="step-indicator bg-gray-300 text-gray-600 flex-shrink-0">
+                                    <i class="fas fa-download"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-base font-bold text-gray-500">Schritt 4</p>
+                                    <p class="text-base text-gray-500">Download</p>
+                                </div>
+                            </div>
+                        </div>
+                    </nav>
                 </div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-4">
-                    <div>
-                        <div class="grid memes-container">
-                            <div class="grid-sizer"></div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left Column - Controls -->
+                <div class="lg:col-span-1 space-y-6">
+                    <!-- Step 1: Template Selection -->
+                    <div id="step-1" class="step-content bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+                        <div class="step-header-container">
+                            <div class="step-header-icon">
+                                <i class="fas fa-layer-group"></i>
+                            </div>
+                            <div class="step-header-content">
+                                <h2 class="step-header-title">Vorlage auswählen</h2>
+                                <p class="step-header-description">Wählen Sie das passende Format für Ihr Bild</p>
+                            </div>
                         </div>
-                    </div>
-                    <div class="meme-preview">
-                        <div class="fabric-canvas-wrapper"><canvas id="meme-canvas"></canvas></div>
-                    </div>
-                    <div class="space-y-2">
-                        <label for="scale" class="block text-sm font-medium text-gray-700">Skalierung:</label>
-                        <input type="range" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                            id="scale" min="0.1" step="0.01" max="2">
-                    </div>
-                </div>
-                <div class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label for="canvas-template"
-                                class="block text-sm font-medium text-gray-700 mb-1">Vorlage:</label>
-                            <select class="form-select text-method" name="canvas-template" id="canvas-template">
-                                <optgroup label="Social Media">
-                                    <option value="post">Post</option>
-                                    <option value="story">Story</option>
-                                    <option value="event">Veranstaltung</option>
-                                    <option value="facebook_header">Facebook Header</option>
-                                </optgroup>
-                                <optgroup label="Druck">
-                                    <option value="a2">A2</option>
-                                    <option value="a2_quer">A2 Querformat</option>
-                                    <option value="a3">A3</option>
-                                    <option value="a3_quer">A3 Querformat</option>
-                                    <option value="a4">A4</option>
-                                    <option value="a4_quer">A4 Querformat</option>
-                                    <option value="a5">A5</option>
-                                    <option value="a5_quer">A5 Querformat</option>
-                                </optgroup>
-                            </select>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="canvas-template" class="block text-sm font-medium text-gray-700 mb-2">Wofür möchten Sie das Bild verwenden?</label>
+                                <select class="form-select text-method w-full" name="canvas-template" id="canvas-template">
+                                    <optgroup label="Social Media">
+                                        <option value="post">Instagram/Facebook Post</option>
+                                        <option value="story">Instagram/Facebook Story</option>
+                                        <option value="event">Veranstaltung</option>
+                                        <option value="facebook_header">Facebook Header</option>
+                                    </optgroup>
+                                    <optgroup label="Druck">
+                                        <option value="a4">A4 Poster</option>
+                                        <option value="a4_quer">A4 Querformat</option>
+                                        <option value="a3">A3 Poster</option>
+                                        <option value="a3_quer">A3 Querformat</option>
+                                        <option value="a2">A2 Poster</option>
+                                        <option value="a2_quer">A2 Querformat</option>
+                                        <option value="a5">A5 Flyer</option>
+                                        <option value="a5_quer">A5 Querformat</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="logo-selection" class="block text-sm font-medium text-gray-700 mb-2">Ihre Organisation:</label>
+                                <select class="form-select text-method w-full" name="logo-selection" id="logo-selection">
+                                    <optgroup label="Allgemein">
+                                        <option value="">Logo auswählen...</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                            <button id="step-1-next" class="w-full btn-primary">Weiter zum Hintergrundbild</button>
                         </div>
-                        <div>
-                            <label for="logo-selection" class="block text-sm font-medium text-gray-700 mb-1">Logo
-                                für:</label>
-                            <select class="form-select text-method" name="logo-selection" id="logo-selection">
-                                <optgroup label="Allgemein">
-                                    <option value="">Logo Auswählen</option>
-                                </optgroup>
-                            </select>
-                        </div>
-                    </div>
-                    <div>
-                        <input type="file" class="hidden" id="meme-input">
-                        <label class="btn-primary btn-block cursor-pointer" for="meme-input">Hintergrundbild
-                            aussuchen</label>
                     </div>
 
-                    <div>
-                        <label for="text" class="block text-sm font-medium text-gray-700 mb-1">Text:</label>
-                        <textarea class="form-input text-method" id="text" placeholder="Type your text here"
-                            rows="2"></textarea>
-                    </div>
+                    <!-- Step 2: Background Image -->
+                    <div id="step-2" class="step-content hidden bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+                        <div class="step-header-container">
+                            <div class="step-header-icon">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            <div class="step-header-content">
+                                <h2 class="step-header-title">Hintergrundbild hinzufügen</h2>
+                                <p class="step-header-description">Wählen Sie eine Vorlage oder laden Sie Ihr eigenes Bild hoch</p>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            
+                            <!-- Template Images -->
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <h4 class="text-sm font-medium text-gray-700 mb-3">Vorlagen:</h4>
+                                <div class="grid memes-container">
+                                    <div class="grid-sizer"></div>
+                                </div>
+                            </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label for="text-color"
-                                class="block text-sm font-medium text-gray-700 mb-1">Schriftfarbe:</label>
-                            <select class="form-select text-method" name="text-color" id="text-color">
-                                <option value="rgb(255,240,0)">Gelb</option>
-                                <option value="rgb(255,255,255)">Weiß</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="shadow-depth"
-                                class="block text-sm font-medium text-gray-700 mb-1">Schlagschatten:</label>
-                            <input class="form-input text-method" type="number" value="3" id="shadow-depth" min="0"
-                                max="30" placeholder="0">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Text Ausrichtung:</label>
-                            <div class="btn-group">
-                                <label class="btn-primary active align cursor-pointer">
-                                    <input type="radio" value="left" name="align" id="left" checked class="sr-only">
-                                    <i class="fas fa-align-left"></i>
+                            <!-- Custom Upload -->
+                            <div class="border-t pt-4">
+                                <h4 class="text-sm font-medium text-gray-700 mb-3">Oder eigenes Bild hochladen:</h4>
+                                <input type="file" class="hidden" id="meme-input">
+                                <label class="btn-secondary btn-block cursor-pointer" for="meme-input">
+                                    <i class="fas fa-upload mr-2"></i>Eigenes Bild hochladen
                                 </label>
-                                <label class="btn-primary align cursor-pointer">
-                                    <input type="radio" value="center" name="align" id="center" class="sr-only">
-                                    <i class="fas fa-align-center"></i>
-                                </label>
-                                <label class="btn-primary align cursor-pointer">
-                                    <input type="radio" value="right" name="align" id="right" class="sr-only">
-                                    <i class="fas fa-align-right"></i>
-                                </label>
+                            </div>
+
+                            <div class="flex space-x-3">
+                                <button id="step-2-back" class="flex-1 btn-secondary">Zurück</button>
+                                <button id="step-2-next" class="flex-1 btn-primary">Weiter zu Inhalten</button>
                             </div>
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <button class="btn-primary" id="add-text">Text einfügen</button>
-                        <button class="btn-primary" id="add-pink-circle">Rosa Kreis einfügen</button>
-                        <button class="btn-primary" id="add-cross">Kreuz einfügen</button>
-                        <input type="file" class="hidden" id="add-image">
-                        <label class="btn-primary cursor-pointer" for="add-image" style="display: inline-block; text-align: center; vertical-align: middle; box-sizing: border-box;">Bild einfügen</label>
-                    </div>
 
-                    <div class="space-y-2">
-                        <label for="qr-text" class="block text-sm font-medium text-gray-700">QR Code Text:</label>
-                        <input type="text" class="form-input" id="qr-text" placeholder="Text für QR Code eingeben">
-                        <button class="btn-primary btn-block" id="add-qr-code">QR Code einfügen</button>
-                    </div>
+                    <!-- Step 3: Content -->
+                    <div id="step-3" class="step-content hidden bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+                        <div class="step-header-container">
+                            <div class="step-header-icon">
+                                <i class="fas fa-edit"></i>
+                            </div>
+                            <div class="step-header-content">
+                                <h2 class="step-header-title">Inhalte hinzufügen</h2>
+                                <p class="step-header-description">Fügen Sie Text, Bilder und andere Elemente hinzu</p>
+                            </div>
+                        </div>
+                        <div class="space-y-6">
+                            <!-- Text Section -->
+                            <div class="border-b">
+                                <div class="step-section-header">
+                                    <i class="fas fa-font"></i>
+                                    <h4>Text hinzufügen</h4>
+                                </div>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label for="text" class="block text-sm font-medium text-gray-700 mb-2">Ihr Text:</label>
+                                        <textarea class="form-input text-method w-full" id="text" placeholder="Ihren Text hier eingeben..." rows="3"></textarea>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div>
+                                            <label for="text-color" class="block text-sm font-medium text-gray-700 mb-2">Textfarbe:</label>
+                                            <select class="form-select text-method w-full" name="text-color" id="text-color">
+                                                <option value="rgb(255,240,0)">Gelb</option>
+                                                <option value="rgb(255,255,255)">Weiß</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label for="shadow-depth" class="block text-sm font-medium text-gray-700 mb-2">Text-Schatten:</label>
+                                            <input class="form-input text-method w-full" type="number" value="3" id="shadow-depth" min="0" max="30" placeholder="0">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Ausrichtung:</label>
+                                            <div class="btn-group">
+                                                <label class="btn-primary active align cursor-pointer">
+                                                    <input type="radio" value="left" name="align" id="left" checked class="sr-only">
+                                                    <i class="fas fa-align-left"></i>
+                                                </label>
+                                                <label class="btn-primary align cursor-pointer">
+                                                    <input type="radio" value="center" name="align" id="center" class="sr-only">
+                                                    <i class="fas fa-align-center"></i>
+                                                </label>
+                                                <label class="btn-primary align cursor-pointer">
+                                                    <input type="radio" value="right" name="align" id="right" class="sr-only">
+                                                    <i class="fas fa-align-right"></i>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button class="btn-primary w-full btn-lg" id="add-text">
+                                        <i class="fas fa-plus mr-2"></i>Text einfügen
+                                    </button>
+                                </div>
+                            </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <button class="btn-primary" id="add-circle">Kreis Rand an/aus</button>
-                        <div>
-                            <label for="circle-radius" class="block text-sm font-medium text-gray-700 mb-1">Kreis
-                                Größe:</label>
-                            <select class="form-select" name="circle-radius" id="circle-radius">
-                                <option value="2">Groß</option>
-                                <option value="3">Mittel</option>
-                                <option value="4">Klein</option>
-                            </select>
+                            <!-- Additional Elements -->
+                            <div class="border-b">
+                                <div class="step-section-header">
+                                    <i class="fas fa-shapes"></i>
+                                    <h4>Weitere Elemente</h4>
+                                </div>
+                                <div class="element-buttons-grid">
+                                    <input type="file" class="hidden" id="add-image">
+                                    <label class="element-button" for="add-image">
+                                        <i class="fas fa-image"></i>Bild hinzufügen
+                                    </label>
+                                    <button class="element-button" id="add-pink-circle">
+                                        <i class="fas fa-circle"></i>Rosa Kreis
+                                    </button>
+                                    <button class="element-button" id="add-cross">
+                                        <i class="fas fa-check"></i>Häkchen
+                                    </button>
+                                    <button class="element-button" id="show-qr-section">
+                                        <i class="fas fa-qrcode"></i>QR Code
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- QR Code Section (Initially Hidden) -->
+                            <div id="qr-section" class="hidden">
+                                <div class="step-section-header">
+                                    <i class="fas fa-qrcode"></i>
+                                    <h4>QR Code erstellen</h4>
+                                </div>
+                                <div class="space-y-3">
+                                    <input type="text" class="form-input w-full" id="qr-text" placeholder="Link oder Text für QR Code eingeben...">
+                                    <button class="btn-primary w-full" id="add-qr-code">
+                                        <i class="fas fa-plus mr-2"></i>QR Code einfügen
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Element Controls -->
+                            <div class="element-controls">
+                                <div class="step-section-header">
+                                    <i class="fas fa-cog"></i>
+                                    <h4>Element bearbeiten</h4>
+                                </div>
+                                <div class="space-y-4">
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <button class="btn-secondary" id="bring-to-front">
+                                            <i class="fas fa-arrow-up mr-2"></i>In Vordergrund
+                                        </button>
+                                        <button class="btn-danger" id="remove-element">
+                                            <i class="fas fa-trash mr-2"></i>Löschen
+                                        </button>
+                                    </div>
+                                    <div class="space-y-3">
+                                        <div class="bg-yellow-50 border border-yellow-200 rounded-md p-3">
+                                            <div class="flex items-start">
+                                                <div class="flex-shrink-0">
+                                                    <i class="fas fa-info-circle text-yellow-400"></i>
+                                                </div>
+                                                <div class="ml-3">
+                                                    <p class="text-sm text-yellow-700">
+                                                        <strong>Kreis-Ausschnitt:</strong> Wählen Sie zuerst ein eingefügtes Bild aus, dann klicken Sie auf "Kreis anwenden" um nur einen runden Bereich zu zeigen.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-3">
+                                            <div>
+                                                <label for="circle-radius" class="block text-sm font-medium text-gray-700 mb-1">Kreis Größe:</label>
+                                                <select class="form-select w-full" name="circle-radius" id="circle-radius">
+                                                    <option value="2">Groß (90%)</option>
+                                                    <option value="3">Mittel (70%)</option>
+                                                    <option value="4">Klein (50%)</option>
+                                                </select>
+                                            </div>
+                                            <div class="flex items-end">
+                                                <button class="btn-secondary w-full" id="add-circle">
+                                                    <i class="fas fa-circle mr-2"></i>Kreis anwenden
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label for="scale" class="block text-sm font-medium text-gray-700 mb-2">Größe anpassen:</label>
+                                        <input type="range" class="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer" id="scale" min="0.1" step="0.01" max="2">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex space-x-3">
+                                <button id="step-3-back" class="flex-1 btn-secondary">Zurück</button>
+                                <button id="step-3-next" class="flex-1 btn-primary">Zum Download</button>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <button class="btn-primary" id="bring-to-front">In Vordergrund</button>
-                        <button class="btn-danger" id="remove-element">Text/Bild löschen</button>
+                    <!-- Step 4: Download -->
+                    <div id="step-4" class="step-content hidden bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+                        <div class="step-header-container">
+                            <div class="step-header-icon">
+                                <i class="fas fa-download"></i>
+                            </div>
+                            <div class="step-header-content">
+                                <h2 class="step-header-title">Bild herunterladen</h2>
+                                <p class="step-header-description">Ihr Bild ist fertig - laden Sie es herunter</p>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="bg-blue-50 border border-blue-200 rounded-md p-4">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-info-circle text-blue-400"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm text-blue-700">
+                                            Ihr Bild ist fertig! Überprüfen Sie die Vorschau und laden Sie es herunter.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Advanced Options (Collapsible) -->
+                            <div class="border rounded-lg">
+                                <button id="toggle-advanced" class="w-full flex justify-between items-center p-4 text-left">
+                                    <span class="text-sm font-medium text-gray-700">Erweiterte Optionen</span>
+                                    <i class="fas fa-chevron-down text-gray-400"></i>
+                                </button>
+                                <div id="advanced-options" class="hidden border-t p-4 space-y-3">
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label for="image-format" class="block text-sm font-medium text-gray-700 mb-1">Format:</label>
+                                            <select class="form-select text-method w-full" name="image-format" id="image-format">
+                                                <option value="png">PNG (bessere Qualität)</option>
+                                                <option value="jpeg">JPEG (kleinere Datei)</option>
+                                            </select>
+                                        </div>
+                                        <div id="quality-section">
+                                            <label for="image-quality" class="block text-sm font-medium text-gray-700 mb-1">Qualität:</label>
+                                            <select class="form-select text-method w-full" name="image-quality" id="image-quality">
+                                                <option value="1.0">Hoch</option>
+                                                <option value="0.5">Mittel</option>
+                                                <option value="0.1">Niedrig</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button class="btn-primary w-full text-lg py-3" id="generate-meme">
+                                <i class="fas fa-download mr-2"></i>Bild herunterladen
+                            </button>
+
+                            <div class="flex space-x-3">
+                                <button id="step-4-back" class="flex-1 btn-secondary">Zurück</button>
+                                <button id="start-over" class="flex-1 btn-secondary">Neues Bild erstellen</button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label for="image-format" class="block text-sm font-medium text-gray-700 mb-1">Download
-                                Format:</label>
-                            <select class="form-select text-method" name="image-format" id="image-format">
-                                <option value="jpeg">JPEG</option>
-                                <option value="png">PNG</option>
-                            </select>
+                </div>
+
+                <!-- Right Column - Preview -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900">Live Vorschau</h3>
+                            <div class="text-sm text-gray-500" id="canvas-dimensions">
+                                1080 × 1080 px • 200 DPI
+                            </div>
                         </div>
-                        <div>
-                            <label for="image-quality" class="block text-sm font-medium text-gray-700 mb-1">Qualität(bei
-                                JPEG):</label>
-                            <select class="form-select text-method" name="image-quality" id="image-quality">
-                                <option value="1.0">Groß</option>
-                                <option value="0.5">Mittel</option>
-                                <option value="0.1">Klein</option>
-                            </select>
-                        </div>
-                        <div class="flex items-end">
-                            <button class="btn-primary w-full" id="generate-meme">Download</button>
+                        <div class="meme-preview">
+                            <div class="fabric-canvas-wrapper">
+                                <canvas id="meme-canvas"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="alert-container max-w-7xl mx-auto px-4 mt-4 hidden"></div>
+        <div class="alert-container hidden"></div>
 
         <script id="meme-template" type="x-tmpl-mustache">
             <div class="grid-item">
@@ -253,6 +540,7 @@
     <script src="resources/js/choice-image.js"></script>
     <script src="resources/js/handlers.js"></script>
     <script src="resources/js/main.js"></script>
+    <script src="resources/js/wizard.js"></script>
 </body>
 
 </html>
