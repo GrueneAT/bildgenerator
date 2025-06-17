@@ -1,8 +1,15 @@
 @font-face {
-    font-family: "Gotham Narrow";
+    font-family: "Gotham Narrow Ultra Italic";
     font-style: normal;
     font-weight: normal;
     src: url("../fonts/GothamNarrow-UltraItalic.otf") format("opentype");
+}
+
+@font-face {
+    font-family: "Gotham Narrow Book";
+    font-style: normal;
+    font-weight: normal;
+    src: url("../fonts/Gotham-Narrow-Book.otf") format("opentype");
 }
 
 @font-face {

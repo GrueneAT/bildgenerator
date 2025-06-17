@@ -1,28 +1,15 @@
-body {
-    /* font-family: 'Lato', sans-serif; */
-    padding-bottom: 3em;
-}
-
-.header {
-    text-transform: uppercase;
-}
-
-.discription {
-    text-transform: none;
-}
-
-.source:hover {
-    text-decoration: none;
-}
+/* Basic utility styles moved to Tailwind classes:
+   body: pb-12
+   .header: uppercase  
+   .discription: normal-case
+   .source:hover: hover:no-underline
+*/
 
 .choice .custom-file {
     font-size: 16px;
 }
 
-.choice p {
-    display: inline-block;
-    font-size: 20px;
-}
+/* .choice p: use inline-block text-xl */
 
 .input-image {
     display: inline-block;
@@ -33,9 +20,7 @@ body {
     width: 260px;
 }
 
-.choice input {
-    display: none;   
-}
+/* .choice input: use hidden */
 
 .custom-file {
     height: calc(1em + 1.5rem + 0px);
@@ -45,7 +30,6 @@ body {
     color: #fff;
     background-color: #d9534f;
     border-color: #d9534f;
-/*  border-radius: 5px; */
     height: calc(1em + 1.5rem + 0px);
     padding: 0.5rem 1.5rem;
     border: 0;
@@ -62,11 +46,9 @@ body {
     cursor: pointer;
 }
 
-.memes-container div {
-    cursor: pointer;
-}
+/* .memes-container div: use cursor-pointer */
 
-/* Responsive Grid*/
+/* Responsive Grid for Masonry */
 @media (max-width: 575px) { 
     .grid-sizer,
     .grid-item {
@@ -107,66 +89,402 @@ body {
 }
 
 .grid-item img {
-  display: block;
-  width: 100%;
-  transition: all 0.2s;
+    display: block;
+    width: 100%;
+    transition: all 0.2s;
 }
 
 .grid-item img:hover {
     transform: scale(1.1);
 }
 
-.form-group {
-    margin-bottom: 0.75rem;
-}
+/* .form-group: use mb-3 */
 
-.meme-preview {
-    border: 1px solid #cecece;
-}
+/* .meme-preview: use border border-gray-300 */
 
 
-.preview {
-    padding-left: 15px;
-    padding-right: 15px;
-}
+/* .preview: use px-4 */
 
-.back-btn .btn{
-    font-size: 14px;
-    font-weight: 700;
-    text-transform: none;
-}
+/* .back-btn .btn: use text-sm font-bold normal-case */
 
-.canvas-container {
-    width: 100%;
-}
+/* .canvas-container: use w-full */
 
 canvas {
     width: 100% !important;
     height: 100% !important;
     max-width: 100%;
-    max-height: 100%
+    max-height: 100%;
 }
 
-.new-select {
-    border: 1px solid #ced4da;
-    border-radius: .25rem;
-}
+/* .new-select: use border border-gray-300 rounded */
 
-.bootstrap-select .dropdown-toggle:focus, .bootstrap-select>select.mobile-device:focus+.dropdown-toggle {
-    outline: 0px auto -webkit-focus-ring-color!important;
-}
+/* Bootstrap-select CSS removed - no longer needed */
 
 #bg-option {
     border-bottom-right-radius: 0;
     border-top-right-radius: 0;
 }
 
-.add-btns{
+.add-btns {
     border-bottom: 1px solid #cecece;
 }
 
 .alert-container {
     position: fixed;
     top: 0;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 99999;
+    padding: 1rem;
+    max-width: 32rem;
+    width: 90%;
+}
+
+.alert button[type="button"] {
+    padding: 0.25rem;
+    border-radius: 0.25rem;
+    transition: all 0.2s ease;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.alert button[type="button"]:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    transform: scale(1.1);
+}
+
+.alert button[type="button"]:focus {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2);
+}
+
+.alert button[type="button"] i {
+    font-size: 0.75rem;
+}
+
+.step-indicator {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.step-indicator.active {
+    background-color: #8ab414;
+    color: white;
+    border-color: #8ab414;
+    transform: scale(1.05);
+}
+
+.step-indicator:not(.active) {
+    background-color: #e5e7eb;
+    color: #9ca3af;
+    border-color: #e5e7eb;
+}
+
+.step-content {
+    transition: all 0.3s ease-in-out;
+}
+
+/* .btn-secondary: use inline-flex items-center justify-center rounded-md bg-gray-500 px-5 py-2.5 font-semibold text-white transition-all duration-200 border-0 cursor-pointer text-center no-underline text-sm leading-5 min-h-10 */
+
+/* .btn-secondary:hover: use hover:bg-gray-600 hover:-translate-y-px hover:shadow-md */
+
+/* .btn-secondary:focus: use focus:outline-none focus:ring-3 focus:ring-gray-500/30 */
+
+/* .btn-secondary:active: use active:translate-y-0 active:shadow-sm */
+
+/* .btn-primary: use inline-flex items-center justify-center min-h-10 text-sm leading-5 transition-all duration-200 bg-gruene-primary text-white border-0 rounded-md px-5 py-2.5 font-semibold cursor-pointer no-underline */
+
+/* .btn-primary:hover: use hover:bg-gruene-dark hover:-translate-y-px hover:shadow-md */
+
+/* .btn-primary:active: use active:translate-y-0 */
+
+/* Button sizing variants - use Tailwind:
+   .btn-block: w-full
+   .btn-sm: px-3 py-1.5 text-xs min-h-8
+   .btn-lg: px-6 py-3 text-base min-h-12
+*/
+
+.form-input:focus, .form-select:focus {
+    border-color: #8ab414;
+    box-shadow: 0 0 0 3px rgb(138 180 20 / 0.1);
+}
+
+.meme-preview {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background: #f9fafb;
+    position: relative;
+}
+
+#canvas-dimensions {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    border: 1px solid #d1d5db;
+}
+
+.fabric-canvas-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+    padding: 1rem;
+}
+
+/* .step-indicator:not(.active): use bg-gray-300 text-gray-500 */
+
+/* .step-indicator: use relative z-10 */
+
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+    .step-indicator {
+        width: 1.5rem;
+        height: 1.5rem;
+        font-size: 0.75rem;
+    }
+    
+    .grid.grid-cols-2,
+    .grid.grid-cols-3 {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .fabric-canvas-wrapper {
+        min-height: 200px;
+        padding: 0.5rem;
+    }
+    
+    .btn-primary, .btn-secondary, .element-button {
+        min-height: 44px;
+        padding: 0.75rem 1rem;
+    }
+    
+    .alert-container {
+        width: 95%;
+        max-width: 100%;
+        padding: 0.5rem;
+    }
+    
+    .element-buttons-grid {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+    
+    .element-button {
+        min-height: 3.5rem;
+        font-size: 0.875rem;
+    }
+}
+
+.btn-secondary.cursor-pointer:hover,
+.cursor-pointer:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+#advanced-options {
+    transition: all 0.3s ease-in-out;
+}
+
+#toggle-advanced i {
+    transition: transform 0.2s;
+}
+
+#toggle-advanced[aria-expanded="true"] i {
+    transform: rotate(180deg);
+}
+
+/* Better Visual Hierarchy */
+
+/* QR Section Animation - removed duplicate rules */
+
+.grid-item {
+    border-radius: 0.375rem;
+    overflow: hidden;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.grid-item:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* .step-content .border-b: use border-gray-200 mb-6 pb-6 */
+
+/* .step-content .border-b:last-child: use border-b-0 mb-0 pb-0 */
+
+.element-buttons-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+}
+
+.element-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: 2px solid #e5e7eb;
+    background-color: #f9fafb;
+    color: #374151;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    text-decoration: none;
+    min-height: 3rem;
+}
+
+.element-button:hover {
+    border-color: #8ab414;
+    background-color: #f0f9e8;
+    color: #4d7c0f;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.element-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+}
+
+.element-button i {
+    margin-right: 0.5rem;
+    width: 1rem;
+    text-align: center;
+}
+
+.step-section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.step-section-header h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+}
+
+.step-section-header i {
+    margin-right: 0.75rem;
+    color: #8ab414;
+    width: 1.25rem;
+    text-align: center;
+}
+
+/* .element-controls: use bg-slate-50 rounded-lg p-4 */
+
+/* .element-controls .grid: use gap-3 */
+
+/* .element-controls label: use font-medium text-gray-700 mb-1 */
+
+#qr-section {
+    background-color: #fef3cd;
+    border: 1px solid #fbbf24;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    transition: all 0.3s ease-in-out;
+}
+
+#qr-section.hidden {
+    opacity: 0;
+    max-height: 0;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+}
+
+#qr-section:not(.hidden) {
+    opacity: 1;
+    max-height: 300px;
+}
+
+.btn-group {
+    display: inline-flex;
+    border-radius: 0.375rem;
+    overflow: hidden;
+    border: 1px solid #d1d5db;
+}
+
+.btn-group.w-full {
+    width: 100%;
+}
+
+/* .btn-group.w-full: use w-full */
+
+/* .btn-group.lg\:w-auto: use lg:w-auto */
+
+.btn-group .btn-primary {
+    border-radius: 0;
+    border: none;
+    margin: 0;
+    min-height: 2.25rem;
+}
+
+.btn-group .btn-primary:not(:last-child) {
+    border-right: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-group .btn-primary.active {
+    background-color: #8ab414;
+    color: white;
+}
+
+.btn-group .btn-primary:not(.active) {
+    background-color: #f3f4f6;
+    color: #6b7280;
+}
+
+.btn-group .btn-primary:not(.active):hover {
+    background-color: #e5e7eb;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Button size variants */
+.btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    min-height: 2rem;
+}
+
+.btn-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    line-height: 1.5rem;
+    min-height: 3rem;
+}
+
+/* Step wizard spacing - only apply margin to visible steps */
+.step-content:not(.hidden):not(:first-child) {
+    margin-top: 1.5rem;
+}
+
+/* Fix step alignment - ensure visible steps start at top */
+.step-content:not(.hidden) {
+    margin-top: 0 !important;
 }

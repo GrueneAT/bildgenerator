@@ -1,4 +1,4 @@
-// Modal functionality to replace Bootstrap modals
+// Modal functionality
 jQuery(function() {
     // Video modal functionality
     jQuery('#video-modal-btn').on('click', function() {
@@ -9,7 +9,14 @@ jQuery(function() {
     });
 
     // Close modal functionality
-    jQuery('#close-modal, #videoModal').on('click', function(e) {
+    jQuery('#close-modal').on('click', function(e) {
+        jQuery('#videoModal').addClass('hidden');
+        jQuery('#video-iframe').attr('src', '');
+        jQuery('body').removeClass('overflow-hidden');
+    });
+    
+    // Close modal when clicking background
+    jQuery('#videoModal').on('click', function(e) {
         if (e.target === this) {
             jQuery('#videoModal').addClass('hidden');
             jQuery('#video-iframe').attr('src', '');
@@ -27,7 +34,7 @@ jQuery(function() {
     });
 });
 
-// Button group functionality to replace Bootstrap button groups
+// Button group functionality
 jQuery(function() {
     jQuery('.btn-group label').on('click', function() {
         const $label = jQuery(this);
@@ -47,7 +54,7 @@ jQuery(function() {
     });
 });
 
-// Alert functionality to replace Bootstrap alerts
+// Alert functionality
 function showTailwindAlert(message, type = 'danger') {
     const $alertContainer = jQuery('.alert-container');
     
