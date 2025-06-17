@@ -379,6 +379,14 @@ canvas {
     margin-bottom: 1rem;
     padding-bottom: 0.5rem;
     border-bottom: 2px solid #e5e7eb;
+    background: none;
+    border: none;
+    outline: none;
+}
+
+.step-section-header:focus {
+    outline: 2px solid #8ab414;
+    outline-offset: 2px;
 }
 
 .step-section-header h4 {

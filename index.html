@@ -109,13 +109,13 @@
     <div id="generator">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
         <!-- Progress Steps -->
-        <div class="mb-6">
+        <div class="mb-6 hidden md:block">
           <div
             class="bg-white rounded-lg shadow-sm border border-gray-200 py-4 px-6"
           >
             <nav aria-label="Progress" class="max-w-6xl mx-auto">
               <!-- Desktop Layout -->
-              <div class="hidden md:block">
+              <div class="block">
                 <div class="flex items-center justify-between relative">
                   <!-- Step 1 -->
                   <div
@@ -217,8 +217,8 @@
                 </div>
               </div>
 
-              <!-- Mobile Layout -->
-              <div class="md:hidden space-y-3">
+              <!-- Mobile Layout (Hidden) -->
+              <div class="hidden">
                 <!-- Step 1 -->
                 <div
                   class="flex items-center space-x-3 p-3 rounded-lg bg-green-50 border border-green-200 cursor-pointer"
@@ -293,7 +293,7 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
           <!-- Left Column - Controls -->
-          <div class="lg:col-span-1">
+          <div class="lg:col-span-1 order-2 lg:order-1">
             <!-- Step 1: Template Selection -->
             <div
               id="step-1"
@@ -455,11 +455,16 @@
               <div class="space-y-6">
                 <!-- Text Section -->
                 <div class="border-b">
-                  <div class="step-section-header">
+                  <button
+                    class="step-section-header w-full text-left cursor-pointer hover:bg-gray-50 p-2 -mx-2 rounded transition-colors duration-200"
+                    onclick="toggleSection('text-section')"
+                    aria-expanded="false"
+                  >
                     <i class="fas fa-font"></i>
                     <h4>Text hinzufügen</h4>
-                  </div>
-                  <div class="space-y-4">
+                    <i class="fas fa-chevron-down text-gray-400 ml-auto transition-transform duration-200" id="text-section-chevron" style="transform: rotate(-90deg);"></i>
+                  </button>
+                  <div id="text-section" class="space-y-4 mt-4 hidden">
                     <div>
                       <label
                         for="text"
@@ -578,11 +583,17 @@
 
                 <!-- Additional Elements -->
                 <div class="border-b">
-                  <div class="step-section-header">
+                  <button
+                    class="step-section-header w-full text-left cursor-pointer hover:bg-gray-50 p-2 -mx-2 rounded transition-colors duration-200"
+                    onclick="toggleSection('elements-section')"
+                    aria-expanded="false"
+                  >
                     <i class="fas fa-shapes"></i>
                     <h4>Weitere Elemente</h4>
-                  </div>
-                  <div class="element-buttons-grid">
+                    <i class="fas fa-chevron-down text-gray-400 ml-auto transition-transform duration-200" id="elements-section-chevron" style="transform: rotate(-90deg);"></i>
+                  </button>
+                  <div id="elements-section" class="mt-4 hidden">
+                    <div class="element-buttons-grid">
                     <input type="file" class="hidden" id="add-image" />
                     <label class="element-button" for="add-image">
                       <i class="fas fa-image"></i>Bild hinzufügen
@@ -596,6 +607,7 @@
                     <button class="element-button" id="show-qr-section">
                       <i class="fas fa-qrcode"></i>QR Code
                     </button>
+                    </div>
                   </div>
                 </div>
 
@@ -638,11 +650,16 @@
 
                 <!-- Element Controls -->
                 <div class="element-controls">
-                  <div class="step-section-header">
+                  <button
+                    class="step-section-header w-full text-left cursor-pointer hover:bg-gray-50 p-2 -mx-2 rounded transition-colors duration-200"
+                    onclick="toggleSection('controls-section')"
+                    aria-expanded="false"
+                  >
                     <i class="fas fa-cog"></i>
                     <h4>Element bearbeiten</h4>
-                  </div>
-                  <div class="space-y-4">
+                    <i class="fas fa-chevron-down text-gray-400 ml-auto transition-transform duration-200" id="controls-section-chevron" style="transform: rotate(-90deg);"></i>
+                  </button>
+                  <div id="controls-section" class="space-y-4 mt-4 hidden">
                     <div class="grid grid-cols-2 gap-3">
                       <button class="btn-secondary" id="bring-to-front">
                         <i class="fas fa-arrow-up mr-2"></i>In Vordergrund
@@ -832,7 +849,7 @@
           </div>
 
           <!-- Right Column - Preview -->
-          <div class="lg:col-span-2">
+          <div class="lg:col-span-2 order-1 lg:order-2">
             <div
               class="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
             >

@@ -42,6 +42,27 @@ function bindHandler(selector, event, handler) {
     jQuery(selector).off(event).on(event, handler);
 }
 
+// Section toggle functionality
+function toggleSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    const chevron = document.getElementById(sectionId + '-chevron');
+    const button = document.querySelector(`[onclick="toggleSection('${sectionId}')"]`);
+    
+    if (section.style.display === 'none' || section.classList.contains('hidden')) {
+        // Show section
+        section.style.display = 'block';
+        section.classList.remove('hidden');
+        chevron.style.transform = 'rotate(0deg)';
+        button.setAttribute('aria-expanded', 'true');
+    } else {
+        // Hide section
+        section.style.display = 'none';
+        section.classList.add('hidden');
+        chevron.style.transform = 'rotate(-90deg)';
+        button.setAttribute('aria-expanded', 'false');
+    }
+}
+
 // Canvas object event handlers
 function loadObjectHandlers() {
     bindHandler('#text', 'input', function () {
