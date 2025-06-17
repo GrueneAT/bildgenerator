@@ -4,15 +4,71 @@ const totalSteps = 4;
 
 // Initialize wizard functionality
 function initializeWizard() {
+    // Ensure we always start from step 1
+    currentStep = 1;
+    
+    // Preload fonts to ensure they're available when needed
+    preloadFonts();
+    
     setupStepNavigation();
     setupAdvancedOptions();
     setupQRSection();
     updateCanvasDimensions();
-    showStep(1);
+    goToStep(1);
+}
+
+// Preload custom fonts
+function preloadFonts() {
+    const fonts = [
+        new FontFaceObserver('Gotham Narrow'),
+        new FontFaceObserver('Gotham Narrow Bold')
+    ];
+    
+    fonts.forEach(font => {
+        font.load().then(function() {
+            console.log('Font loaded successfully:', font.family);
+        }).catch(function() {
+            console.log('Font failed to load:', font.family);
+        });
+    });
 }
 
 // Step Navigation
 function setupStepNavigation() {
+    // Step indicator click navigation (desktop)
+    jQuery('#step-1-indicator').on('click', function() {
+        goToStep(1);
+    });
+    
+    jQuery('#step-2-indicator').on('click', function() {
+        goToStep(2);
+    });
+    
+    jQuery('#step-3-indicator').on('click', function() {
+        goToStep(3);
+    });
+    
+    jQuery('#step-4-indicator').on('click', function() {
+        goToStep(4);
+    });
+    
+    // Step indicator click navigation (mobile)
+    jQuery('#step-1-indicator-mobile').on('click', function() {
+        goToStep(1);
+    });
+    
+    jQuery('#step-2-indicator-mobile').on('click', function() {
+        goToStep(2);
+    });
+    
+    jQuery('#step-3-indicator-mobile').on('click', function() {
+        goToStep(3);
+    });
+    
+    jQuery('#step-4-indicator-mobile').on('click', function() {
+        goToStep(4);
+    });
+
     // Next buttons
     jQuery('#step-1-next').on('click', function() {
         if (validateStep1()) {
@@ -318,14 +374,11 @@ function enhanceCanvasIntegration() {
     // Canvas event listeners for better UX
     if (canvas) {
         canvas.on('object:added', function(e) {
-            if (currentStep < 3) {
-                // Auto-advance to step 3 when content is added
-                goToStep(3);
-            }
+            // Object added - no auto-advance to maintain user control
         });
         
         canvas.on('object:removed', function(e) {
-            showAlert('Element entfernt', 'info');
+            // Element removed silently - no notification needed
         });
     }
 }

@@ -205,23 +205,23 @@ canvas {
 
 /* Step Indicator Styles */
 .step-indicator {
-    width: 3rem;
-    height: 3rem;
+    width: 2rem;
+    height: 2rem;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.125rem;
+    font-size: 0.875rem;
     font-weight: 600;
     transition: all 0.3s ease;
-    border: 3px solid transparent;
+    border: 2px solid transparent;
 }
 
 .step-indicator.active {
     background-color: #8ab414;
     color: white;
     border-color: #8ab414;
-    transform: scale(1.1);
+    transform: scale(1.05);
 }
 
 .step-indicator:not(.active) {
@@ -390,9 +390,6 @@ canvas {
     }
     
     
-    .step-content {
-        padding: 1rem;
-    }
     
     .fabric-canvas-wrapper {
         min-height: 200px;
@@ -460,19 +457,6 @@ canvas {
 }
 
 /* Better Visual Hierarchy */
-.step-content h3 {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: #111827;
-    margin-bottom: 1rem;
-}
-
-.step-content h4 {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #374151;
-    margin-bottom: 0.75rem;
-}
 
 /* QR Section Animation */
 #qr-section {
@@ -623,6 +607,17 @@ canvas {
     border-radius: 0.375rem;
     overflow: hidden;
     border: 1px solid #d1d5db;
+    width: fit-content;
+}
+
+.btn-group.w-full {
+    width: 100%;
+}
+
+@media (min-width: 1024px) {
+    .btn-group.lg\:w-auto {
+        width: auto;
+    }
 }
 
 .btn-group .btn-primary {

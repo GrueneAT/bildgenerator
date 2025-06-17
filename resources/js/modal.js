@@ -9,7 +9,14 @@ jQuery(function() {
     });
 
     // Close modal functionality
-    jQuery('#close-modal, #videoModal').on('click', function(e) {
+    jQuery('#close-modal').on('click', function(e) {
+        jQuery('#videoModal').addClass('hidden');
+        jQuery('#video-iframe').attr('src', '');
+        jQuery('body').removeClass('overflow-hidden');
+    });
+    
+    // Close modal when clicking background
+    jQuery('#videoModal').on('click', function(e) {
         if (e.target === this) {
             jQuery('#videoModal').addClass('hidden');
             jQuery('#video-iframe').attr('src', '');

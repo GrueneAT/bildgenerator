@@ -13,6 +13,42 @@ if (typeof generatorApplicationURL === 'undefined') {
     var generatorApplicationURL = "";
 }
 
+// Helper function to scale elements appropriately for the canvas
+function scaleElementToFit(element, maxWidthRatio = 0.5, maxHeightRatio = 0.4) {
+    const maxWidth = canvas.width * maxWidthRatio;
+    const maxHeight = canvas.height * maxHeightRatio;
+    
+    // Get the element's current dimensions
+    const elementWidth = element.width || element.getScaledWidth();
+    const elementHeight = element.height || element.getScaledHeight();
+    
+    // Calculate scale factors for both width and height
+    const widthScale = maxWidth / elementWidth;
+    const heightScale = maxHeight / elementHeight;
+    
+    // Use the smaller scale factor to ensure the element fits in both dimensions
+    const scale = Math.min(widthScale, heightScale);
+    
+    if (element.type === 'text') {
+        // For text objects, use scaleToWidth but respect height constraints
+        if (widthScale < heightScale) {
+            element.scaleToWidth(maxWidth);
+        } else {
+            element.scaleToHeight(maxHeight);
+        }
+    } else if (element.scaleToWidth && element.scaleToHeight) {
+        // For images, use the appropriate scaling method
+        if (widthScale < heightScale) {
+            element.scaleToWidth(maxWidth);
+        } else {
+            element.scaleToHeight(maxHeight);
+        }
+    } else {
+        // For other objects like circles, set scale directly
+        element.scale(scale);
+    }
+}
+
 // Utility functions
 const isValidJSON = str => {
     try {
@@ -248,6 +284,7 @@ function addLogo() {
         // canvas.sendToBack(image);
         logo = image;
 
+        // Since fonts are preloaded, we can create logo text directly
         logoName = new fabric.Text(logoText, {
             top: canvas.height * currentTemplate().logoTextTop,
             fontFamily: "Gotham Narrow Bold",
@@ -257,7 +294,6 @@ function addLogo() {
             fill: 'rgb(255,255,255)',
             stroke: '#000000',
             strokeWidth: 0,
-            // shadow: createShadow('#000000', jQuery('#shadow-depth').val()),
             objectCaching: false,
             lineHeight: 0.8,
             angle: -5.5,
@@ -404,10 +440,9 @@ jQuery('#add-text').off('click').on('click', function () {
         return
     }
 
-    // Create new text object
+    // Since fonts are preloaded, we can create text directly
     var text = new fabric.Text(jQuery('#text').val(), {
-        top: 200,
-        fontFamily: "Gotham Narrow", //jQuery('#font-family').find(":selected").attr('value'),
+        fontFamily: "Gotham Narrow",
         fontSize: canvas.width / 2,
         fontStyle: 'normal',
         textAlign: jQuery('input[name="align"]:checked').val(),
@@ -421,13 +456,16 @@ jQuery('#add-text').off('click').on('click', function () {
     })
 
     relativeScalingControlsOnly(text);
-    text.scaleToWidth(canvas.width / 2)
-
+    scaleElementToFit(text, 0.8, 0.5);
 
     canvas.add(text).setActiveObject(text);
-    loadFont(text.fontFamily);
     canvas.centerObject(text);
-    updateScale(text)
+    text.set({
+        top: canvas.height / 2 - text.getScaledHeight() / 2
+    });
+    text.setCoords();
+    updateScale(text);
+    canvas.renderAll();
 })
 jQuery('#generate-meme').off('click').on('click', function () {
     if (logoText != "") {
@@ -496,7 +534,7 @@ jQuery('#add-image').off('input').on('input', function () {
         image.src = reader.result
         image.onload = function () {
             fabric.Image.fromURL(reader.result, function (image) {
-                image.scaleToWidth(canvas.width / 2)
+                scaleElementToFit(image, 0.5, 0.4);
                 relativeScalingControlsOnly(image);
                 canvas.add(image).setActiveObject(image);
                 canvas.centerObject(image);
@@ -619,6 +657,7 @@ jQuery('#add-pink-circle').off('click').on('click', function () {
         radius: radius,
         fill: "rgb(225,0,120)"
     });
+    scaleElementToFit(pinkCircle, 0.3, 0.3);
     relativeScalingControlsOnly(pinkCircle)
     canvas.add(pinkCircle)
     for (object of canvas.getObjects()) {
@@ -635,7 +674,7 @@ jQuery('#add-pink-circle').off('click').on('click', function () {
 
 jQuery('#add-cross').off('click').on('click', function () {
     fabric.Image.fromURL(generatorApplicationURL + "resources/images/Ankreuzen.png", function (image) {
-        image.scaleToWidth(canvas.width / 2)
+        scaleElementToFit(image, 0.4, 0.3);
         canvas.add(image);
         canvas.centerObject(image);
         canvas.bringToFront(image);
@@ -683,7 +722,7 @@ jQuery('#add-qr-code').off('click').on('click', function () {
             if (qrImg) {
                 // Add QR code image to canvas
                 fabric.Image.fromURL(qrImg.src, function (qrImage) {
-                    qrImage.scaleToWidth(canvas.width / 4);
+                    scaleElementToFit(qrImage, 0.25, 0.25);
                     relativeScalingControlsOnly(qrImage);
                     canvas.add(qrImage).setActiveObject(qrImage);
                     canvas.centerObject(qrImage);
