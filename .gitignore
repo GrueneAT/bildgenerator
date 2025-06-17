@@ -1,2 +1,3 @@
 resources/images/logos/index/*.json
 node_modules
+resources/css/output.css
