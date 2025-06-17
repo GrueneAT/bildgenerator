@@ -1,28 +1,15 @@
-body {
-    /* font-family: 'Lato', sans-serif; */
-    padding-bottom: 3em;
-}
-
-.header {
-    text-transform: uppercase;
-}
-
-.discription {
-    text-transform: none;
-}
-
-.source:hover {
-    text-decoration: none;
-}
+/* Basic utility styles moved to Tailwind classes:
+   body: pb-12
+   .header: uppercase  
+   .discription: normal-case
+   .source:hover: hover:no-underline
+*/
 
 .choice .custom-file {
     font-size: 16px;
 }
 
-.choice p {
-    display: inline-block;
-    font-size: 20px;
-}
+/* .choice p: use inline-block text-xl */
 
 .input-image {
     display: inline-block;
@@ -33,9 +20,7 @@ body {
     width: 260px;
 }
 
-.choice input {
-    display: none;   
-}
+/* .choice input: use hidden */
 
 .custom-file {
     height: calc(1em + 1.5rem + 0px);
@@ -45,7 +30,6 @@ body {
     color: #fff;
     background-color: #d9534f;
     border-color: #d9534f;
-/*  border-radius: 5px; */
     height: calc(1em + 1.5rem + 0px);
     padding: 0.5rem 1.5rem;
     border: 0;
@@ -62,11 +46,9 @@ body {
     cursor: pointer;
 }
 
-.memes-container div {
-    cursor: pointer;
-}
+/* .memes-container div: use cursor-pointer */
 
-/* Responsive Grid*/
+/* Responsive Grid for Masonry */
 @media (max-width: 575px) { 
     .grid-sizer,
     .grid-item {
@@ -107,50 +89,34 @@ body {
 }
 
 .grid-item img {
-  display: block;
-  width: 100%;
-  transition: all 0.2s;
+    display: block;
+    width: 100%;
+    transition: all 0.2s;
 }
 
 .grid-item img:hover {
     transform: scale(1.1);
 }
 
-.form-group {
-    margin-bottom: 0.75rem;
-}
+/* .form-group: use mb-3 */
 
-.meme-preview {
-    border: 1px solid #cecece;
-}
+/* .meme-preview: use border border-gray-300 */
 
 
-.preview {
-    padding-left: 15px;
-    padding-right: 15px;
-}
+/* .preview: use px-4 */
 
-.back-btn .btn{
-    font-size: 14px;
-    font-weight: 700;
-    text-transform: none;
-}
+/* .back-btn .btn: use text-sm font-bold normal-case */
 
-.canvas-container {
-    width: 100%;
-}
+/* .canvas-container: use w-full */
 
 canvas {
     width: 100% !important;
     height: 100% !important;
     max-width: 100%;
-    max-height: 100%
+    max-height: 100%;
 }
 
-.new-select {
-    border: 1px solid #ced4da;
-    border-radius: .25rem;
-}
+/* .new-select: use border border-gray-300 rounded */
 
 /* Bootstrap-select CSS removed - no longer needed */
 
@@ -159,7 +125,7 @@ canvas {
     border-top-right-radius: 0;
 }
 
-.add-btns{
+.add-btns {
     border-bottom: 1px solid #cecece;
 }
 
@@ -174,7 +140,6 @@ canvas {
     width: 90%;
 }
 
-/* Alert close button styling */
 .alert button[type="button"] {
     padding: 0.25rem;
     border-radius: 0.25rem;
@@ -201,7 +166,6 @@ canvas {
     font-size: 0.75rem;
 }
 
-/* Step Indicator Styles */
 .step-indicator {
     width: 2rem;
     height: 2rem;
@@ -232,102 +196,31 @@ canvas {
     transition: all 0.3s ease-in-out;
 }
 
-/* Enhanced Button Styles */
-.btn-secondary {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 0.375rem;
-    background-color: #6b7280;
-    padding: 0.625rem 1.25rem;
-    font-weight: 600;
-    color: white;
-    transition: all 0.2s ease;
-    border: none;
-    cursor: pointer;
-    text-align: center;
-    text-decoration: none;
-    font-size: 0.875rem;
-    line-height: 1.25rem;
-    min-height: 2.5rem;
-}
+/* .btn-secondary: use inline-flex items-center justify-center rounded-md bg-gray-500 px-5 py-2.5 font-semibold text-white transition-all duration-200 border-0 cursor-pointer text-center no-underline text-sm leading-5 min-h-10 */
 
-.btn-secondary:hover {
-    background-color: #4b5563;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
+/* .btn-secondary:hover: use hover:bg-gray-600 hover:-translate-y-px hover:shadow-md */
 
-.btn-secondary:focus {
-    outline: 2px solid transparent;
-    outline-offset: 2px;
-    box-shadow: 0 0 0 3px rgb(107 114 128 / 0.3);
-}
+/* .btn-secondary:focus: use focus:outline-none focus:ring-3 focus:ring-gray-500/30 */
 
-.btn-secondary:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
-}
+/* .btn-secondary:active: use active:translate-y-0 active:shadow-sm */
 
-/* Primary button enhancements */
-.btn-primary {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 2.5rem;
-    font-size: 0.875rem;
-    line-height: 1.25rem;
-    transition: all 0.2s ease;
-    background-color: #8ab414;
-    color: white;
-    border: none;
-    border-radius: 0.375rem;
-    padding: 0.625rem 1.25rem;
-    font-weight: 600;
-    cursor: pointer;
-    text-decoration: none;
-}
+/* .btn-primary: use inline-flex items-center justify-center min-h-10 text-sm leading-5 transition-all duration-200 bg-gruene-primary text-white border-0 rounded-md px-5 py-2.5 font-semibold cursor-pointer no-underline */
 
-.btn-primary:hover {
-    background-color: #538430;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
+/* .btn-primary:hover: use hover:bg-gruene-dark hover:-translate-y-px hover:shadow-md */
 
-.btn-primary:active {
-    transform: translateY(0);
-}
+/* .btn-primary:active: use active:translate-y-0 */
 
-/* Button sizing variants */
-.btn-block {
-    width: 100%;
-}
-
-.btn-sm {
-    padding: 0.375rem 0.75rem;
-    font-size: 0.75rem;
-    min-height: 2rem;
-}
-
-.btn-lg {
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-    min-height: 3rem;
-}
-
-/* Enhanced Form Styles */
-.form-input, .form-select {
-    border-radius: 0.375rem;
-    border: 1px solid #d1d5db;
-    transition: all 0.2s;
-}
+/* Button sizing variants - use Tailwind:
+   .btn-block: w-full
+   .btn-sm: px-3 py-1.5 text-xs min-h-8
+   .btn-lg: px-6 py-3 text-base min-h-12
+*/
 
 .form-input:focus, .form-select:focus {
     border-color: #8ab414;
     box-shadow: 0 0 0 3px rgb(138 180 20 / 0.1);
 }
 
-/* Canvas Preview Enhancements */
 .meme-preview {
     border: 1px solid #e5e7eb;
     border-radius: 0.5rem;
@@ -336,7 +229,6 @@ canvas {
     position: relative;
 }
 
-/* Canvas dimensions display */
 #canvas-dimensions {
     font-family: 'Courier New', monospace;
     font-weight: 600;
@@ -356,17 +248,9 @@ canvas {
     padding: 1rem;
 }
 
-/* Progress Steps Visual Enhancement */
-.step-indicator:not(.active) {
-    background-color: #d1d5db;
-    color: #6b7280;
-}
+/* .step-indicator:not(.active): use bg-gray-300 text-gray-500 */
 
-/* Navigation improvements */
-.step-indicator {
-    position: relative;
-    z-index: 1;
-}
+/* .step-indicator: use relative z-10 */
 
 
 /* Mobile Optimizations */
@@ -383,44 +267,22 @@ canvas {
         gap: 0.75rem;
     }
     
-    /* Mobile-specific layout adjustments */
-    .lg\:col-span-2 {
-        order: -1;
-        margin-bottom: 1rem;
-    }
-    
-    /* Mobile step indicators */
-    .step-indicator {
-        width: 2.5rem;
-        height: 2.5rem;
-        font-size: 1rem;
-    }
-    
-    
-    
     .fabric-canvas-wrapper {
         min-height: 200px;
         padding: 0.5rem;
     }
     
-    /* Touch-friendly buttons */
     .btn-primary, .btn-secondary, .element-button {
         min-height: 44px;
         padding: 0.75rem 1rem;
     }
     
-    /* Mobile alert adjustments */
     .alert-container {
         width: 95%;
         max-width: 100%;
         padding: 0.5rem;
     }
     
-    .alert {
-        font-size: 0.875rem;
-    }
-    
-    /* Mobile element buttons */
     .element-buttons-grid {
         grid-template-columns: 1fr;
         gap: 0.5rem;
@@ -430,27 +292,14 @@ canvas {
         min-height: 3.5rem;
         font-size: 0.875rem;
     }
-    
-    /* Simplified progress steps for mobile */
-    .flex.items-center.space-x-5 {
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        justify-content: center;
-    }
-    
-    .flex.items-center.space-x-5 li {
-        margin: 0;
-    }
 }
 
-/* Hover Effects for Interactive Elements */
 .btn-secondary.cursor-pointer:hover,
 .cursor-pointer:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-/* Advanced Options Collapsible */
 #advanced-options {
     transition: all 0.3s ease-in-out;
 }
@@ -467,7 +316,6 @@ canvas {
 
 /* QR Section Animation - removed duplicate rules */
 
-/* Better Grid Item Styling */
 .grid-item {
     border-radius: 0.375rem;
     overflow: hidden;
@@ -480,20 +328,10 @@ canvas {
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-/* Step 3 Content Enhancements */
-.step-content .border-b {
-    border-color: #e5e7eb;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1.5rem;
-}
+/* .step-content .border-b: use border-gray-200 mb-6 pb-6 */
 
-.step-content .border-b:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-    padding-bottom: 0;
-}
+/* .step-content .border-b:last-child: use border-b-0 mb-0 pb-0 */
 
-/* Element buttons grid styling */
 .element-buttons-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -535,7 +373,6 @@ canvas {
     text-align: center;
 }
 
-/* Section headers in step 3 */
 .step-section-header {
     display: flex;
     align-items: center;
@@ -558,24 +395,12 @@ canvas {
     text-align: center;
 }
 
-/* Enhanced element controls */
-.element-controls {
-    background-color: #f8fafc;
-    border-radius: 0.5rem;
-    padding: 1rem;
-}
+/* .element-controls: use bg-slate-50 rounded-lg p-4 */
 
-.element-controls .grid {
-    gap: 0.75rem;
-}
+/* .element-controls .grid: use gap-3 */
 
-.element-controls label {
-    font-weight: 500;
-    color: #374151;
-    margin-bottom: 0.25rem;
-}
+/* .element-controls label: use font-medium text-gray-700 mb-1 */
 
-/* QR section styling */
 #qr-section {
     background-color: #fef3cd;
     border: 1px solid #fbbf24;
@@ -597,24 +422,20 @@ canvas {
     max-height: 300px;
 }
 
-/* Text alignment button group */
 .btn-group {
     display: inline-flex;
     border-radius: 0.375rem;
     overflow: hidden;
     border: 1px solid #d1d5db;
-    width: fit-content;
 }
 
 .btn-group.w-full {
     width: 100%;
 }
 
-@media (min-width: 1024px) {
-    .btn-group.lg\:w-auto {
-        width: auto;
-    }
-}
+/* .btn-group.w-full: use w-full */
+
+/* .btn-group.lg\:w-auto: use lg:w-auto */
 
 .btn-group .btn-primary {
     border-radius: 0;
@@ -641,4 +462,29 @@ canvas {
     background-color: #e5e7eb;
     transform: none;
     box-shadow: none;
+}
+
+/* Button size variants */
+.btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    min-height: 2rem;
+}
+
+.btn-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    line-height: 1.5rem;
+    min-height: 3rem;
+}
+
+/* Step wizard spacing - only apply margin to visible steps */
+.step-content:not(.hidden):not(:first-child) {
+    margin-top: 1.5rem;
+}
+
+/* Fix step alignment - ensure visible steps start at top */
+.step-content:not(.hidden) {
+    margin-top: 0 !important;
 }
