@@ -139,8 +139,7 @@
                     <div class="h-1 bg-gray-200 rounded-full relative">
                       <div
                         id="progress-1-2"
-                        class="h-1 bg-green-600 rounded-full transition-all duration-500 absolute top-0 left-0"
-                        style="width: 100%"
+                        class="h-1 bg-green-600 rounded-full transition-all duration-500 absolute top-0 left-0 w-full"
                       ></div>
                     </div>
                   </div>
@@ -167,8 +166,7 @@
                     <div class="h-1 bg-gray-200 rounded-full relative">
                       <div
                         id="progress-2-3"
-                        class="h-1 bg-green-600 rounded-full transition-all duration-500 absolute top-0 left-0"
-                        style="width: 0%"
+                        class="h-1 bg-green-600 rounded-full transition-all duration-500 absolute top-0 left-0 w-0"
                       ></div>
                     </div>
                   </div>
@@ -195,8 +193,7 @@
                     <div class="h-1 bg-gray-200 rounded-full relative">
                       <div
                         id="progress-3-4"
-                        class="h-1 bg-green-600 rounded-full transition-all duration-500 absolute top-0 left-0"
-                        style="width: 0%"
+                        class="h-1 bg-green-600 rounded-full transition-all duration-500 absolute top-0 left-0 w-0"
                       ></div>
                     </div>
                   </div>
@@ -334,7 +331,8 @@
                     id="canvas-template"
                   >
                     <optgroup label="Social Media">
-                      <option value="post">Instagram/Facebook Post</option>
+                      <option value="post">Post quadratisch</option>
+                      <option value="post_45">Post 4:5</option>
                       <option value="story">Instagram/Facebook Story</option>
                       <option value="event">Veranstaltung</option>
                       <option value="facebook_header">Facebook Header</option>
@@ -475,48 +473,65 @@
                         rows="3"
                       ></textarea>
                     </div>
-                    <div
-                      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-                    >
+                    <div class="space-y-4">
                       <div>
                         <label
-                          for="text-color"
+                          for="font-style-select"
                           class="block text-sm font-medium text-gray-700 mb-2"
-                          >Textfarbe:</label
+                          >Schriftart:</label
                         >
                         <select
-                          class="form-select text-method w-full"
-                          name="text-color"
-                          id="text-color"
+                          class="form-select w-full"
+                          id="font-style-select"
                         >
-                          <option value="rgb(255,240,0)">Gelb</option>
-                          <option value="rgb(255,255,255)">Weiß</option>
+                          <option value="Gotham Narrow Ultra Italic">Überschrift</option>
+                          <option value="Gotham Narrow Book">Fließtext</option>
                         </select>
                       </div>
-                      <div>
-                        <label
-                          for="shadow-depth"
-                          class="block text-sm font-medium text-gray-700 mb-2"
-                          >Schatten:</label
-                        >
-                        <input
-                          class="form-input text-method w-full"
-                          type="number"
-                          value="3"
-                          id="shadow-depth"
-                          min="0"
-                          max="30"
-                          placeholder="0"
-                        />
+                    </div>
+                    <div class="space-y-4">
+                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label
+                            for="text-color"
+                            class="block text-sm font-medium text-gray-700 mb-2"
+                            >Textfarbe:</label
+                          >
+                          <select
+                            class="form-select text-method w-full"
+                            name="text-color"
+                            id="text-color"
+                          >
+                            <option value="rgb(255,240,0)">Gelb</option>
+                            <option value="rgb(255,255,255)">Weiß</option>
+                            <option value="rgb(0,0,0)">Schwarz</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label
+                            for="shadow-depth"
+                            class="block text-sm font-medium text-gray-700 mb-2"
+                            >Schatten:</label
+                          >
+                          <input
+                            class="form-input text-method w-full"
+                            type="number"
+                            value="3"
+                            id="shadow-depth"
+                            min="0"
+                            max="30"
+                            placeholder="0"
+                          />
+                        </div>
                       </div>
-                      <div class="sm:col-span-2 lg:col-span-1">
+                      <div>
                         <label
                           class="block text-sm font-medium text-gray-700 mb-2"
                           >Ausrichtung:</label
                         >
-                        <div class="btn-group w-full lg:w-auto">
+                        <div class="btn-group w-full">
                           <label
-                            class="btn-primary align cursor-pointer flex-1 lg:flex-none"
+                            class="btn-primary align cursor-pointer flex-1"
                           >
                             <input
                               type="radio"
@@ -528,7 +543,7 @@
                             <i class="fas fa-align-left"></i>
                           </label>
                           <label
-                            class="btn-primary active align cursor-pointer flex-1 lg:flex-none"
+                            class="btn-primary active align cursor-pointer flex-1"
                           >
                             <input
                               type="radio"
@@ -541,7 +556,7 @@
                             <i class="fas fa-align-center"></i>
                           </label>
                           <label
-                            class="btn-primary align cursor-pointer flex-1 lg:flex-none"
+                            class="btn-primary align cursor-pointer flex-1"
                           >
                             <input
                               type="radio"
@@ -585,21 +600,39 @@
                 </div>
 
                 <!-- QR Code Section (Initially Hidden) -->
-                <div id="qr-section" class="hidden">
+                <div id="qr-section" class="hidden border-b pb-4">
                   <div class="step-section-header">
                     <i class="fas fa-qrcode"></i>
                     <h4>QR Code erstellen</h4>
                   </div>
-                  <div class="space-y-3">
-                    <input
-                      type="text"
-                      class="form-input w-full"
-                      id="qr-text"
-                      placeholder="Link oder Text für QR Code eingeben..."
-                    />
-                    <button class="btn-primary w-full" id="add-qr-code">
-                      <i class="fas fa-plus mr-2"></i>QR Code einfügen
-                    </button>
+                  <div class="space-y-4">
+                    <div>
+                      <input
+                        type="text"
+                        class="form-input w-full"
+                        id="qr-text"
+                        placeholder="Link oder Text für QR Code eingeben..."
+                      />
+                    </div>
+                    <div>
+                      <label
+                        for="qr-color"
+                        class="block text-sm font-medium text-gray-700 mb-2"
+                        >QR Code Farbe:</label
+                      >
+                      <select
+                        class="form-select w-full"
+                        id="qr-color"
+                      >
+                        <option value="#000000">Schwarz</option>
+                        <option value="#538430">Dunkelgrün</option>
+                      </select>
+                    </div>
+                    <div>
+                      <button class="btn-primary w-full" id="add-qr-code">
+                        <i class="fas fa-plus mr-2"></i>QR Code einfügen
+                      </button>
+                    </div>
                   </div>
                 </div>
 

@@ -27,7 +27,8 @@ function updateInputs() {
     if (activeObject && activeObject.get('type') === "text") {
         enableTextMethods();
         jQuery('#text').val(activeObject.text);
-        jQuery('#text-color').val(activeObject.fill).selectpicker('refresh');
+        jQuery('#text-color').val(activeObject.fill);
+        jQuery('#font-style-select').val(activeObject.fontFamily);
         jQuery(`input[value="${activeObject.textAlign}"]`).parent().trigger('update-status');
         updateScale(activeObject);
     }
@@ -81,6 +82,14 @@ function loadObjectHandlers() {
 
     bindHandler('#shadow-depth', 'input', function () {
         setValue("shadow", createShadow('black', jQuery(this).val()));
+    });
+
+    bindHandler('#font-style-select', 'change', function () {
+        const activeObject = canvas.getActiveObject();
+        if (activeObject && activeObject.get('type') === "text") {
+            const selectedFont = jQuery(this).val();
+            setValue("fontFamily", selectedFont);
+        }
     });
 }
 

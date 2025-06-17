@@ -280,9 +280,18 @@ canvas {
     font-size: 0.875rem;
     line-height: 1.25rem;
     transition: all 0.2s ease;
+    background-color: #8ab414;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    padding: 0.625rem 1.25rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
 }
 
 .btn-primary:hover {
+    background-color: #538430;
     transform: translateY(-1px);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
@@ -458,18 +467,7 @@ canvas {
 
 /* Better Visual Hierarchy */
 
-/* QR Section Animation */
-#qr-section {
-    transition: all 0.3s ease-in-out;
-    opacity: 0;
-    max-height: 0;
-    overflow: hidden;
-}
-
-#qr-section:not(.hidden) {
-    opacity: 1;
-    max-height: 200px;
-}
+/* QR Section Animation - removed duplicate rules */
 
 /* Better Grid Item Styling */
 .grid-item {
@@ -598,7 +596,7 @@ canvas {
 
 #qr-section:not(.hidden) {
     opacity: 1;
-    max-height: 200px;
+    max-height: 300px;
 }
 
 /* Text alignment button group */

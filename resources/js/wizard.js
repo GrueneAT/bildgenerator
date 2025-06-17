@@ -20,7 +20,8 @@ function initializeWizard() {
 // Preload custom fonts
 function preloadFonts() {
     const fonts = [
-        new FontFaceObserver('Gotham Narrow'),
+        new FontFaceObserver('Gotham Narrow Ultra Italic'),
+        new FontFaceObserver('Gotham Narrow Book'),
         new FontFaceObserver('Gotham Narrow Bold')
     ];
     
@@ -244,6 +245,9 @@ function setupQRSection() {
         if (!qrSection.hasClass('hidden')) {
             jQuery('#qr-text').focus();
         }
+        
+        // Debug log
+        console.log('QR section toggled, hidden class:', qrSection.hasClass('hidden'));
     });
 }
 
@@ -328,10 +332,45 @@ function showTailwindAlert(message, type = 'info') {
     }, 5000);
 }
 
+// LocalStorage functions for organization selection
+function saveSelectedOrganization() {
+    const selectedOrg = jQuery('#logo-selection').val();
+    if (selectedOrg) {
+        localStorage.setItem('gruener-bildgenerator-organisation', selectedOrg);
+    }
+}
+
+function restoreSelectedOrganization() {
+    const savedOrg = localStorage.getItem('gruener-bildgenerator-organisation');
+    if (savedOrg) {
+        // Wait for options to be loaded, then set the value
+        const checkOptions = setInterval(() => {
+            const $logoSelect = jQuery('#logo-selection');
+            if ($logoSelect.find('option').length > 1) { // More than just the default option
+                if ($logoSelect.find(`option[value="${savedOrg}"]`).length > 0) {
+                    $logoSelect.val(savedOrg);
+                    // Trigger change event to update the logo
+                    $logoSelect.trigger('change');
+                    console.log('Restored organization selection:', savedOrg);
+                }
+                clearInterval(checkOptions);
+            }
+        }, 100);
+        
+        // Clear interval after 5 seconds to prevent infinite checking
+        setTimeout(() => clearInterval(checkOptions), 5000);
+    }
+}
+
 // Auto-advance logic
 function setupAutoAdvance() {
     // Auto-advance from step 1 when template and logo are selected
     jQuery('#canvas-template, #logo-selection').on('change', function() {
+        // Save organization selection when it changes
+        if (this.id === 'logo-selection') {
+            saveSelectedOrganization();
+        }
+        
         // Always update dimensions when template changes
         setTimeout(() => {
             updateCanvasDimensions();
@@ -401,6 +440,11 @@ jQuery(document).ready(function() {
     setupAutoAdvance();
     enhanceCanvasIntegration();
     setupMobileEnhancements();
+    
+    // Restore saved organization selection after logo options are loaded
+    setTimeout(() => {
+        restoreSelectedOrganization();
+    }, 1500);
     
     // Initial state
     showAlert('Willkommen! Wählen Sie zuerst eine Vorlage aus.', 'info');
