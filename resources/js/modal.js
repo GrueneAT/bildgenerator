@@ -1,4 +1,4 @@
-// Modal functionality to replace Bootstrap modals
+// Modal functionality
 jQuery(function() {
     // Video modal functionality
     jQuery('#video-modal-btn').on('click', function() {
@@ -34,7 +34,7 @@ jQuery(function() {
     });
 });
 
-// Button group functionality to replace Bootstrap button groups
+// Button group functionality
 jQuery(function() {
     jQuery('.btn-group label').on('click', function() {
         const $label = jQuery(this);
@@ -54,7 +54,7 @@ jQuery(function() {
     });
 });
 
-// Alert functionality to replace Bootstrap alerts
+// Alert functionality
 function showTailwindAlert(message, type = 'danger') {
     const $alertContainer = jQuery('.alert-container');
     

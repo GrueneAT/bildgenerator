@@ -32,10 +32,7 @@ function createShadow(color, width) {
 }
 
 // UI utilities
-function refreshSelectPicker() {
-    // No longer needed with Tailwind CSS
-    // Bootstrap-select has been removed
-}
+// refreshSelectPicker function removed - no longer needed with Tailwind CSS
 
 function toggleTextMethods(enable) {
     const $textMethods = jQuery('.text-method');
@@ -48,7 +45,6 @@ function toggleTextMethods(enable) {
         $textMethods.attr('disabled', 'disabled');
         $alignButtons.addClass('disabled');
     }
-    refreshSelectPicker();
 }
 
 function disableTextMethods() {

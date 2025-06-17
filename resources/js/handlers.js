@@ -11,12 +11,10 @@ function loadFont(font) {
             text.set("fontFamily", "");
             text.set("fontFamily", font);
             canvas.renderAll();
-            refreshSelectPicker();
         });
     } else {
         text.set("fontFamily", font);
         canvas.renderAll();
-        refreshSelectPicker();
     }
 }
 

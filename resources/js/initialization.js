@@ -1,6 +1,5 @@
 // Initialize UI components
 jQuery(function() {
-    // No longer need selectpicker initialization
-    // Tailwind CSS handles form styling
+    // UI components initialized with Tailwind CSS
     console.log('UI components initialized with Tailwind CSS');
 });

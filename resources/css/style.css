@@ -152,9 +152,7 @@ canvas {
     border-radius: .25rem;
 }
 
-.bootstrap-select .dropdown-toggle:focus, .bootstrap-select>select.mobile-device:focus+.dropdown-toggle {
-    outline: 0px auto -webkit-focus-ring-color!important;
-}
+/* Bootstrap-select CSS removed - no longer needed */
 
 #bg-option {
     border-bottom-right-radius: 0;
