@@ -343,22 +343,31 @@ function saveSelectedOrganization() {
 function restoreSelectedOrganization() {
     const savedOrg = localStorage.getItem('gruener-bildgenerator-organisation');
     if (savedOrg) {
-        // Wait for options to be loaded, then set the value
+        // Wait for options to be loaded and searchable select to be initialized
         const checkOptions = setInterval(() => {
             const $logoSelect = jQuery('#logo-selection');
-            if ($logoSelect.find('option').length > 1) { // More than just the default option
+            const searchableSelect = $logoSelect.data('searchable-select');
+            
+            if ($logoSelect.find('option').length > 1 && searchableSelect) { // Options loaded and component ready
+                if ($logoSelect.find(`option[value="${savedOrg}"]`).length > 0) {
+                    // Use searchable select's method to properly update both the select and UI
+                    searchableSelect.selectOption(savedOrg);
+                    console.log('Restored organization selection:', savedOrg);
+                }
+                clearInterval(checkOptions);
+            } else if ($logoSelect.find('option').length > 1) {
+                // Fallback for regular select without searchable component
                 if ($logoSelect.find(`option[value="${savedOrg}"]`).length > 0) {
                     $logoSelect.val(savedOrg);
-                    // Trigger change event to update the logo
                     $logoSelect.trigger('change');
-                    console.log('Restored organization selection:', savedOrg);
+                    console.log('Restored organization selection (fallback):', savedOrg);
                 }
                 clearInterval(checkOptions);
             }
         }, 100);
         
-        // Clear interval after 5 seconds to prevent infinite checking
-        setTimeout(() => clearInterval(checkOptions), 5000);
+        // Clear interval after 10 seconds to prevent infinite checking
+        setTimeout(() => clearInterval(checkOptions), 10000);
     }
 }
 

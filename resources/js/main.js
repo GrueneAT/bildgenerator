@@ -77,8 +77,8 @@ var template_values = {
     height: 1080,
     topBorderMultiplier: 1,
     border: 20,
-    logoTop: 0.789,
-    logoTextTop: 0.947,
+    logoTop: 0.79,
+    logoTextTop: 0.948,
     dpi: 200,
   },
   post_45: {
@@ -86,8 +86,8 @@ var template_values = {
     height: 1350,
     topBorderMultiplier: 1,
     border: 20,
-    logoTop: 0.82,
-    logoTextTop: 0.95,
+    logoTop: 0.815,
+    logoTextTop: 0.959,
     dpi: 200,
   },
   event: {
