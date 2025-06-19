@@ -40,6 +40,28 @@ jobs:
         run: npm ci
       - name: Build CSS
         run: npm run build-css-prod
+      - name: Create logo directories (for logo generation)
+        run: |
+          mkdir -p resources/images/logos/gemeinden
+          mkdir -p resources/images/logos/bundeslaender
+          mkdir -p resources/images/logos/domains
+      - name: Generate logo JSON files (if logo images exist)
+        run: |
+          if [ -n "$(ls resources/images/logos/gemeinden/ 2>/dev/null)" ]; then
+            make logo-json
+          else
+            echo "No logo images found, using existing index.json"
+          fi
+      - name: Generate production HTML with embedded logos
+        run: |
+          if [ -f resources/images/logos/index.json ]; then
+            python3 embed_logos.py index.html index-production.html
+          else
+            echo "No logo data found, using original index.html"
+            cp index.html index-production.html
+          fi
+      - name: Copy production HTML as index for deployment
+        run: cp index-production.html index.html
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact
