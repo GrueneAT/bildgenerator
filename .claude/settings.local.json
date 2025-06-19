@@ -13,7 +13,10 @@
       "Bash(npx playwright:*)",
       "Bash(npm test:*)",
       "Bash(npm run test:coverage:*)",
-      "Bash(npm run test:*)"
+      "Bash(npm run test:*)",
+      "Bash(find:*)",
+      "Bash(cat:*)",
+      "Bash(ls:*)"
     ],
     "deny": []
   }

@@ -513,7 +513,7 @@ jQuery("#add-text")
       strokeWidth: 0,
       shadow: createShadow("#000000", jQuery("#shadow-depth").val()),
       objectCaching: false,
-      lineHeight: 0.7,
+      lineHeight: parseFloat(jQuery("#line-height").val()) || 1.0,
       centeredScaling: false,
       selectable: true,
       moveable: true,
@@ -1026,6 +1026,15 @@ function generateLogoSelection(data) {
 }
 
 function loadLogoSelection() {
+  // Check for embedded logo data first (production mode)
+  if (typeof window.EMBEDDED_LOGO_DATA !== "undefined") {
+    console.log("Using embedded logo data for faster loading");
+    generateLogoSelection(window.EMBEDDED_LOGO_DATA);
+    return;
+  }
+
+  // Fallback to AJAX loading (development mode)
+  console.log("Loading logo data via AJAX request");
   const defaultIndex =
     generatorApplicationURL + "resources/images/logos/index.json";
 
@@ -1044,6 +1053,12 @@ function loadLogoSelection() {
 
   jQuery.getJSON(logoIndex, function (data) {
     generateLogoSelection(data);
+  }).fail(function(jqxhr, textStatus, error) {
+    console.error("Failed to load logo data:", textStatus, error);
+    // Show user-friendly error message
+    if (typeof showAlert === "function") {
+      showAlert("Fehler beim Laden der Logo-Daten. Bitte Seite neu laden.", "warning");
+    }
   });
 }
 

@@ -462,7 +462,11 @@
                   >
                     <i class="fas fa-font"></i>
                     <h4>Text hinzufügen</h4>
-                    <i class="fas fa-chevron-down text-gray-400 ml-auto transition-transform duration-200" id="text-section-chevron" style="transform: rotate(-90deg);"></i>
+                    <i
+                      class="fas fa-chevron-down text-gray-400 ml-auto transition-transform duration-200"
+                      id="text-section-chevron"
+                      style="transform: rotate(-90deg)"
+                    ></i>
                   </button>
                   <div id="text-section" class="space-y-4 mt-4 hidden">
                     <div>
@@ -489,7 +493,9 @@
                           class="form-select w-full"
                           id="font-style-select"
                         >
-                          <option value="Gotham Narrow Ultra Italic">Überschrift</option>
+                          <option value="Gotham Narrow Ultra Italic">
+                            Überschrift
+                          </option>
                           <option value="Gotham Narrow Book">Fließtext</option>
                         </select>
                       </div>
@@ -514,6 +520,26 @@
                         </div>
                         <div>
                           <label
+                            for="line-height"
+                            class="block text-sm font-medium text-gray-700 mb-2"
+                            >Zeilenabstand:</label
+                          >
+                          <select
+                            class="form-select text-method w-full"
+                            name="line-height"
+                            id="line-height"
+                          >
+                            <option value="0.8">Klein</option>
+                            <option value="0.9">Mittel</option>
+                            <option value="1.1">Groß</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div
+                        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4"
+                      >
+                        <div>
+                          <label
                             for="shadow-depth"
                             class="block text-sm font-medium text-gray-700 mb-2"
                             >Schatten:</label
@@ -528,50 +554,50 @@
                             placeholder="0"
                           />
                         </div>
-                      </div>
-                      <div>
-                        <label
-                          class="block text-sm font-medium text-gray-700 mb-2"
-                          >Ausrichtung:</label
-                        >
-                        <div class="btn-group w-full">
+                        <div>
                           <label
-                            class="btn-primary align cursor-pointer flex-1"
+                            class="block text-sm font-medium text-gray-700 mb-2"
+                            >Ausrichtung:</label
                           >
-                            <input
-                              type="radio"
-                              value="left"
-                              name="align"
-                              id="left"
-                              class="sr-only"
-                            />
-                            <i class="fas fa-align-left"></i>
-                          </label>
-                          <label
-                            class="btn-primary active align cursor-pointer flex-1"
-                          >
-                            <input
-                              type="radio"
-                              value="center"
-                              name="align"
-                              id="center"
-                              checked
-                              class="sr-only"
-                            />
-                            <i class="fas fa-align-center"></i>
-                          </label>
-                          <label
-                            class="btn-primary align cursor-pointer flex-1"
-                          >
-                            <input
-                              type="radio"
-                              value="right"
-                              name="align"
-                              id="right"
-                              class="sr-only"
-                            />
-                            <i class="fas fa-align-right"></i>
-                          </label>
+                          <div class="btn-group w-full">
+                            <label
+                              class="btn-primary align cursor-pointer flex-1"
+                            >
+                              <input
+                                type="radio"
+                                value="left"
+                                name="align"
+                                id="left"
+                                class="sr-only"
+                              />
+                              <i class="fas fa-align-left"></i>
+                            </label>
+                            <label
+                              class="btn-primary active align cursor-pointer flex-1"
+                            >
+                              <input
+                                type="radio"
+                                value="center"
+                                name="align"
+                                id="center"
+                                checked
+                                class="sr-only"
+                              />
+                              <i class="fas fa-align-center"></i>
+                            </label>
+                            <label
+                              class="btn-primary align cursor-pointer flex-1"
+                            >
+                              <input
+                                type="radio"
+                                value="right"
+                                name="align"
+                                id="right"
+                                class="sr-only"
+                              />
+                              <i class="fas fa-align-right"></i>
+                            </label>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -590,23 +616,27 @@
                   >
                     <i class="fas fa-shapes"></i>
                     <h4>Weitere Elemente</h4>
-                    <i class="fas fa-chevron-down text-gray-400 ml-auto transition-transform duration-200" id="elements-section-chevron" style="transform: rotate(-90deg);"></i>
+                    <i
+                      class="fas fa-chevron-down text-gray-400 ml-auto transition-transform duration-200"
+                      id="elements-section-chevron"
+                      style="transform: rotate(-90deg)"
+                    ></i>
                   </button>
                   <div id="elements-section" class="mt-4 hidden">
                     <div class="element-buttons-grid">
-                    <input type="file" class="hidden" id="add-image" />
-                    <label class="element-button" for="add-image">
-                      <i class="fas fa-image"></i>Bild hinzufügen
-                    </label>
-                    <button class="element-button" id="add-pink-circle">
-                      <i class="fas fa-circle"></i>Rosa Kreis
-                    </button>
-                    <button class="element-button" id="add-cross">
-                      <i class="fas fa-check"></i>Häkchen
-                    </button>
-                    <button class="element-button" id="show-qr-section">
-                      <i class="fas fa-qrcode"></i>QR Code
-                    </button>
+                      <input type="file" class="hidden" id="add-image" />
+                      <label class="element-button" for="add-image">
+                        <i class="fas fa-image"></i>Bild hinzufügen
+                      </label>
+                      <button class="element-button" id="add-pink-circle">
+                        <i class="fas fa-circle"></i>Rosa Kreis
+                      </button>
+                      <button class="element-button" id="add-cross">
+                        <i class="fas fa-check"></i>Häkchen
+                      </button>
+                      <button class="element-button" id="show-qr-section">
+                        <i class="fas fa-qrcode"></i>QR Code
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -632,10 +662,7 @@
                         class="block text-sm font-medium text-gray-700 mb-2"
                         >QR Code Farbe:</label
                       >
-                      <select
-                        class="form-select w-full"
-                        id="qr-color"
-                      >
+                      <select class="form-select w-full" id="qr-color">
                         <option value="#000000">Schwarz</option>
                         <option value="#538430">Dunkelgrün</option>
                       </select>
@@ -657,7 +684,11 @@
                   >
                     <i class="fas fa-cog"></i>
                     <h4>Element bearbeiten</h4>
-                    <i class="fas fa-chevron-down text-gray-400 ml-auto transition-transform duration-200" id="controls-section-chevron" style="transform: rotate(-90deg);"></i>
+                    <i
+                      class="fas fa-chevron-down text-gray-400 ml-auto transition-transform duration-200"
+                      id="controls-section-chevron"
+                      style="transform: rotate(-90deg)"
+                    ></i>
                   </button>
                   <div id="controls-section" class="space-y-4 mt-4 hidden">
                     <div class="grid grid-cols-2 gap-3">

@@ -26,6 +26,7 @@ function updateInputs() {
         enableTextMethods();
         jQuery('#text').val(activeObject.text);
         jQuery('#text-color').val(activeObject.fill);
+        jQuery('#line-height').val(activeObject.lineHeight);
         jQuery('#font-style-select').val(activeObject.fontFamily);
         jQuery(`input[value="${activeObject.textAlign}"]`).parent().trigger('update-status');
         updateScale(activeObject);
@@ -108,6 +109,14 @@ function loadObjectHandlers() {
         if (activeObject && activeObject.get('type') === "text") {
             const selectedFont = jQuery(this).val();
             setValue("fontFamily", selectedFont);
+        }
+    });
+
+    bindHandler('#line-height', 'change', function () {
+        const activeObject = canvas.getActiveObject();
+        if (activeObject && activeObject.get('type') === "text") {
+            const lineHeight = parseFloat(jQuery(this).val());
+            setValue("lineHeight", lineHeight);
         }
     });
 }
