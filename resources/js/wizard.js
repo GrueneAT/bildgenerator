@@ -343,31 +343,27 @@ function saveSelectedOrganization() {
 function restoreSelectedOrganization() {
     const savedOrg = localStorage.getItem('gruener-bildgenerator-organisation');
     if (savedOrg) {
-        // Wait for options to be loaded and searchable select to be initialized
-        const checkOptions = setInterval(() => {
-            const $logoSelect = jQuery('#logo-selection');
-            const searchableSelect = $logoSelect.data('searchable-select');
-            
-            if ($logoSelect.find('option').length > 1 && searchableSelect) { // Options loaded and component ready
-                if ($logoSelect.find(`option[value="${savedOrg}"]`).length > 0) {
-                    // Use searchable select's method to properly update both the select and UI
-                    searchableSelect.selectOption(savedOrg);
-                    console.log('Restored organization selection:', savedOrg);
-                }
-                clearInterval(checkOptions);
-            } else if ($logoSelect.find('option').length > 1) {
-                // Fallback for regular select without searchable component
-                if ($logoSelect.find(`option[value="${savedOrg}"]`).length > 0) {
-                    $logoSelect.val(savedOrg);
-                    $logoSelect.trigger('change');
-                    console.log('Restored organization selection (fallback):', savedOrg);
-                }
-                clearInterval(checkOptions);
-            }
-        }, 100);
+        const $logoSelect = jQuery('#logo-selection');
+        const searchableSelect = $logoSelect.data('searchable-select');
         
-        // Clear interval after 10 seconds to prevent infinite checking
-        setTimeout(() => clearInterval(checkOptions), 10000);
+        // Check if options are already loaded and component is ready
+        if ($logoSelect.find('option').length > 1 && searchableSelect) {
+            if ($logoSelect.find(`option[value="${savedOrg}"]`).length > 0) {
+                // Use searchable select's method to properly update both the select and UI
+                searchableSelect.selectOption(savedOrg);
+                console.log('Restored organization selection:', savedOrg);
+            }
+        } else if ($logoSelect.find('option').length > 1) {
+            // Fallback for regular select without searchable component
+            if ($logoSelect.find(`option[value="${savedOrg}"]`).length > 0) {
+                $logoSelect.val(savedOrg);
+                $logoSelect.trigger('change');
+                console.log('Restored organization selection (fallback):', savedOrg);
+            }
+        } else {
+            // If options aren't loaded yet, wait for them with a minimal delay
+            setTimeout(() => restoreSelectedOrganization(), 50);
+        }
     }
 }
 
@@ -450,10 +446,10 @@ jQuery(document).ready(function() {
     enhanceCanvasIntegration();
     setupMobileEnhancements();
     
-    // Restore saved organization selection after logo options are loaded
+    // Restore saved organization selection (now immediate with embedded logos)
     setTimeout(() => {
         restoreSelectedOrganization();
-    }, 1500);
+    }, 100);
     
     // Initial state
     showAlert('Willkommen! Wählen Sie zuerst eine Vorlage aus.', 'info');
