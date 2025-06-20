@@ -1051,15 +1051,20 @@ function loadLogoSelection() {
     logoIndex = defaultIndex;
   }
 
-  jQuery.getJSON(logoIndex, function (data) {
-    generateLogoSelection(data);
-  }).fail(function(jqxhr, textStatus, error) {
-    console.error("Failed to load logo data:", textStatus, error);
-    // Show user-friendly error message
-    if (typeof showAlert === "function") {
-      showAlert("Fehler beim Laden der Logo-Daten. Bitte Seite neu laden.", "warning");
-    }
-  });
+  jQuery
+    .getJSON(logoIndex, function (data) {
+      generateLogoSelection(data);
+    })
+    .fail(function (jqxhr, textStatus, error) {
+      console.error("Failed to load logo data:", textStatus, error);
+      // Show user-friendly error message
+      if (typeof showAlert === "function") {
+        showAlert(
+          "Fehler beim Laden der Logo-Daten. Bitte Seite neu laden.",
+          "warning"
+        );
+      }
+    });
 }
 
 loadLogoSelection();
