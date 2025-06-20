@@ -121,7 +121,6 @@ jobs:
             --reporter=list
         env:
           CI: true
-          PLAYWRIGHT_BROWSERS_PATH: 0
           
       - name: Archive visual test results on failure
         if: failure()
