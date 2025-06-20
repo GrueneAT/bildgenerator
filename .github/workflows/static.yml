@@ -51,6 +51,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
         
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+        
       - name: Run unit tests
         run: npm run test:coverage
         
@@ -196,7 +199,7 @@ jobs:
         run: python3 logo_json.py
         
       - name: Run E2E tests
-        run: npx playwright test --exclude="**/visual-regression.spec.js"
+        run: npx playwright test --grep-invert "visual-regression"
         env:
           CI: true
           
