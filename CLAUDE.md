@@ -97,3 +97,5 @@ Logos are organized in a hierarchical structure:
 - Tailwind CSS requires compilation when utility classes are modified
 - The wizard system enforces step-by-step user flow with validation
 - NEVER use inline styles and ALWAYS use tailwind, add custom styles to css files ONLY when absolutely necessary
+- In visual regression tests NEVER manipulate the canvas or other elements directly, ALWAYS use the available features in the same way a user would.
+- Documentation files always have to go to the root of the repository
