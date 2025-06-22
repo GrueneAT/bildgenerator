@@ -10,6 +10,9 @@
     "test:coverage": "jest --coverage",
     "test:e2e": "playwright test",
     "test:e2e-ui": "playwright test --ui",
+    "test:visual": "playwright test e2e/visual-regression.spec.js",
+    "test:visual-ui": "playwright test e2e/visual-regression.spec.js --ui",
+    "test:visual-strict": "playwright test e2e/visual-regression.spec.js --timeout=90000",
     "test:all": "npm run test && npm run test:e2e"
   },
   "devDependencies": {
@@ -19,6 +22,8 @@
     "jest-environment-jsdom": "^29.7.0",
     "@testing-library/jest-dom": "^6.1.4",
     "@testing-library/dom": "^9.3.3",
-    "@playwright/test": "^1.40.0"
+    "@playwright/test": "^1.40.0",
+    "pixelmatch": "^5.3.0",
+    "pngjs": "^7.0.0"
   }
 }
