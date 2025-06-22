@@ -103,20 +103,20 @@ jobs:
       - name: Verify reference images exist
         run: |
           echo "Checking reference images..."
-          ls -la e2e-regression-source/
-          if [ -z "$(ls -A e2e-regression-source/)" ]; then
-            echo "❌ No reference images found in e2e-regression-source/"
+          ls -la visual-regression/reference-images/
+          if [ -z "$(ls -A visual-regression/reference-images/)" ]; then
+            echo "❌ No reference images found in visual-regression/reference-images/"
             echo "Please run the baseline update workflow first"
             exit 1
           else
             echo "✅ Reference images found:"
-            ls -1 e2e-regression-source/*.png | wc -l | xargs echo "Total images:"
+            ls -1 visual-regression/reference-images/*.png | wc -l | xargs echo "Total images:"
           fi
           
       - name: Run visual regression tests
         run: |
           echo "🎨 Running pixel-perfect visual regression tests..."
-          npx playwright test e2e/visual-regression.spec.js \
+          npx playwright test visual-regression/tests/visual-regression.spec.js \
             --timeout=90000 \
             --reporter=list
         env:
@@ -128,7 +128,7 @@ jobs:
         with:
           name: visual-regression-failure-${{ github.run_number }}
           path: |
-            e2e-comparison-results/
+            visual-regression/comparison-results/
             test-results/
             playwright-report/
           retention-days: 14
@@ -139,8 +139,8 @@ jobs:
           echo "🔄 Updating baseline images..."
           
           # Copy comparison images to reference directory
-          if [ -d "e2e-comparison-results" ]; then
-            cp e2e-comparison-results/*.png e2e-regression-source/ 2>/dev/null || true
+          if [ -d "visual-regression/comparison-results" ]; then
+            cp visual-regression/comparison-results/*.png visual-regression/reference-images/ 2>/dev/null || true
             echo "✅ Baseline images updated"
           else
             echo "ℹ️ No new comparison images to update"
@@ -151,7 +151,7 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add e2e-regression-source/
+          git add visual-regression/reference-images/
           
           if git diff --staged --quiet; then
             echo "ℹ️ No baseline changes to commit"

@@ -10,9 +10,15 @@
     "test:coverage": "jest --coverage",
     "test:e2e": "playwright test",
     "test:e2e-ui": "playwright test --ui",
-    "test:visual": "playwright test e2e/visual-regression.spec.js",
-    "test:visual-ui": "playwright test e2e/visual-regression.spec.js --ui",
-    "test:visual-strict": "playwright test e2e/visual-regression.spec.js --timeout=90000",
+    "test:visual": "playwright test visual-regression/tests/",
+    "test:visual-ui": "playwright test visual-regression/tests/ --ui",
+    "test:visual-strict": "playwright test visual-regression/tests/ --timeout=90000",
+    "test:visual-core": "playwright test visual-regression/tests/core-functionality.spec.js",
+    "test:visual-templates": "playwright test visual-regression/tests/templates.spec.js",
+    "test:visual-text": "playwright test visual-regression/tests/text-system.spec.js",
+    "test:visual-elements": "playwright test visual-regression/tests/elements.spec.js",
+    "test:visual-qr": "playwright test visual-regression/tests/qr-codes.spec.js",
+    "test:visual-layouts": "playwright test visual-regression/tests/layouts.spec.js",
     "test:all": "npm run test && npm run test:e2e"
   },
   "devDependencies": {
