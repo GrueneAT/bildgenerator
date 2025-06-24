@@ -11,9 +11,30 @@ module.exports = {
   ],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],
+  coverageThreshold: {
+    global: {
+      branches: 0,
+      functions: 0,
+      lines: 1.5,
+      statements: 1.5
+    }
+  },
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/resources/$1'
   },
+  transform: {
+    '^.+\\.js$': ['babel-jest', {
+      presets: [
+        ['@babel/preset-env', {
+          targets: { node: 'current' },
+          modules: 'commonjs'
+        }]
+      ]
+    }]
+  },
+  transformIgnorePatterns: [
+    'node_modules/(?!(resources/js)/)'
+  ],
   globals: {
     'fabric': {},
     'jQuery': {},

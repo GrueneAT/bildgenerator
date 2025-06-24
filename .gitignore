@@ -6,5 +6,4 @@ playwright-report
 screenshots
 test-results
 index-production.html
-e2e-comparison-results
-e2e-reference-images
+visual-regression/comparison-results

@@ -48,6 +48,21 @@
               Grüner Bildgenerator
             </h1>
           </div>
+          <!-- Navigation Tabs -->
+          <div class="hidden md:flex items-center gap-2">
+            <button 
+              id="tab-generator" 
+              class="nav-tab active px-4 py-2 text-sm font-medium rounded-lg bg-gruene-primary text-white"
+            >
+              <i class="fas fa-image mr-2"></i>Bildgenerator
+            </button>
+            <button 
+              id="tab-qrcode" 
+              class="nav-tab px-4 py-2 text-sm font-medium rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300"
+            >
+              <i class="fas fa-qrcode mr-2"></i>QR-Code
+            </button>
+          </div>
           <div class="flex items-center gap-2 text-sm">
             <a
               href="mailto:florian.motlik@gruene.at"
@@ -106,6 +121,244 @@
         </div>
       </div>
     </div>
+    
+    <!-- Mobile Navigation Tabs -->
+    <div class="md:hidden px-4 sm:px-6 lg:px-8 pb-4">
+      <div class="flex gap-2">
+        <button 
+          id="tab-generator-mobile" 
+          class="nav-tab-mobile active flex-1 px-4 py-2 text-sm font-medium rounded-lg bg-gruene-primary text-white text-center"
+        >
+          <i class="fas fa-image mr-2"></i>Bildgenerator
+        </button>
+        <button 
+          id="tab-qrcode-mobile" 
+          class="nav-tab-mobile flex-1 px-4 py-2 text-sm font-medium rounded-lg bg-gray-200 text-gray-700 text-center"
+        >
+          <i class="fas fa-qrcode mr-2"></i>QR-Code
+        </button>
+      </div>
+    </div>
+    
+    <!-- QR Code Generator Container -->
+    <div id="qrcode-container" class="container-fluid d-none">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+        <!-- QR Code Progress Steps -->
+        <div class="mb-6 hidden md:block">
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 py-4 px-6">
+            <nav aria-label="QR Code Progress" class="max-w-6xl mx-auto">
+              <div class="flex items-center justify-between relative">
+                <!-- QR Step 1 -->
+                <div class="flex flex-col items-center text-center flex-1 cursor-pointer" onclick="qrGoToStep(1)">
+                  <div id="qr-step-1-indicator" class="step-indicator active bg-green-600 text-white shadow-lg mb-2">
+                    <i class="fas fa-list"></i>
+                  </div>
+                  <div>
+                    <p class="text-xs font-bold text-gray-900">Schritt 1</p>
+                    <p class="text-xs text-gray-600">Inhaltstyp wählen</p>
+                  </div>
+                </div>
+
+                <!-- QR Progress Line 1-2 -->
+                <div class="flex-1 px-4">
+                  <div class="h-1 bg-gray-200 rounded-full relative">
+                    <div id="qr-progress-1-2" class="h-1 bg-green-600 rounded-full transition-all duration-500 absolute top-0 left-0 w-0"></div>
+                  </div>
+                </div>
+
+                <!-- QR Step 2 -->
+                <div class="flex flex-col items-center text-center flex-1 cursor-pointer" onclick="qrGoToStep(2)">
+                  <div id="qr-step-2-indicator" class="step-indicator bg-gray-300 text-gray-600 mb-2">
+                    <i class="fas fa-edit"></i>
+                  </div>
+                  <div>
+                    <p class="text-xs font-bold text-gray-500">Schritt 2</p>
+                    <p class="text-xs text-gray-500">Inhalte eingeben</p>
+                  </div>
+                </div>
+
+                <!-- QR Progress Line 2-3 -->
+                <div class="flex-1 px-4">
+                  <div class="h-1 bg-gray-200 rounded-full relative">
+                    <div id="qr-progress-2-3" class="h-1 bg-green-600 rounded-full transition-all duration-500 absolute top-0 left-0 w-0"></div>
+                  </div>
+                </div>
+
+                <!-- QR Step 3 -->
+                <div class="flex flex-col items-center text-center flex-1 cursor-pointer" onclick="qrGoToStep(3)">
+                  <div id="qr-step-3-indicator" class="step-indicator bg-gray-300 text-gray-600 mb-2">
+                    <i class="fas fa-qrcode"></i>
+                  </div>
+                  <div>
+                    <p class="text-xs font-bold text-gray-500">Schritt 3</p>
+                    <p class="text-xs text-gray-500">QR-Code erstellen</p>
+                  </div>
+                </div>
+              </div>
+            </nav>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+          <!-- Left Column - QR Controls -->
+          <div class="lg:col-span-1 order-2 lg:order-1">
+            <!-- QR Step 1: Content Type Selection -->
+            <div id="qr-step-1" class="qr-step-content bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+              <div class="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6 mb-6 text-center md:text-left">
+                <div class="w-12 h-12 md:w-12 md:h-12 bg-green-600 text-white rounded-full flex items-center justify-center text-lg font-bold shadow-lg flex-shrink-0">
+                  <i class="fas fa-list"></i>
+                </div>
+                <div class="flex-1">
+                  <h2 class="text-2xl md:text-xl font-bold text-gray-900 mb-2 md:mb-1 leading-tight">
+                    Inhaltstyp wählen
+                  </h2>
+                  <p class="text-gray-600 text-base md:text-sm leading-relaxed">
+                    Wählen Sie aus, welchen Inhalt Ihr QR-Code enthalten soll
+                  </p>
+                </div>
+              </div>
+              <div class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <button class="qr-type-button" data-type="text">
+                    <i class="fas fa-font text-2xl mb-3"></i>
+                    <div class="font-medium text-lg">Text</div>
+                    <div class="text-sm text-gray-600">Einfacher Text</div>
+                  </button>
+                  <button class="qr-type-button" data-type="url">
+                    <i class="fas fa-globe text-2xl mb-3"></i>
+                    <div class="font-medium text-lg">Homepage</div>
+                    <div class="text-sm text-gray-600">Website-Link</div>
+                  </button>
+                  <button class="qr-type-button" data-type="email">
+                    <i class="fas fa-envelope text-2xl mb-3"></i>
+                    <div class="font-medium text-lg">E-Mail</div>
+                    <div class="text-sm text-gray-600">E-Mail mit Betreff</div>
+                  </button>
+                  <button class="qr-type-button" data-type="vcard">
+                    <i class="fas fa-user text-2xl mb-3"></i>
+                    <div class="font-medium text-lg">Visitenkarte</div>
+                    <div class="text-sm text-gray-600">Kontaktdaten</div>
+                  </button>
+                </div>
+                <button id="qr-step-1-next" class="w-full btn-primary disabled:opacity-50" disabled>
+                  Weiter zur Eingabe
+                </button>
+              </div>
+            </div>
+
+            <!-- QR Step 2: Content Input -->
+            <div id="qr-step-2" class="qr-step-content hidden bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+              <div class="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6 mb-6 text-center md:text-left">
+                <div class="w-12 h-12 md:w-12 md:h-12 bg-green-600 text-white rounded-full flex items-center justify-center text-lg font-bold shadow-lg flex-shrink-0">
+                  <i class="fas fa-edit"></i>
+                </div>
+                <div class="flex-1">
+                  <h2 class="text-2xl md:text-xl font-bold text-gray-900 mb-2 md:mb-1 leading-tight">
+                    Inhalte eingeben
+                  </h2>
+                  <p class="text-gray-600 text-base md:text-sm leading-relaxed">
+                    Geben Sie die Informationen für Ihren QR-Code ein
+                  </p>
+                </div>
+              </div>
+              <div class="space-y-4">
+                <div id="qr-form-container">
+                  <!-- Dynamic forms will be inserted here -->
+                </div>
+                <div class="flex space-x-3">
+                  <button id="qr-step-2-back" class="flex-1 btn-secondary">
+                    Zurück
+                  </button>
+                  <button id="qr-step-2-next" class="flex-1 btn-primary">
+                    QR-Code erstellen
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- QR Step 3: QR Code Generation -->
+            <div id="qr-step-3" class="qr-step-content hidden bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+              <div class="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6 mb-6 text-center md:text-left">
+                <div class="w-12 h-12 md:w-12 md:h-12 bg-green-600 text-white rounded-full flex items-center justify-center text-lg font-bold shadow-lg flex-shrink-0">
+                  <i class="fas fa-qrcode"></i>
+                </div>
+                <div class="flex-1">
+                  <h2 class="text-2xl md:text-xl font-bold text-gray-900 mb-2 md:mb-1 leading-tight">
+                    QR-Code anpassen
+                  </h2>
+                  <p class="text-gray-600 text-base md:text-sm leading-relaxed">
+                    Passen Sie Farben an und laden Sie Ihren QR-Code herunter
+                  </p>
+                </div>
+              </div>
+              <div class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label for="qr-color-select" class="block text-sm font-medium text-gray-700 mb-2">
+                      QR-Code Farbe:
+                    </label>
+                    <select class="form-select w-full" id="qr-color-select">
+                      <option value="#000000">Schwarz</option>
+                      <option value="#FFFFFF">Weiß</option>
+                      <option value="#538430">Dunkelgrün</option>
+                      <option value="#82B624">Hellgrün</option>
+                      <option value="#FFED00">Gelb</option>
+                      <option value="#E6007E">Magenta</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="qr-background-select" class="block text-sm font-medium text-gray-700 mb-2">
+                      Hintergrund:
+                    </label>
+                    <select class="form-select w-full" id="qr-background-select">
+                      <option value="#FFFFFF">Weiß</option>
+                      <option value="#000000">Schwarz</option>
+                      <option value="transparent">Transparent</option>
+                    </select>
+                  </div>
+                </div>
+                <button class="w-full btn-primary text-lg py-3" id="qr-download">
+                  <i class="fas fa-download mr-2"></i>QR-Code als PNG herunterladen
+                </button>
+                <div class="flex space-x-3">
+                  <button id="qr-step-3-back" class="flex-1 btn-secondary">
+                    Zurück
+                  </button>
+                  <button id="qr-start-over" class="flex-1 btn-secondary">
+                    Neuer QR-Code
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column - QR Preview -->
+          <div class="lg:col-span-2 order-1 lg:order-2">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-900">
+                  QR-Code Vorschau
+                </h3>
+                <div class="text-sm text-gray-500" id="qr-status">
+                  Wählen Sie einen Inhaltstyp
+                </div>
+              </div>
+              <div class="qr-preview-container">
+                <div class="flex justify-center items-center min-h-64 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+                  <div id="qr-preview-placeholder" class="text-center text-gray-400">
+                    <i class="fas fa-qrcode text-6xl mb-4"></i>
+                    <p class="text-lg">QR-Code Vorschau</p>
+                    <p class="text-sm">Wählen Sie einen Inhaltstyp aus</p>
+                  </div>
+                  <div id="qr-preview-display" class="hidden"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div id="generator">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
         <!-- Progress Steps -->
@@ -927,5 +1180,11 @@
     <script src="resources/js/handlers.js"></script>
     <script src="resources/js/main.js"></script>
     <script src="resources/js/wizard.js"></script>
+    
+    <!-- QR Code Module Scripts -->
+    <script src="resources/js/qrcode/qrcode-helpers.js"></script>
+    <script src="resources/js/qrcode/qrcode-generator.js"></script>
+    <script src="resources/js/qrcode/qrcode-wizard.js"></script>
+    <script src="resources/js/qrcode/qrcode-handlers.js"></script>
   </body>
 </html>

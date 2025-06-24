@@ -24,6 +24,10 @@
   .btn-primary {
     @apply bg-gruene-primary hover:bg-gruene-secondary text-white font-bold py-2 px-4 rounded transition-colors duration-200;
   }
+
+  .btn-secondary {
+    @apply bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition-colors duration-200;
+  }
   
   .btn-danger {
     @apply bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors duration-200;
@@ -121,5 +125,85 @@
   
   .btn-group > button.active {
     @apply bg-gruene-secondary text-white;
+  }
+
+  /* QR Code specific components */
+  .qr-type-button {
+    @apply p-6 border-2 border-gray-300 rounded-lg text-center hover:border-gruene-primary hover:bg-gruene-primary hover:text-white transition-all duration-200 cursor-pointer bg-white text-gray-700;
+  }
+  
+  .qr-type-button.active {
+    @apply border-gruene-primary bg-gruene-primary text-white;
+  }
+  
+  .qr-preview-container {
+    @apply relative w-full;
+  }
+  
+  .qr-preview-container canvas {
+    @apply mx-auto;
+  }
+  
+  .qr-step-content {
+    @apply transition-all duration-300 ease-in-out;
+  }
+  
+  .qr-form-section {
+    @apply space-y-4 p-4 border border-gray-200 rounded-lg bg-gray-50;
+  }
+  
+  .validation-hint {
+    @apply text-xs text-red-600 mt-1;
+  }
+  
+  /* Navigation tab components */
+  .nav-tab {
+    @apply transition-all duration-200 hover:bg-opacity-90;
+  }
+  
+  .nav-tab-mobile {
+    @apply transition-all duration-200 hover:bg-opacity-90;
+  }
+  
+  .nav-tab.active,
+  .nav-tab-mobile.active {
+    @apply shadow-sm;
+  }
+  
+  /* Step indicator enhancements for QR */
+  .step-indicator {
+    @apply w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300;
+  }
+  
+  .step-indicator.active {
+    @apply transform scale-110;
+  }
+  
+  /* Mobile enhancements */
+  @media (max-width: 768px) {
+    .qr-type-button {
+      @apply p-4 text-sm;
+    }
+    
+    .qr-type-button i {
+      @apply text-xl mb-2;
+    }
+    
+    .touch-friendly {
+      @apply min-h-12 text-base;
+    }
+  }
+  
+  /* Print styles for QR codes */
+  @media print {
+    .qr-preview-container {
+      @apply shadow-none border-none;
+    }
+    
+    .nav-tab,
+    .nav-tab-mobile,
+    button:not(.qr-download) {
+      @apply hidden;
+    }
   }
 }
