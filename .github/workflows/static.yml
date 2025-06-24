@@ -5,7 +5,7 @@ on:
   # Runs on pushes targeting the default branch
   push:
     branches: ["main", "develop"]
-  
+
   # Pull requests to main branch
   pull_request:
     branches: ["main"]
@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
     inputs:
       update_visual_baseline:
-        description: 'Update visual regression baseline images'
+        description: "Update visual regression baseline images"
         required: false
         default: false
         type: boolean
@@ -37,33 +37,33 @@ jobs:
     name: Unit Tests & Code Quality
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
-          
+          node-version: "20"
+          cache: "npm"
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
-        
+
       - name: Run unit tests
         run: npm run test:coverage
-        
+
       - name: Upload coverage reports
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: coverage/
           retention-days: 7
-          
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
@@ -75,31 +75,31 @@ jobs:
     name: Visual Regression Tests
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
-          
+          node-version: "20"
+          cache: "npm"
+
       - name: Install Node.js dependencies
         run: npm ci
-        
+
       - name: Install Playwright with Chromium
         run: npx playwright install --with-deps chromium
-        
+
       - name: Setup Python for logo processing
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
-          
+          python-version: "3.x"
+
       - name: Generate logo JSON files
         run: python3 logo_json.py
-        
+
       - name: Verify reference images exist
         run: |
           echo "Checking reference images..."
@@ -112,16 +112,19 @@ jobs:
             echo "✅ Reference images found:"
             ls -1 visual-regression/reference-images/*.png | wc -l | xargs echo "Total images:"
           fi
-          
+
+      - name: List available visual regression tests
+        run: |
+          echo "📋 Available visual regression tests:"
+          npm run test:visual-strict -- --list
+
       - name: Run visual regression tests
         run: |
           echo "🎨 Running pixel-perfect visual regression tests..."
-          npx playwright test visual-regression/tests/visual-regression.spec.js \
-            --timeout=90000 \
-            --reporter=list
+          npm run test:visual-strict
         env:
           CI: true
-          
+
       - name: Archive visual test results on failure
         if: failure()
         uses: actions/upload-artifact@v4
@@ -132,12 +135,12 @@ jobs:
             test-results/
             playwright-report/
           retention-days: 14
-          
+
       - name: Update baseline images if requested
         if: ${{ github.event.inputs.update_visual_baseline == 'true' && github.event_name == 'workflow_dispatch' }}
         run: |
           echo "🔄 Updating baseline images..."
-          
+
           # Copy comparison images to reference directory
           if [ -d "visual-regression/comparison-results" ]; then
             cp visual-regression/comparison-results/*.png visual-regression/reference-images/ 2>/dev/null || true
@@ -145,14 +148,14 @@ jobs:
           else
             echo "ℹ️ No new comparison images to update"
           fi
-          
+
       - name: Commit updated baselines
         if: ${{ github.event.inputs.update_visual_baseline == 'true' && github.event_name == 'workflow_dispatch' }}
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add visual-regression/reference-images/
-          
+
           if git diff --staged --quiet; then
             echo "ℹ️ No baseline changes to commit"
           else
@@ -172,36 +175,36 @@ jobs:
     name: End-to-End Tests
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
-          
+          node-version: "20"
+          cache: "npm"
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
-        
+
       - name: Setup Python for logo processing
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
-          
+          python-version: "3.x"
+
       - name: Generate logo JSON files
         run: python3 logo_json.py
-        
+
       - name: Run E2E tests
-        run: npx playwright test --grep-invert "visual-regression"
+        run: npx playwright test e2e/
         env:
           CI: true
-          
+
       - name: Upload E2E test results
         if: failure()
         uses: actions/upload-artifact@v4
@@ -227,8 +230,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
       - name: Install dependencies
         run: npm ci
       - name: Build CSS
@@ -261,7 +264,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload entire repository
-          path: '.'
+          path: "."
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
