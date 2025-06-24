@@ -19,7 +19,12 @@
       "Bash(ls:*)",
       "Bash(cp:*)",
       "Bash(mv:*)",
-      "Bash(true)"
+      "Bash(true)",
+      "Bash(GENERATE_REFERENCE=true npx playwright test visual-regression/tests/templates.spec.js --quiet)",
+      "Bash(GENERATE_REFERENCE=true npx playwright test visual-regression/tests/templates.spec.js:184 --quiet)",
+      "Bash(GENERATE_REFERENCE=true npx playwright test visual-regression/tests/templates.spec.js:184 --timeout=60000)",
+      "Bash(GENERATE_REFERENCE=true npx playwright test visual-regression/tests/text-system.spec.js --quiet)",
+      "Bash(GENERATE_REFERENCE=true npx playwright test visual-regression/tests/background-images.spec.js --quiet)"
     ],
     "deny": []
   }

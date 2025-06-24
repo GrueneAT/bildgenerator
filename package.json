@@ -19,6 +19,12 @@
     "test:visual-elements": "playwright test visual-regression/tests/elements.spec.js",
     "test:visual-qr": "playwright test visual-regression/tests/qr-codes.spec.js",
     "test:visual-layouts": "playwright test visual-regression/tests/layouts.spec.js",
+    "test:visual-wizard": "playwright test visual-regression/tests/wizard-navigation.spec.js",
+    "test:visual-errors": "playwright test visual-regression/tests/error-handling.spec.js",
+    "test:visual-positioning": "playwright test visual-regression/tests/positioning.spec.js",
+    "test:visual-backgrounds": "playwright test visual-regression/tests/background-images.spec.js",
+    "generate-references": "GENERATE_REFERENCE=true playwright test visual-regression/tests/",
+    "generate-references-script": "./scripts/generate-reference-images.sh",
     "test:all": "npm run test && npm run test:e2e"
   },
   "devDependencies": {

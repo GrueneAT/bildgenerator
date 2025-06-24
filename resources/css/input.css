@@ -24,6 +24,10 @@
   .btn-primary {
     @apply bg-gruene-primary hover:bg-gruene-secondary text-white font-bold py-2 px-4 rounded transition-colors duration-200;
   }
+
+  .btn-secondary {
+    @apply bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition-colors duration-200;
+  }
   
   .btn-danger {
     @apply bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors duration-200;

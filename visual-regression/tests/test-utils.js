@@ -7,6 +7,9 @@ import { expect } from '@playwright/test';
 export const REFERENCE_DIR = 'visual-regression/reference-images';
 export const COMPARISON_DIR = 'visual-regression/comparison-results';
 
+// Set to true to generate reference images instead of comparing
+export const GENERATE_REFERENCE_MODE = process.env.GENERATE_REFERENCE === 'true';
+
 /**
  * Setup basic template with logo selection
  * @param {import('@playwright/test').Page} page 
@@ -24,8 +27,13 @@ export async function setupBasicTemplate(page, templateType = 'post') {
     await page.waitForTimeout(2000);
   }
   
-  // Wait for logo selection to be available and select the first available logo
-  await page.waitForTimeout(2000);
+  // Wait for canvas and logos to be properly initialized
+  await page.waitForFunction(() => {
+    return typeof canvas !== 'undefined' && 
+           canvas !== null && 
+           document.getElementById('logo-selection') &&
+           document.getElementById('logo-selection').options.length > 1;
+  }, { timeout: 30000 });
   
   // Check if we have a default logo available and select it
   await page.evaluate(() => {
@@ -45,10 +53,50 @@ export async function setupBasicTemplate(page, templateType = 'post') {
   
   await page.waitForTimeout(2000);
   
-  // If no logo was selected, we might need to handle this differently
-  // For now, let's try to proceed
+  // Wait for step 1 next button to be visible and enabled
+  await page.waitForSelector('#step-1-next:visible', { timeout: 10000 });
   await page.click('#step-1-next');
   await page.waitForTimeout(1000);
+}
+
+/**
+ * Wait for a specific wizard step to be active
+ * @param {import('@playwright/test').Page} page 
+ * @param {number} stepNumber - Step number (1-4)
+ */
+export async function waitForWizardStep(page, stepNumber) {
+  await page.waitForFunction((step) => {
+    const stepElement = document.getElementById(`step-${step}`);
+    return stepElement && !stepElement.classList.contains('hidden');
+  }, stepNumber, { timeout: 10000 });
+}
+
+/**
+ * Navigate to a specific wizard step safely
+ * @param {import('@playwright/test').Page} page 
+ * @param {number} fromStep - Current step
+ * @param {number} toStep - Target step
+ */
+export async function navigateToStep(page, fromStep, toStep) {
+  if (fromStep === toStep) return;
+  
+  if (fromStep < toStep) {
+    // Moving forward
+    for (let step = fromStep; step < toStep; step++) {
+      const nextButtonId = `#step-${step}-next`;
+      await page.waitForSelector(`${nextButtonId}:visible`, { timeout: 10000 });
+      await page.click(nextButtonId);
+      await waitForWizardStep(page, step + 1);
+    }
+  } else {
+    // Moving backward
+    for (let step = fromStep; step > toStep; step--) {
+      const backButtonId = `#step-${step}-back`;
+      await page.waitForSelector(`${backButtonId}:visible`, { timeout: 10000 });
+      await page.click(backButtonId);
+      await waitForWizardStep(page, step - 1);
+    }
+  }
 }
 
 /**
@@ -61,17 +109,24 @@ export async function compareWithReference(page, testName) {
   
   const referenceImagePath = path.join(REFERENCE_DIR, `${testName}-reference.png`);
   
-  // Check if reference image exists
-  if (!fs.existsSync(referenceImagePath)) {
-    console.log(`Reference image not found at ${referenceImagePath}. Skipping comparison.`);
-    test.skip();
-    return;
-  }
-
   // Capture current image
   const canvasDataUrl = await page.evaluate(() => {
     return canvas.toDataURL('image/png', 1.0);
   });
+
+  // If in reference generation mode, save the reference image
+  if (GENERATE_REFERENCE_MODE) {
+    const base64Data = canvasDataUrl.replace(/^data:image\/png;base64,/, '');
+    fs.writeFileSync(referenceImagePath, base64Data, 'base64');
+    console.log(`✓ Reference image generated: ${referenceImagePath}`);
+    return;
+  }
+
+  // Check if reference image exists
+  if (!fs.existsSync(referenceImagePath)) {
+    console.log(`❌ Reference image not found at ${referenceImagePath}. Run with GENERATE_REFERENCE=true to create it.`);
+    throw new Error(`Reference image missing: ${testName}. Run: GENERATE_REFERENCE=true npx playwright test`);
+  }
 
   // Save comparison image
   const comparisonImagePath = path.join(COMPARISON_DIR, `${testName}-comparison.png`);
