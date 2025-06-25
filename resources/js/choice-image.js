@@ -18,7 +18,7 @@ jQuery(function () {
         const fileType = file.type;
         jQuery('#meme-input').val(''); // Reset file input
 
-        if (!isImage(fileType)) {
+        if (!ValidationUtils.isValidImageFile(file)) {
             showAlert('Error! Invalid Image');
             return;
         }

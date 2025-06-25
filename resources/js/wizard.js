@@ -107,16 +107,12 @@ function setupStepNavigation() {
 }
 
 function validateStep1() {
-    const template = jQuery('#canvas-template').val();
-    const logo = jQuery('#logo-selection').val();
+    const validation = ValidationUtils.validateStep1();
     
-    if (!template) {
-        showAlert('Bitte wählen Sie eine Vorlage aus.', 'warning');
-        return false;
-    }
-    
-    if (!logo) {
-        showAlert('Bitte wählen Sie ein Logo aus.', 'warning');
+    if (!validation.isValid) {
+        validation.errors.forEach(error => {
+            showAlert(error, 'warning');
+        });
         return false;
     }
     
@@ -267,70 +263,7 @@ function updateCanvasDimensions() {
     }
 }
 
-// Enhanced Alert System
-function showTailwindAlert(message, type = 'info') {
-    const alertContainer = jQuery('.alert-container');
-    
-    // Map alert types to Tailwind classes
-    const alertClasses = {
-        'success': 'bg-green-100 border-green-400 text-green-700',
-        'warning': 'bg-yellow-100 border-yellow-400 text-yellow-700',
-        'danger': 'bg-red-100 border-red-400 text-red-700',
-        'info': 'bg-blue-100 border-blue-400 text-blue-700'
-    };
-    
-    const iconClasses = {
-        'success': 'fas fa-check-circle',
-        'warning': 'fas fa-exclamation-triangle',
-        'danger': 'fas fa-exclamation-circle',
-        'info': 'fas fa-info-circle'
-    };
-    
-    const alertClass = alertClasses[type] || alertClasses['info'];
-    const iconClass = iconClasses[type] || iconClasses['info'];
-    
-    const alertHTML = `
-        <div class="alert ${alertClass} border px-4 py-3 rounded-md mb-4 shadow" role="alert">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <i class="${iconClass}"></i>
-                    </div>
-                    <div class="ml-3">
-                        <span class="font-medium">${message}</span>
-                    </div>
-                </div>
-                <div class="flex-shrink-0">
-                    <button type="button" class="ml-2 text-current hover:text-opacity-75 focus:outline-none alert-close-btn">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    alertContainer.removeClass('hidden').append(alertHTML);
-    
-    // Add click handler for close button
-    alertContainer.find('.alert-close-btn').last().on('click', function() {
-        jQuery(this).closest('.alert').fadeOut(300, function() {
-            jQuery(this).remove();
-            if (alertContainer.find('.alert').length === 0) {
-                alertContainer.addClass('hidden');
-            }
-        });
-    });
-    
-    // Auto-remove after 5 seconds
-    setTimeout(() => {
-        alertContainer.find('.alert').first().fadeOut(300, function() {
-            jQuery(this).remove();
-            if (alertContainer.find('.alert').length === 0) {
-                alertContainer.addClass('hidden');
-            }
-        });
-    }, 5000);
-}
+// Alert system now handled by centralized AlertSystem
 
 // LocalStorage functions for organization selection
 function saveSelectedOrganization() {

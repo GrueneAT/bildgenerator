@@ -54,30 +54,4 @@ jQuery(function() {
     });
 });
 
-// Alert functionality
-function showTailwindAlert(message, type = 'danger') {
-    const $alertContainer = jQuery('.alert-container');
-    
-    const alertClasses = {
-        danger: 'bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded',
-        success: 'bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded',
-        warning: 'bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded',
-        info: 'bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded'
-    };
-    
-    // Clear all previous alert classes
-    $alertContainer.removeClass();
-    $alertContainer.addClass('alert-container max-w-7xl mx-auto px-4 mt-4');
-    $alertContainer.addClass(alertClasses[type]);
-    
-    $alertContainer
-        .removeClass('hidden')
-        .html(`<p class="text-center mb-0 font-medium">${message}</p>`)
-        .fadeIn('normal', function () {
-            setTimeout(function () {
-                $alertContainer.fadeOut('normal', function () {
-                    $alertContainer.addClass('hidden').html('');
-                });
-            }, CONSTANTS.ALERT_DURATION);
-        });
-}
+// Alert functionality now handled by centralized AlertSystem

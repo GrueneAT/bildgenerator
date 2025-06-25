@@ -1,9 +1,4 @@
-// Constants
-const CONSTANTS = {
-    FILENAME_LENGTH: 6,
-    ALERT_DURATION: 3000,
-    VALID_IMAGE_TYPES: ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml']
-};
+// Legacy constants reference - use AppConstants instead
 
 // Canvas utilities
 function setValue(key, value) {
@@ -55,9 +50,9 @@ function enableTextMethods() {
     toggleTextMethods(true);
 }
 
-// Validation utilities
+// Validation utilities - using centralized ValidationUtils
 function isImage(fileType) {
-    return CONSTANTS.VALID_IMAGE_TYPES.includes(fileType);
+    return ValidationUtils.isValidImage(fileType);
 }
 
 // File utilities
@@ -65,7 +60,7 @@ function createImgName() {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let result = '';
     
-    for (let i = 0; i < CONSTANTS.FILENAME_LENGTH; i++) {
+    for (let i = 0; i < AppConstants.FILE.FILENAME_LENGTH; i++) {
         result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     
@@ -73,7 +68,4 @@ function createImgName() {
     return `${result}.${format}`;
 }
 
-// Alert utilities
-function showAlert(message, type = 'danger') {
-    showTailwindAlert(message, type);
-}
+// Alert utilities now handled by AlertSystem - see alert-system.js

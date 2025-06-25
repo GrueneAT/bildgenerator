@@ -143,6 +143,9 @@
     <!-- QR Code Generator Container -->
     <div id="qrcode-container" class="container-fluid d-none">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+        <!-- QR Alert Container -->
+        <div id="qr-alert-container" class="mb-4 hidden"></div>
+        
         <!-- QR Code Progress Steps -->
         <div class="mb-6 hidden md:block">
           <div class="bg-white rounded-lg shadow-sm border border-gray-200 py-4 px-6">
@@ -1172,6 +1175,14 @@
     <script src="vendors/fontfaceobserver/fontfaceobserver.standalone.js"></script>
     <script src="vendors/qrcode.min.js"></script>
 
+    <!-- Core utilities - must load first -->
+    <script src="resources/js/constants.js"></script>
+    <script src="resources/js/validation.js"></script>
+    <script src="resources/js/alert-system.js"></script>
+    <script src="resources/js/canvas-utils.js"></script>
+    <script src="resources/js/event-handlers.js"></script>
+    
+    <!-- Application modules -->
     <script src="resources/js/modal.js"></script>
     <script src="resources/js/searchable-select.js"></script>
     <script src="resources/js/initialization.js"></script>

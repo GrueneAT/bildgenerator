@@ -1,9 +1,53 @@
-resources/images/logos/index/*.json
-node_modules
+# Dependencies
+node_modules/
+
+# Build outputs
+build/
+dist/
 resources/css/output.css
-coverage
-playwright-report
-screenshots
-test-results
+resources/css/output.css.map
+app.min.js
+app.min.css
+app.min.js.map
+app.min.css.map
+
+# Generated files
+resources/images/logos/index/*.json
 index-production.html
-visual-regression/comparison-results
+
+# Testing artifacts
+coverage/
+playwright-report/
+test-results/
+screenshots/
+visual-regression/comparison-results/
+
+# Temporary files
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.test
