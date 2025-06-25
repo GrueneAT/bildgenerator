@@ -24,5 +24,7 @@ export default defineConfig({
     command: "make server",
     url: "http://localhost:8000",
     reuseExistingServer: !process.env.CI,
+    stdout: "ignore", // Suppress server stdout
+    stderr: "pipe",   // Still show errors
   },
 });
