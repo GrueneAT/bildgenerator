@@ -38,9 +38,9 @@ function updateScale(activeObject) {
     jQuery('#scale').val(scale);
 }
 
-// Event handler utility
+// Event handler utility - using centralized EventHandlerUtils
 function bindHandler(selector, event, handler) {
-    jQuery(selector).off(event).on(event, handler);
+    return EventHandlerUtils.bindHandler(selector, event, handler);
 }
 
 // Section toggle functionality
@@ -64,61 +64,9 @@ function toggleSection(sectionId) {
     }
 }
 
-// Canvas object event handlers
+// Canvas object event handlers - now managed by EventHandlerUtils
 function loadObjectHandlers() {
-    bindHandler('#text', 'input', function () {
-        setValue("text", jQuery(this).val());
-    });
-
-    bindHandler('#scale', 'input', function () {
-        const activeObject = canvas.getActiveObject();
-        if (activeObject && activeObject !== contentImage) {
-            activeObject.scale(parseFloat(this.value)).setCoords();
-            canvas.renderAll();
-            updateScale(activeObject);
-        }
-    });
-
-    bindHandler('#text-color', 'change', function () {
-        const activeObject = canvas.getActiveObject();
-        if (activeObject && activeObject.get('type') === "text") {
-            setValue("fill", jQuery(this).find(":selected").attr('value'));
-        }
-    });
-
-    bindHandler('input[name="align"]', 'change', function () {
-        const alignValue = jQuery(this).attr('id');
-        console.log('Text alignment changed to:', alignValue);
-        setValue("textAlign", alignValue);
-        
-        // Also trigger visual update
-        jQuery(this).parent().trigger('update-status');
-    });
-
-    bindHandler('#stroke-width', 'input', function () {
-        const width = jQuery(this).val();
-        setValue("strokeWidth", width == 0 ? null : width);
-    });
-
-    bindHandler('#shadow-depth', 'input', function () {
-        setValue("shadow", createShadow('black', jQuery(this).val()));
-    });
-
-    bindHandler('#font-style-select', 'change', function () {
-        const activeObject = canvas.getActiveObject();
-        if (activeObject && activeObject.get('type') === "text") {
-            const selectedFont = jQuery(this).val();
-            setValue("fontFamily", selectedFont);
-        }
-    });
-
-    bindHandler('#line-height', 'change', function () {
-        const activeObject = canvas.getActiveObject();
-        if (activeObject && activeObject.get('type') === "text") {
-            const lineHeight = parseFloat(jQuery(this).val());
-            setValue("lineHeight", lineHeight);
-        }
-    });
+    EventHandlerUtils.setupCanvasObjectHandlers();
 }
 
 /*****************************
