@@ -68,8 +68,4 @@ function createImgName() {
     return `${result}.${format}`;
 }
 
-// Alert utilities - now handled by AlertSystem
-// Legacy function maintained for backwards compatibility
-function showAlert(message, type = 'danger') {
-    return AlertSystem.show(message, type);
-}
+// Alert utilities now handled by AlertSystem - see alert-system.js

@@ -486,15 +486,20 @@ function updateQRStatus(message) {
     jQuery('#qr-status').text(message);
 }
 
-// Show QR Alert
+// Show QR Alert - Now uses unified alert system
 function showQRAlert(message, type = 'info') {
-    // Use the main application's alert system if available
+    // Use the unified alert system if available
+    if (typeof window.AlertSystem !== 'undefined' && window.AlertSystem.showQRAlert) {
+        return window.AlertSystem.showQRAlert(message, type);
+    }
+    
+    // Fallback to legacy system
     if (typeof showAlert === 'function') {
         showAlert(message, type);
     } else if (typeof showTailwindAlert === 'function') {
         showTailwindAlert(message, type);
     } else {
-        // Fallback to console
+        // Final fallback to console
         console.log(`QR Alert (${type}):`, message);
     }
 }
