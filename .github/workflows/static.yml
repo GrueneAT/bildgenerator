@@ -21,7 +21,7 @@ on:
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -286,12 +286,15 @@ jobs:
     needs: [build, deploy]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -321,6 +324,8 @@ jobs:
           rm -rf ./build-artifacts
 
       - name: Commit and push production artifacts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git add .
           if git diff --staged --quiet; then
@@ -332,6 +337,7 @@ jobs:
             Workflow run: ${{ github.run_number }}
             Build date: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
             "
+            echo "Pushing to production branch..."
             git push --force-with-lease origin production
             echo "✅ Production artifacts committed to production branch"
           fi
