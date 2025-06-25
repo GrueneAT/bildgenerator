@@ -538,3 +538,6 @@ jQuery(document).ready(function() {
     // Don't auto-initialize - will be called when QR tab is activated
     console.log('QR Code Wizard module loaded');
 });
+
+// Expose functions to global scope for inline event handlers
+window.qrGoToStep = qrGoToStep;

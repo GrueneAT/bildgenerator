@@ -398,3 +398,6 @@ jQuery(window).on('resize', function() {
     updateCanvasDimensions();
     setupMobileEnhancements();
 });
+
+// Expose functions to global scope for inline event handlers
+window.goToStep = goToStep;

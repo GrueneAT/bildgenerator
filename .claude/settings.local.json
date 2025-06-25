@@ -26,7 +26,8 @@
       "Bash(GENERATE_REFERENCE=true npx playwright test visual-regression/tests/text-system.spec.js --quiet)",
       "Bash(GENERATE_REFERENCE=true npx playwright test visual-regression/tests/background-images.spec.js --quiet)",
       "Bash(npx tailwindcss:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": []
   }

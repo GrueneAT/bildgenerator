@@ -191,29 +191,37 @@ function enableSnap() {
   CanvasUtils.enableSnap();
 }
 
-replaceCanvas();
+// Application initialization function - called after fabric is ready
+function initializeApplication() {
+  // Initialize canvas first
+  replaceCanvas();
+  
+  // Initialize fabric object defaults
+  fabric.Object.prototype.set({
+    transparentCorners: false,
+    cornerColor: AppConstants.COLORS.CORNER_COLOR,
+    borderColor: AppConstants.COLORS.BORDER_COLOR,
+    cornerSize: parseInt(canvas.width) * AppConstants.CANVAS.CORNER_SIZE_MULTIPLIER,
+    cornerStrokeColor: AppConstants.COLORS.CORNER_STROKE,
+    borderScaleFactor: AppConstants.CANVAS.BORDER_SCALE_FACTOR,
+    padding: AppConstants.CANVAS.PADDING,
+  });
 
-// Event handlers now managed by EventHandlerUtils
+  // Initialize all event handlers
+  EventHandlerUtils.initializeAllHandlers();
 
-fabric.Object.prototype.set({
-  transparentCorners: false,
-  cornerColor: AppConstants.COLORS.CORNER_COLOR,
-  borderColor: AppConstants.COLORS.BORDER_COLOR,
-  cornerSize: parseInt(canvas.width) * AppConstants.CANVAS.CORNER_SIZE_MULTIPLIER,
-  cornerStrokeColor: AppConstants.COLORS.CORNER_STROKE,
-  borderScaleFactor: AppConstants.CANVAS.BORDER_SCALE_FACTOR,
-  padding: AppConstants.CANVAS.PADDING,
-});
+  // Update edit methods values to the selected canvas text
+  canvas.on({
+    "selection:created": updateInputs,
+    "selection:updated": updateInputs,
+    "selection:cleared": enableTextMethods,
+  });
 
-// Initialize all event handlers
-EventHandlerUtils.initializeAllHandlers();
-
-// Update edit methods values to the selected canvas text
-canvas.on({
-  "selection:created": updateInputs,
-  "selection:updated": updateInputs,
-  "selection:cleared": enableTextMethods,
-});
+  // Expose canvas and other functions to global scope for testing
+  window.canvas = canvas;
+  window.processMeme = processMeme;
+  window.contentImage = contentImage;
+}
 
 function processMeme(memeInfo) {
   // Add meme template as canvas background
@@ -224,6 +232,8 @@ function processMeme(memeInfo) {
         canvas.remove(contentImage);
       }
       contentImage = meme;
+      // Update global reference for testing
+      window.contentImage = contentImage;
       positionBackgroundImage();
     },
     {
