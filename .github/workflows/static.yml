@@ -136,40 +136,6 @@ jobs:
             playwright-report/
           retention-days: 14
 
-      - name: Update baseline images if requested
-        if: ${{ github.event.inputs.update_visual_baseline == 'true' && github.event_name == 'workflow_dispatch' }}
-        run: |
-          echo "🔄 Updating baseline images..."
-
-          # Copy comparison images to reference directory
-          if [ -d "visual-regression/comparison-results" ]; then
-            cp visual-regression/comparison-results/*.png visual-regression/reference-images/ 2>/dev/null || true
-            echo "✅ Baseline images updated"
-          else
-            echo "ℹ️ No new comparison images to update"
-          fi
-
-      - name: Commit updated baselines
-        if: ${{ github.event.inputs.update_visual_baseline == 'true' && github.event_name == 'workflow_dispatch' }}
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add visual-regression/reference-images/
-
-          if git diff --staged --quiet; then
-            echo "ℹ️ No baseline changes to commit"
-          else
-            git commit -m "🎨 Update visual regression baselines
-
-            Manual baseline update
-            Triggered by: @${{ github.actor }}
-            Commit: ${{ github.sha }}
-            
-            🤖 Automated via workflow_dispatch"
-            git push
-            echo "✅ Baseline images committed and pushed"
-          fi
-
   # End-to-end testing
   e2e-tests:
     name: End-to-End Tests
@@ -222,31 +188,31 @@ jobs:
     timeout-minutes: 10
     outputs:
       build-path: ${{ steps.build.outputs.path }}
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: "npm"
-          
+
       - name: Setup Python for logo processing
         uses: actions/setup-python@v4
         with:
           python-version: "3.x"
-          
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Create logo directories (for logo generation)
         run: |
           mkdir -p resources/images/logos/gemeinden
           mkdir -p resources/images/logos/bundeslaender
           mkdir -p resources/images/logos/domains
-          
+
       - name: Generate logo JSON files (if logo images exist)
         run: |
           if [ -n "$(ls resources/images/logos/gemeinden/ 2>/dev/null)" ]; then
@@ -254,7 +220,7 @@ jobs:
           else
             echo "No logo images found, using existing index.json"
           fi
-          
+
       - name: Run production build
         id: build
         run: |
@@ -262,7 +228,7 @@ jobs:
           npm run build
           echo "✅ Production build completed"
           echo "path=build" >> $GITHUB_OUTPUT
-          
+
       - name: Verify build output
         run: |
           echo "📦 Verifying build artifacts..."
@@ -271,14 +237,14 @@ jobs:
           echo "CSS: $(du -h build/app.min.css | cut -f1)"
           echo "JS: $(du -h build/app.min.js | cut -f1)"
           echo "HTML: $(du -h build/index.html | cut -f1)"
-          
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: production-build
           path: build/
           retention-days: 7
-          
+
   # Deploy to GitHub Pages (only on main branch)
   deploy:
     name: Deploy to GitHub Pages
@@ -288,28 +254,28 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
           name: production-build
           path: ./deploy
-          
+
       - name: Verify deployment files
         run: |
           echo "📁 Deployment directory contents:"
           find ./deploy -type f -name "*.html" -o -name "*.js" -o -name "*.css" | head -20
           echo "📊 Total files: $(find ./deploy -type f | wc -l)"
-          
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
-        
+
       - name: Upload to GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
           path: "./deploy"
-          
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
