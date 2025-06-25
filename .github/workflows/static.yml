@@ -279,3 +279,59 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  # Commit build artifacts to production branch
+  commit-artifacts:
+    name: Commit Build Artifacts to Production Branch
+    needs: [build, deploy]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: production-build
+          path: ./build-artifacts
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create or switch to production branch
+        run: |
+          git checkout -B production
+          git rm -rf . --ignore-unmatch
+          echo "# Production Build Artifacts" > README.md
+          echo "" >> README.md
+          echo "This branch contains the built artifacts for production deployment." >> README.md
+          echo "Built from commit: ${{ github.sha }}" >> README.md
+          echo "Build date: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> README.md
+
+      - name: Copy build artifacts
+        run: |
+          mkdir -p bundle
+          cp -r ./build-artifacts/* ./bundle/
+          rm -rf ./build-artifacts
+
+      - name: Commit and push production artifacts
+        run: |
+          git add .
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Deploy production build from ${{ github.sha }}
+
+            Built from main branch commit: ${{ github.sha }}
+            Workflow run: ${{ github.run_number }}
+            Build date: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+            "
+            git push --force-with-lease origin production
+            echo "✅ Production artifacts committed to production branch"
+          fi
