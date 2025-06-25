@@ -5,6 +5,11 @@ node_modules/
 build/
 dist/
 resources/css/output.css
+resources/css/output.css.map
+app.min.js
+app.min.css
+app.min.js.map
+app.min.css.map
 
 # Generated files
 resources/images/logos/index/*.json

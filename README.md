@@ -95,6 +95,42 @@ Der grüne Bildgenerator ist ein browser-basiertes Tool zur Erstellung professio
 - **Smart Constraints** - Schutz von Logo und Hintergrund
 - **Snap Alignment** - Automatische Zentrierung und Ausrichtung
 
+### 🏗️ **Production Build System**
+
+#### **Optimized Assets**
+- **JavaScript Bundle** - 55% size reduction through minification
+- **CSS Bundle** - 11% size reduction with PostCSS optimization
+- **Source Maps** - Full debugging support in production
+- **Cache Busting** - Automatic versioning for browser cache management
+- **Tree Shaking** - Unused code elimination
+
+#### **Build Commands**
+```bash
+npm run build         # Full production build
+npm run build:js      # JavaScript bundle only
+npm run build:css     # CSS bundle only
+npm run build:clean   # Clean build
+make build            # Make-based build with logo processing
+```
+
+#### **GitHub Actions Integration**
+- **Automated Deployment** - GitHub Pages deployment on main branch
+- **Build Testing** - PR build validation with size analysis
+- **Release Creation** - Tagged releases with deployment packages
+- **Visual Regression** - Automated UI testing
+
+### 🚀 **Deployment Options**
+
+#### **Automated Deployment (Recommended)**
+- **GitHub Pages** - Push to main branch for automatic deployment
+- **Zero Configuration** - Built-in CI/CD pipeline
+- **Performance Optimized** - Minified and compressed assets
+
+#### **Manual Deployment**
+- **Static Hosting** - Netlify, Vercel, AWS S3
+- **Traditional Servers** - Apache, Nginx with static files
+- **CDN Ready** - Optimized for global content delivery
+
 ### 💾 **Export & Download**
 
 #### **Format Options**
