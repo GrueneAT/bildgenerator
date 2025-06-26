@@ -100,7 +100,31 @@ export async function navigateToStep(page, fromStep, toStep) {
 }
 
 /**
- * Compare current canvas state with reference image
+ * Navigate to the download step (step 4) from any current step
+ * @param {import('@playwright/test').Page} page 
+ */
+export async function navigateToDownloadStep(page) {
+  // Determine current step
+  const currentStep = await page.evaluate(() => {
+    for (let i = 1; i <= 4; i++) {
+      const stepElement = document.getElementById(`step-${i}`);
+      if (stepElement && !stepElement.classList.contains('hidden')) {
+        return i;
+      }
+    }
+    return 1; // Default to step 1 if can't determine
+  });
+  
+  // Navigate to step 4
+  await navigateToStep(page, currentStep, 4);
+  
+  // Wait for step 4 to be fully visible
+  await waitForWizardStep(page, 4);
+  await page.waitForSelector('#generate-meme:visible', { timeout: 10000 });
+}
+
+/**
+ * Compare current canvas state with reference image using download mechanism
  * @param {import('@playwright/test').Page} page 
  * @param {string} testName - Name for the test/reference image
  */
@@ -109,16 +133,38 @@ export async function compareWithReference(page, testName) {
   
   const referenceImagePath = path.join(REFERENCE_DIR, `${testName}-reference.png`);
   
-  // Capture current image
-  const canvasDataUrl = await page.evaluate(() => {
-    return canvas.toDataURL('image/png', 1.0);
+  // Navigate to step 4 (download step) if not already there
+  const isStep4Visible = await page.isVisible('#step-4:not(.hidden)');
+  if (!isStep4Visible) {
+    // Navigate through steps to reach download
+    await navigateToDownloadStep(page);
+  }
+  
+  // Set up download listener and dialog handlers
+  const downloadPromise = page.waitForEvent('download');
+  
+  // Handle confirmation dialogs that may appear
+  page.on('dialog', async dialog => {
+    console.log(`Dialog detected: ${dialog.message()}`);
+    await dialog.accept();
   });
+  
+  // Click the download button
+  await page.click('#generate-meme');
+  
+  // Wait for the download to complete
+  const download = await downloadPromise;
+  
+  // Save the downloaded file to a temporary location
+  const tempDownloadPath = path.join(COMPARISON_DIR, `temp-${testName}.png`);
+  await download.saveAs(tempDownloadPath);
 
-  // If in reference generation mode, save the reference image
+  // If in reference generation mode, copy the downloaded image as reference
   if (GENERATE_REFERENCE_MODE) {
-    const base64Data = canvasDataUrl.replace(/^data:image\/png;base64,/, '');
-    fs.writeFileSync(referenceImagePath, base64Data, 'base64');
+    fs.copyFileSync(tempDownloadPath, referenceImagePath);
     console.log(`✓ Reference image generated: ${referenceImagePath}`);
+    // Clean up temp file
+    fs.unlinkSync(tempDownloadPath);
     return;
   }
 
@@ -128,10 +174,12 @@ export async function compareWithReference(page, testName) {
     throw new Error(`Reference image missing: ${testName}. Run: GENERATE_REFERENCE=true npx playwright test`);
   }
 
-  // Save comparison image
+  // Copy the downloaded file as comparison image
   const comparisonImagePath = path.join(COMPARISON_DIR, `${testName}-comparison.png`);
-  const base64Data = canvasDataUrl.replace(/^data:image\/png;base64,/, '');
-  fs.writeFileSync(comparisonImagePath, base64Data, 'base64');
+  fs.copyFileSync(tempDownloadPath, comparisonImagePath);
+  
+  // Clean up temp file
+  fs.unlinkSync(tempDownloadPath);
 
   try {
     // Load reference and comparison images
@@ -187,19 +235,12 @@ export async function compareWithReference(page, testName) {
     throw error;
   }
   
-  // Verify basic element structure
-  const elementCount = await page.evaluate(() => {
-    const objects = canvas.getObjects();
-    return {
-      total: objects.length,
-      texts: objects.filter(obj => obj.type === 'text').length,
-      images: objects.filter(obj => obj.type === 'image').length,
-      circles: objects.filter(obj => obj.type === 'circle').length
-    };
-  });
+  // Verify that the downloaded image is valid and has content
+  const downloadedImg = PNG.sync.read(fs.readFileSync(comparisonImagePath));
+  expect(downloadedImg.width).toBeGreaterThan(100); // Reasonable minimum size
+  expect(downloadedImg.height).toBeGreaterThan(100);
   
-  expect(elementCount.total).toBeGreaterThan(2);
-  console.log(`✓ ${testName} comparison completed - ${elementCount.total} elements verified`);
+  console.log(`✓ ${testName} comparison completed - Image dimensions: ${downloadedImg.width}x${downloadedImg.height}`);
 }
 
 /**

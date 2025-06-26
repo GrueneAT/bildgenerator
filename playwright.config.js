@@ -21,8 +21,10 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "make server",
+    command: "make serve-build",
     url: "http://localhost:8000",
     reuseExistingServer: !process.env.CI,
+    stdout: "ignore", // Suppress server stdout
+    stderr: "pipe",   // Still show errors
   },
 });

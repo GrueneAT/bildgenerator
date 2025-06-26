@@ -103,6 +103,11 @@ async function copyAssets() {
         'vendors/qrcode.min.js'
     ];
     
+    // Copy vendor directories that need to be preserved
+    const vendorDirs = [
+        'vendors/fontawesome'
+    ];
+    
     const vendorDir = path.join(buildDir, 'vendors');
     if (!fs.existsSync(vendorDir)) {
         fs.mkdirSync(vendorDir, { recursive: true });
@@ -121,6 +126,17 @@ async function copyAssets() {
             
             fs.copyFileSync(srcPath, destPath);
             console.log(`   📋 Copied: ${file}`);
+        }
+    }
+    
+    // Copy vendor directories
+    for (const dir of vendorDirs) {
+        const srcPath = path.join(__dirname, '..', dir);
+        const destPath = path.join(buildDir, dir);
+        
+        if (fs.existsSync(srcPath)) {
+            execSync(`cp -r "${srcPath}" "${path.dirname(destPath)}/"`, { cwd: path.join(__dirname, '..') });
+            console.log(`   📋 Copied: ${dir}/`);
         }
     }
     

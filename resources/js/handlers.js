@@ -99,3 +99,6 @@ jQuery('.align').on('update-status', function () {
     jQuery('.align').removeClass('active')
     jQuery(this).addClass('active')
 })
+
+// Expose functions to global scope for inline event handlers
+window.toggleSection = toggleSection;

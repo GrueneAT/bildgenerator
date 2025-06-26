@@ -30,7 +30,13 @@ async function buildCSS() {
             
             if (fs.existsSync(fullPath)) {
                 console.log(`📦 Adding: ${filePath}`);
-                const content = fs.readFileSync(fullPath, 'utf8');
+                let content = fs.readFileSync(fullPath, 'utf8');
+                
+                // Fix font URLs for bundled CSS
+                if (filePath === 'resources/css/fonts.css') {
+                    content = content.replace(/url\("\.\.\/fonts\//g, 'url("resources/fonts/');
+                }
+                
                 concatenatedCSS += `\n/* === ${filePath} === */\n`;
                 concatenatedCSS += content;
                 concatenatedCSS += '\n';
