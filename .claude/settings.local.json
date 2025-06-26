@@ -27,7 +27,15 @@
       "Bash(GENERATE_REFERENCE=true npx playwright test visual-regression/tests/background-images.spec.js --quiet)",
       "Bash(npx tailwindcss:*)",
       "Bash(npm install:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(GENERATE_REFERENCE=true npx playwright test visual-regression/tests/templates.spec.js -g \"Template Post Square\")",
+      "Bash(GENERATE_REFERENCE=true npm run test:visual)",
+      "Bash(GENERATE_REFERENCE=true npx playwright test visual-regression/tests/core-functionality.spec.js --headed=false)",
+      "Bash(GENERATE_REFERENCE=true npx playwright test visual-regression/tests/core-functionality.spec.js)",
+      "Bash(GENERATE_REFERENCE=true npx playwright test visual-regression/tests/error-handling.spec.js:9 --reporter=line)",
+      "Bash(GENERATE_REFERENCE=true npx playwright test \"visual-regression/tests/error-handling.spec.js\" --reporter=line)",
+      "Bash(GENERATE_REFERENCE=true npx playwright test \"visual-regression/tests/positioning.spec.js\" -g \"Multi-Element Layout|Responsive Positioning\" --reporter=line)",
+      "Bash(GENERATE_REFERENCE=true npx playwright test visual-regression/tests/positioning.spec.js -g \"Responsive Positioning\" --timeout=60000)"
     ],
     "deny": []
   }

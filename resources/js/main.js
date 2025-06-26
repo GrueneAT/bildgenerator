@@ -221,6 +221,9 @@ function initializeApplication() {
   window.canvas = canvas;
   window.processMeme = processMeme;
   window.contentImage = contentImage;
+  window.contentRect = contentRect;
+  window.logo = logo;
+  window.logoName = logoName;
 }
 
 function processMeme(memeInfo) {
