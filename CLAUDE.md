@@ -99,3 +99,4 @@ Logos are organized in a hierarchical structure:
 - NEVER use inline styles and ALWAYS use tailwind, add custom styles to css files ONLY when absolutely necessary
 - In visual regression tests NEVER manipulate the canvas or other elements directly, ALWAYS use the available features in the same way a user would.
 - When asked to create a Documentation file ALWYAS create the Documentation files in the root of the repository. They don't have to be created for each action.
+- ALWAYS use pixelmatch when comparing visual regression images to reference images
