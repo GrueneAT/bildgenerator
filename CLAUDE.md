@@ -100,3 +100,47 @@ Logos are organized in a hierarchical structure:
 - In visual regression tests NEVER manipulate the canvas or other elements directly, ALWAYS use the available features in the same way a user would.
 - When asked to create a Documentation file ALWYAS create the Documentation files in the root of the repository. They don't have to be created for each action.
 - ALWAYS use pixelmatch when comparing visual regression images to reference images
+
+## Visual Testing Management
+
+### Playwright Configuration and Test Organization
+
+The visual regression tests are organized into parallel projects for optimal CI performance:
+
+- **fast-tests**: Quick tests (core-functionality, elements, layouts)
+- **medium-tests**: Moderate tests (text-system, positioning, background-images, qr-codes)  
+- **complex-tests**: Heavy tests (qr-generator, templates, error-handling, wizard-navigation)
+- **e2e-tests**: End-to-end integration tests
+
+### CRITICAL: Adding New Visual Test Files
+
+**When creating new visual test files, you MUST update `playwright.config.js` to include them in the appropriate project category, otherwise they will be IGNORED in CI execution.**
+
+**Steps for adding new visual tests:**
+
+1. **Create the test file** in `visual-regression/tests/` 
+2. **Categorize by complexity**:
+   - **Fast** (< 5 seconds per test): Add to `fast-tests` project `testMatch` array
+   - **Medium** (5-10 seconds per test): Add to `medium-tests` project `testMatch` array  
+   - **Complex** (10+ seconds per test): Add to `complex-tests` project `testMatch` array
+3. **Update the testMatch pattern** in the appropriate project in `playwright.config.js`
+
+**Example of adding a new test file:**
+```javascript
+// If creating "performance.spec.js" (medium complexity)
+{
+  name: "medium-tests",
+  testMatch: [
+    "**/text-system.spec.js",
+    "**/positioning.spec.js", 
+    "**/background-images.spec.js",
+    "**/qr-codes.spec.js",
+    "**/performance.spec.js" // ADD NEW FILE HERE
+  ],
+  use: { ...devices["Desktop Chrome"] }
+}
+```
+
+**Verification:** After adding a new test file, run `npm run test:visual` to ensure it executes in the parallel pipeline.
+
+**Common Mistake:** Creating test files without updating `playwright.config.js` results in tests being skipped in CI, leading to false confidence in test coverage.
