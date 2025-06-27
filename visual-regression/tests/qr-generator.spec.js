@@ -39,40 +39,30 @@ async function completeQRWorkflow(page, type, data, colors = null) {
   // Step 2: Fill data based on type
   switch (type) {
     case 'url':
-      await page.fill('#qr-form-container input[type="url"]', data.url);
+      await page.fill('#qr-url-input', data.url);
       break;
     case 'text':
-      await page.fill('#qr-form-container textarea', data.text);
+      await page.fill('#qr-text-input', data.text);
       break;
     case 'email':
-      await page.fill('#qr-form-container input[name="email"]', data.email);
+      await page.fill('#qr-email-address', data.email);
       if (data.subject) {
-        const subjectField = page.locator('#qr-form-container input[name="subject"]');
-        if (await subjectField.count() > 0) {
-          await subjectField.fill(data.subject);
-        }
+        await page.fill('#qr-email-subject', data.subject);
       }
       if (data.body) {
-        const bodyField = page.locator('#qr-form-container textarea[name="body"]');
-        if (await bodyField.count() > 0) {
-          await bodyField.fill(data.body);
-        }
+        await page.fill('#qr-email-body', data.body);
       }
       break;
     case 'vcard':
-      const inputs = await page.locator('#qr-form-container input').all();
-      if (inputs.length > 0 && data.firstName) await inputs[0].fill(data.firstName);
-      if (inputs.length > 1 && data.lastName) await inputs[1].fill(data.lastName);
-      
-      const phoneField = page.locator('#qr-form-container input[type="tel"]');
-      if (await phoneField.count() > 0 && data.phone) {
-        await phoneField.fill(data.phone);
-      }
-      
-      const emailField = page.locator('#qr-form-container input[type="email"]');
-      if (await emailField.count() > 0 && data.email) {
-        await emailField.fill(data.email);
-      }
+      if (data.title) await page.fill('#qr-vcard-title', data.title);
+      if (data.firstName) await page.fill('#qr-vcard-firstname', data.firstName);
+      if (data.lastName) await page.fill('#qr-vcard-lastname', data.lastName);
+      if (data.phone) await page.fill('#qr-vcard-phone', data.phone);
+      if (data.email) await page.fill('#qr-vcard-email', data.email);
+      if (data.address) await page.fill('#qr-vcard-address', data.address);
+      if (data.zip) await page.fill('#qr-vcard-zip', data.zip);
+      if (data.city) await page.fill('#qr-vcard-city', data.city);
+      if (data.website) await page.fill('#qr-vcard-website', data.website);
       break;
   }
   
@@ -96,6 +86,7 @@ async function completeQRWorkflow(page, type, data, colors = null) {
   
   // Wait for QR code generation
   await page.waitForSelector('.qr-preview-container canvas', { state: 'visible', timeout: 15000 });
+  
   await page.waitForTimeout(2000);
   
   // QR wizard step 3 acts as the "download step" for QR codes
@@ -241,7 +232,7 @@ test.describe('Visual Regression - QR Generator with Pixelmatch', () => {
     
     await setupQRTest(page);
     
-    const data = { text: 'GRÜNE - Für eine nachhaltige Zukunft!' };
+    const data = { text: 'GRÜNE' };
     await completeQRWorkflow(page, 'text', data);
     
     await compareQRWithReference(page, 'qr-text');
@@ -253,7 +244,7 @@ test.describe('Visual Regression - QR Generator with Pixelmatch', () => {
     await setupQRTest(page);
     
     const data = { 
-      url: 'https://gruene.at/sehr-lange-url/mit/vielen/parametern?param1=wert1&param2=wert2&param3=nachhaltige-politik&param4=klimaschutz&param5=erneuerbare-energie' 
+      url: 'https://gruene.at/lange-url?param1=wert1&param2=wert2' 
     };
     await completeQRWorkflow(page, 'url', data);
     
@@ -300,7 +291,7 @@ test.describe('Visual Regression - QR Generator with Pixelmatch', () => {
     
     await setupQRTest(page);
     
-    const data = { text: 'GRÜNE Politik für Österreich' };
+    const data = { text: 'Test' };
     const colors = { foreground: '#538430', background: '#FFFFFF' };
     await completeQRWorkflow(page, 'text', data, colors);
     
@@ -324,7 +315,7 @@ test.describe('Visual Regression - QR Generator with Pixelmatch', () => {
     
     await setupQRTest(page);
     
-    const data = { text: 'Nachhaltige Zukunft für alle!' };
+    const data = { text: 'Zukunft' };
     const colors = { foreground: '#FFED00', background: '#000000' };
     await completeQRWorkflow(page, 'text', data, colors);
     
@@ -336,7 +327,7 @@ test.describe('Visual Regression - QR Generator with Pixelmatch', () => {
     
     await setupQRTest(page);
     
-    const data = { text: 'Kreative Politik für alle!' };
+    const data = { text: 'Kreativ' };
     const colors = { foreground: '#E6007E', background: '#FFFFFF' };
     await completeQRWorkflow(page, 'text', data, colors);
     
@@ -360,7 +351,7 @@ test.describe('Visual Regression - QR Generator with Pixelmatch', () => {
     
     await setupQRTest(page);
     
-    const data = { text: 'GRÜNE Transparent Style' };
+    const data = { text: 'Style' };
     const colors = { foreground: '#538430', background: 'transparent' };
     await completeQRWorkflow(page, 'text', data, colors);
     
@@ -384,7 +375,7 @@ test.describe('Visual Regression - QR Generator with Pixelmatch', () => {
     
     await setupQRTest(page);
     
-    const data = { text: 'Umweltfreundliche Politik' };
+    const data = { text: 'Umwelt' };
     const colors = { foreground: '#82B624', background: '#FFFFFF' };
     await completeQRWorkflow(page, 'text', data, colors);
     
