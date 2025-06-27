@@ -65,15 +65,20 @@ async function createProductionHTML() {
     
     let html = fs.readFileSync(templatePath, 'utf8');
     
-    // Replace individual CSS files with bundled version
+    // Replace vendor CSS and individual CSS files with bundled version
     html = html.replace(
-        /<link rel="stylesheet" href="resources\/css\/output\.css\?v=[\d\.]+"\s*\/?>[\s\S]*?<link rel="stylesheet"[\s\S]*?href="resources\/css\/style\.css\?v=[\d\.]+"\s*\/?>/g,
+        /<link rel="stylesheet" href="vendors\/fontawesome\/css\/all\.css"\s*\/?>[\s\S]*?<link rel="stylesheet"[\s\S]*?href="resources\/css\/style\.css\?v=[\d\.]+"\s*\/?>/g,
         '<link rel="stylesheet" href="app.min.css">'
     );
     
-    // Replace individual JavaScript files with bundled version
+    // Replace vendor JavaScript files with bundled version
+    const vendorReplacePattern = /<script src="vendors\/jquery\/jquery-3\.7\.1\.min\.js"><\/script>[\s\S]*?<script src="vendors\/qrcode\.min\.js"><\/script>/g;
+    html = html.replace(vendorReplacePattern, 
+        '<!-- jQuery loaded separately -->\n    <script src="jquery.min.js"></script>\n    \n    <!-- Bundled vendor libraries -->\n    <script src="vendors.min.js"></script>');
+    
+    // Replace individual application JavaScript files with bundled version
     const jsReplacePattern = /<!-- Core utilities - must load first -->[\s\S]*?<script src="resources\/js\/qrcode\/qrcode-handlers\.js"><\/script>/g;
-    html = html.replace(jsReplacePattern, '<script src="app.min.js"></script>');
+    html = html.replace(jsReplacePattern, '<!-- Application bundle -->\n    <script src="app.min.js"></script>');
     
     // Update title and add build info
     html = html.replace(
@@ -85,6 +90,8 @@ async function createProductionHTML() {
     const timestamp = Date.now();
     html = html.replace(/app\.min\.css/g, `app.min.css?v=${timestamp}`);
     html = html.replace(/app\.min\.js/g, `app.min.js?v=${timestamp}`);
+    html = html.replace(/vendors\.min\.js/g, `vendors.min.js?v=${timestamp}`);
+    html = html.replace(/jquery\.min\.js/g, `jquery.min.js?v=${timestamp}`);
     
     fs.writeFileSync(outputPath, html);
 }
@@ -92,18 +99,7 @@ async function createProductionHTML() {
 async function copyAssets() {
     const buildDir = path.join(__dirname, '..', 'build');
     
-    // Copy vendor dependencies that are still needed
-    const vendorFiles = [
-        'vendors/jquery/jquery-3.7.1.min.js',
-        'vendors/mustache/mustache.js',
-        'vendors/imagesloaded/imagesloaded.pkgd.min.js',
-        'vendors/masonry/masonry.pkgd.min.js',
-        'vendors/fabric-js/fabric.min.js',
-        'vendors/fontfaceobserver/fontfaceobserver.standalone.js',
-        'vendors/qrcode.min.js'
-    ];
-    
-    // Copy vendor directories that need to be preserved
+    // Copy vendor directories that need to be preserved (CSS/fonts only)
     const vendorDirs = [
         'vendors/fontawesome'
     ];
@@ -113,23 +109,7 @@ async function copyAssets() {
         fs.mkdirSync(vendorDir, { recursive: true });
     }
     
-    for (const file of vendorFiles) {
-        const srcPath = path.join(__dirname, '..', file);
-        const destPath = path.join(buildDir, file);
-        
-        if (fs.existsSync(srcPath)) {
-            // Ensure destination directory exists
-            const destDir = path.dirname(destPath);
-            if (!fs.existsSync(destDir)) {
-                fs.mkdirSync(destDir, { recursive: true });
-            }
-            
-            fs.copyFileSync(srcPath, destPath);
-            console.log(`   📋 Copied: ${file}`);
-        }
-    }
-    
-    // Copy vendor directories
+    // Copy vendor directories (FontAwesome CSS and fonts)
     for (const dir of vendorDirs) {
         const srcPath = path.join(__dirname, '..', dir);
         const destPath = path.join(buildDir, dir);
@@ -139,6 +119,8 @@ async function copyAssets() {
             console.log(`   📋 Copied: ${dir}/`);
         }
     }
+    
+    console.log('   ✅ Vendor JavaScript libraries are now bundled in vendors.min.js and jquery.min.js');
     
     // Copy resources directory (fonts, images, etc.)
     const resourcesDir = path.join(buildDir, 'resources');

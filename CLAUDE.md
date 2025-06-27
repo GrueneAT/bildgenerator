@@ -144,3 +144,90 @@ The visual regression tests are organized into parallel projects for optimal CI 
 **Verification:** After adding a new test file, run `npm run test:visual` to ensure it executes in the parallel pipeline.
 
 **Common Mistake:** Creating test files without updating `playwright.config.js` results in tests being skipped in CI, leading to false confidence in test coverage.
+
+## JavaScript Bundle Management
+
+### Vendor Library Bundling
+
+All vendor JavaScript libraries (except jQuery) are automatically bundled into `vendors.min.js` during the build process:
+
+**Bundled Libraries:**
+- Mustache.js (template rendering)
+- ImagesLoaded (image loading detection)
+- Masonry (grid layouts)
+- Fabric.js (canvas manipulation)
+- FontFaceObserver (font loading)
+- QRCode.js (QR code generation)
+
+**Separate Libraries:**
+- jQuery (`jquery.min.js`) - Kept separate as it's a core dependency
+
+**Adding New Vendor Libraries:**
+
+1. **Install the library** in the `vendors/` directory
+2. **Add to `VENDOR_FILES_ORDER`** in `scripts/build-js.js`:
+   ```javascript
+   const VENDOR_FILES_ORDER = [
+     "vendors/mustache/mustache.js",
+     "vendors/imagesloaded/imagesloaded.pkgd.min.js",
+     // ... existing libraries
+     "vendors/new-library/library.min.js", // ADD NEW LIBRARY HERE
+   ];
+   ```
+3. **Maintain loading order** - Libraries with dependencies should be placed after their dependencies
+4. **Test the build** with `npm run build:js`
+
+**Build Output:**
+- `build/jquery.min.js` - jQuery only
+- `build/vendors.min.js` - All other vendor libraries bundled
+- `build/app.min.js` - Application code bundle
+
+**Production HTML Structure:**
+The production build loads only 3 JavaScript files:
+```html
+<script src="jquery.min.js"></script>
+<script src="vendors.min.js"></script>
+<script src="app.min.js"></script>
+```
+
+**Important:** Any new vendor library MUST be added to `VENDOR_FILES_ORDER` or it will be ignored in the production build.
+
+### Vendor CSS Bundling
+
+All vendor CSS files are automatically bundled into `app.min.css` during the build process:
+
+**Bundled Vendor CSS:**
+- FontAwesome (`vendors/fontawesome/css/all.css`) - Icon styles
+
+**CSS Bundle Order:**
+1. Vendor CSS files (FontAwesome)
+2. Custom fonts (`resources/css/fonts.css`)
+3. Tailwind CSS (`resources/css/output.css`)
+4. Custom styles (`resources/css/style.css`)
+
+**Adding New Vendor CSS Libraries:**
+
+1. **Install the CSS library** in the `vendors/` directory
+2. **Add to `VENDOR_CSS_FILES`** in `scripts/build-css.js`:
+   ```javascript
+   const VENDOR_CSS_FILES = [
+     'vendors/fontawesome/css/all.css',
+     'vendors/new-library/library.min.css', // ADD NEW CSS HERE
+   ];
+   ```
+3. **Handle URL path fixing** if the CSS references relative assets:
+   ```javascript
+   } else if (filePath === 'vendors/new-library/library.min.css') {
+     // Fix asset URLs for bundled CSS
+     content = content.replace(/url\('\.\.\/assets\//g, 'url(\'vendors/new-library/assets/');
+   }
+   ```
+4. **Test the build** with `npm run build:css`
+
+**Production Output:**
+The production build loads only 1 CSS file:
+```html
+<link rel="stylesheet" href="app.min.css">
+```
+
+**Important:** Any new vendor CSS MUST be added to `VENDOR_CSS_FILES` or it will be ignored in the production build.
