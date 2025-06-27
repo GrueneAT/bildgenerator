@@ -77,6 +77,10 @@ async function buildJavaScript() {
             legalComments: 'none',
             drop: ['console', 'debugger'], // Remove console.log and debugger statements
             keepNames: false, // Allow name mangling for smaller size
+            // Define global variables that should be preserved
+            define: {
+                'generatorApplicationURL': 'generatorApplicationURL'
+            }
         });
         
         // Clean up temp file

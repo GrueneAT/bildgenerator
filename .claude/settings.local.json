@@ -23,7 +23,9 @@
       "Bash(npx tailwindcss:*)",
       "Bash(npm install:*)",
       "Bash(npm run build:*)",
-      "Bash(GENERATE_REFERENCE=true npm run test:visual)"
+      "Bash(GENERATE_REFERENCE=true npm run test:visual)",
+      "Bash(GENERATE_REFERENCE=true npm run test:visual-qr-generator)",
+      "Bash(GENERATE_REFERENCE=true npm run test:visual-qr-colors)"
     ],
     "deny": []
   }

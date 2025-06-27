@@ -8,10 +8,13 @@ let logoText;
 let scaleMax;
 let template;
 
-// Application URL fallback
+// Application URL fallback - must be preserved for external scripts
 if (typeof generatorApplicationURL === "undefined") {
   var generatorApplicationURL = "";
 }
+
+// Explicitly expose generatorApplicationURL to prevent minification
+window.generatorApplicationURL = generatorApplicationURL;
 
 function replaceCanvas() {
   template = jQuery("#canvas-template").find(":selected").attr("value");

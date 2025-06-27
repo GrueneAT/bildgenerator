@@ -23,6 +23,7 @@
     "test:visual-text": "npm run build && playwright test visual-regression/tests/text-system.spec.js",
     "test:visual-elements": "npm run build && playwright test visual-regression/tests/elements.spec.js",
     "test:visual-qr": "npm run build && playwright test visual-regression/tests/qr-codes.spec.js",
+    "test:visual-qr-generator": "npm run build && playwright test visual-regression/tests/qr-generator.spec.js",
     "test:visual-layouts": "npm run build && playwright test visual-regression/tests/layouts.spec.js",
     "test:visual-wizard": "npm run build && playwright test visual-regression/tests/wizard-navigation.spec.js",
     "test:visual-errors": "npm run build && playwright test visual-regression/tests/error-handling.spec.js",
