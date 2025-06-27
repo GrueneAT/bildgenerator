@@ -114,8 +114,7 @@ function qrGoToStep(stepNumber) {
         }
     }
     
-    // Auto-scroll to top
-    jQuery('#qrcode-container')[0].scrollIntoView({ behavior: 'smooth' });
+    // Auto-scroll removed completely
     
     console.log('QR Step:', stepNumber);
 }

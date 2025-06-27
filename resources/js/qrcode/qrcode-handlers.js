@@ -124,9 +124,9 @@ function setupQRDownloadHandler() {
 function handleQRHashNavigation() {
     const hash = window.location.hash;
     
-    if (hash === '#qrcode') {
+    if (hash === '#qrcode-tab') {
         switchToTab('qrcode');
-    } else if (hash === '#generator' || hash === '') {
+    } else if (hash === '#generator-tab' || hash === '') {
         switchToTab('generator');
     }
 }
@@ -141,11 +141,11 @@ function setupQRHashNavigation() {
     
     // Update hash when tabs are clicked
     jQuery('#tab-generator, #tab-generator-mobile').on('click', function() {
-        window.location.hash = '#generator';
+        window.location.hash = '#generator-tab';
     });
     
     jQuery('#tab-qrcode, #tab-qrcode-mobile').on('click', function() {
-        window.location.hash = '#qrcode';
+        window.location.hash = '#qrcode-tab';
     });
 }
 
@@ -155,7 +155,7 @@ function restoreLastTab() {
     
     // Check URL hash first
     const hash = window.location.hash;
-    if (hash === '#qrcode') {
+    if (hash === '#qrcode-tab') {
         switchToTab('qrcode');
         return;
     }
@@ -188,11 +188,11 @@ function setupQRKeyboardShortcuts() {
         if (e.altKey && e.key === '1') {
             e.preventDefault();
             switchToTab('generator');
-            window.location.hash = '#generator';
+            window.location.hash = '#generator-tab';
         } else if (e.altKey && e.key === '2') {
             e.preventDefault();
             switchToTab('qrcode');
-            window.location.hash = '#qrcode';
+            window.location.hash = '#qrcode-tab';
         }
     });
 }

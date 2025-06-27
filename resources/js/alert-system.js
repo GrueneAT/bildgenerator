@@ -134,17 +134,10 @@ const AlertSystem = {
         });
     },
 
-    // Scroll alert into view
+    // Scroll alert into view - completely disabled
     scrollAlertIntoView(container) {
-        const containerOffset = container.offset();
-        const windowTop = jQuery(window).scrollTop();
-        const windowHeight = jQuery(window).height();
-        
-        if (containerOffset && (containerOffset.top < windowTop || containerOffset.top > windowTop + windowHeight)) {
-            jQuery('html, body').animate({
-                scrollTop: containerOffset.top - 20
-            }, 300);
-        }
+        // Auto-scroll removed completely
+        return;
     },
 
     // Close all alerts

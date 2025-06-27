@@ -134,8 +134,7 @@ function goToStep(stepNumber) {
     // Update current step
     currentStep = stepNumber;
     
-    // Auto-scroll to top of controls
-    jQuery('#generator')[0].scrollIntoView({ behavior: 'smooth' });
+    // Auto-scroll removed completely
 }
 
 function updateStepIndicators(activeStep) {
@@ -318,21 +317,13 @@ function setupAutoAdvance() {
             const template = jQuery('#canvas-template').val();
             const logo = jQuery('#logo-selection').val();
             
-            if (template && logo) {
-                setTimeout(() => {
-                    showAlert('Vorlage ausgewählt! Sie können nun zum nächsten Schritt.', 'success');
-                }, 500);
-            }
+            // Template selection notification removed
         }
     });
     
     // Auto-advance from step 2 when background image is selected
     jQuery('#meme-input').on('change', function() {
-        if (currentStep === 2 && this.files && this.files[0]) {
-            setTimeout(() => {
-                showAlert('Hintergrundbild geladen! Sie können nun Inhalte hinzufügen.', 'success');
-            }, 1000);
-        }
+        // Background image notification removed
     });
 }
 
@@ -384,8 +375,7 @@ jQuery(document).ready(function() {
         restoreSelectedOrganization();
     }, 100);
     
-    // Initial state
-    showAlert('Willkommen! Wählen Sie zuerst eine Vorlage aus.', 'info');
+    // Initial state - no welcome message on first load
     
     // Update dimensions after a short delay to ensure canvas is ready
     setTimeout(() => {
