@@ -71,21 +71,19 @@ async function buildVendorBundle() {
     const tempVendorPath = path.join(buildDir, "temp-vendors.js");
     fs.writeFileSync(tempVendorPath, concatenatedVendors);
 
-    // Use esbuild to minify vendor bundle
-    const vendorResult = await esbuild.build({
-      entryPoints: [tempVendorPath],
-      bundle: false,
-      minify: true,
-      sourcemap: true,
-      target: ["es2017"],
-      outfile: path.join(buildDir, "vendors.min.js"),
-      format: "iife",
-      banner: {
-        js: `/*! Grüne Bildgenerator Vendors v1.0.0 | Built: ${new Date().toISOString()} */`,
-      },
-      legalComments: "none",
-      keepNames: true, // Preserve library function names
-    });
+    // Write vendor bundle directly (vendors are already minified)
+    const vendorBanner = `/*! Grüne Bildgenerator Vendors v1.0.0 | Built: ${new Date().toISOString()} */\n`;
+    const finalVendorBundle = vendorBanner + concatenatedVendors;
+    fs.writeFileSync(path.join(buildDir, "vendors.min.js"), finalVendorBundle);
+    
+    // Create source map reference
+    fs.writeFileSync(path.join(buildDir, "vendors.min.js.map"), JSON.stringify({
+      version: 3,
+      sources: VENDOR_FILES_ORDER,
+      names: [],
+      mappings: "",
+      file: "vendors.min.js"
+    }));
 
     // Clean up temp file
     fs.unlinkSync(tempVendorPath);
@@ -100,7 +98,7 @@ async function buildVendorBundle() {
 
     // Get vendor bundle size
     const vendorOriginalSize = Buffer.byteLength(concatenatedVendors, "utf8");
-    const vendorMinifiedSize = fs.statSync(path.join(buildDir, "vendors.min.js")).size;
+    const vendorMinifiedSize = Buffer.byteLength(finalVendorBundle, "utf8");
     const vendorCompressionRatio = (
       ((vendorOriginalSize - vendorMinifiedSize) / vendorOriginalSize) *
       100
