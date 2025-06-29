@@ -4,6 +4,16 @@ const fs = require("fs");
 const path = require("path");
 const esbuild = require("esbuild");
 
+// Define vendor libraries to bundle (excluding jQuery)
+const VENDOR_FILES_ORDER = [
+  "vendors/mustache/mustache.js",
+  "vendors/imagesloaded/imagesloaded.pkgd.min.js",
+  "vendors/masonry/masonry.pkgd.min.js",
+  "vendors/fabric-js/fabric.min.js",
+  "vendors/fontfaceobserver/fontfaceobserver.standalone.js",
+  "vendors/qrcode.min.js",
+];
+
 // Define the correct loading order for JavaScript files
 const JS_FILES_ORDER = [
   // Core utilities - must load first
@@ -30,9 +40,95 @@ const JS_FILES_ORDER = [
   "resources/js/qrcode/qrcode-handlers.js",
 ];
 
+async function buildVendorBundle() {
+  try {
+    console.log("📦 Building vendor bundle...");
+    
+    // Ensure build directory exists
+    const buildDir = path.join(__dirname, "..", "build");
+    if (!fs.existsSync(buildDir)) {
+      fs.mkdirSync(buildDir, { recursive: true });
+    }
+
+    // Read and concatenate all vendor files in the correct order
+    let concatenatedVendors = "";
+
+    for (const filePath of VENDOR_FILES_ORDER) {
+      const fullPath = path.join(__dirname, "..", filePath);
+
+      if (fs.existsSync(fullPath)) {
+        console.log(`📦 Adding vendor: ${filePath}`);
+        const content = fs.readFileSync(fullPath, "utf8");
+        concatenatedVendors += `\n// === ${filePath} ===\n`;
+        concatenatedVendors += content;
+        concatenatedVendors += "\n";
+      } else {
+        console.warn(`⚠️  Vendor file not found: ${filePath}`);
+      }
+    }
+
+    // Write the concatenated vendors to a temporary location
+    const tempVendorPath = path.join(buildDir, "temp-vendors.js");
+    fs.writeFileSync(tempVendorPath, concatenatedVendors);
+
+    // Write vendor bundle directly (vendors are already minified)
+    const vendorBanner = `/*! Grüne Bildgenerator Vendors v1.0.0 | Built: ${new Date().toISOString()} */\n`;
+    const finalVendorBundle = vendorBanner + concatenatedVendors;
+    fs.writeFileSync(path.join(buildDir, "vendors.min.js"), finalVendorBundle);
+    
+    // Create source map reference
+    fs.writeFileSync(path.join(buildDir, "vendors.min.js.map"), JSON.stringify({
+      version: 3,
+      sources: VENDOR_FILES_ORDER,
+      names: [],
+      mappings: "",
+      file: "vendors.min.js"
+    }));
+
+    // Clean up temp file
+    fs.unlinkSync(tempVendorPath);
+
+    // Copy jQuery separately
+    const jquerySource = path.join(__dirname, "..", "vendors/jquery/jquery-3.7.1.min.js");
+    const jqueryDest = path.join(buildDir, "jquery.min.js");
+    if (fs.existsSync(jquerySource)) {
+      fs.copyFileSync(jquerySource, jqueryDest);
+      console.log("📦 jQuery copied separately");
+    }
+
+    // Get vendor bundle size
+    const vendorOriginalSize = Buffer.byteLength(concatenatedVendors, "utf8");
+    const vendorMinifiedSize = Buffer.byteLength(finalVendorBundle, "utf8");
+    const vendorCompressionRatio = (
+      ((vendorOriginalSize - vendorMinifiedSize) / vendorOriginalSize) *
+      100
+    ).toFixed(1);
+
+    console.log("✅ Vendor bundle created successfully!");
+    console.log(`📊 Vendor original size: ${(vendorOriginalSize / 1024).toFixed(1)} KB`);
+    console.log(`📊 Vendor minified size: ${(vendorMinifiedSize / 1024).toFixed(1)} KB`);
+    console.log(`📊 Vendor compression: ${vendorCompressionRatio}% smaller`);
+    console.log(`📄 Output: build/vendors.min.js`);
+    console.log(`📄 jQuery: build/jquery.min.js`);
+
+    return {
+      success: true,
+      vendorOriginalSize,
+      vendorMinifiedSize,
+      vendorCompressionRatio,
+    };
+  } catch (error) {
+    console.error("❌ Vendor bundle build failed:", error);
+    throw error;
+  }
+}
+
 async function buildJavaScript() {
   try {
-    console.log("🚀 Building JavaScript bundle...");
+    console.log("🚀 Building JavaScript bundles...");
+
+    // Build vendor bundle first
+    const vendorResults = await buildVendorBundle();
 
     // Ensure build directory exists
     const buildDir = path.join(__dirname, "..", "build");
@@ -93,18 +189,19 @@ async function buildJavaScript() {
       100
     ).toFixed(1);
 
-    console.log("✅ JavaScript bundle created successfully!");
-    console.log(`📊 Original size: ${(originalSize / 1024).toFixed(1)} KB`);
-    console.log(`📊 Minified size: ${(minifiedSize / 1024).toFixed(1)} KB`);
-    console.log(`📊 Compression: ${compressionRatio}% smaller`);
+    console.log("✅ JavaScript bundles created successfully!");
+    console.log(`📊 App original size: ${(originalSize / 1024).toFixed(1)} KB`);
+    console.log(`📊 App minified size: ${(minifiedSize / 1024).toFixed(1)} KB`);
+    console.log(`📊 App compression: ${compressionRatio}% smaller`);
     console.log(`📄 Output: build/app.min.js`);
-    console.log(`🗺️  Source map: build/app.min.js.map`);
+    console.log(`📄 Output: build/vendors.min.js`);
+    console.log(`📄 Output: build/jquery.min.js`);
+    console.log(`🗺️  Source maps: build/*.min.js.map`);
 
     return {
       success: true,
-      originalSize,
-      minifiedSize,
-      compressionRatio,
+      app: { originalSize, minifiedSize, compressionRatio },
+      vendor: vendorResults,
     };
   } catch (error) {
     console.error("❌ JavaScript build failed:", error);
@@ -117,4 +214,4 @@ if (require.main === module) {
   buildJavaScript();
 }
 
-module.exports = { buildJavaScript, JS_FILES_ORDER };
+module.exports = { buildJavaScript, buildVendorBundle, JS_FILES_ORDER, VENDOR_FILES_ORDER };

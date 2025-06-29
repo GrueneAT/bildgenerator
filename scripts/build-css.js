@@ -5,11 +5,17 @@ const path = require('path');
 const postcss = require('postcss');
 const cssnano = require('cssnano');
 
+// Define vendor CSS files to bundle first
+const VENDOR_CSS_FILES = [
+    'vendors/fontawesome/css/all.css'
+];
+
 // Define the CSS files to bundle in order
 const CSS_FILES_ORDER = [
-    'resources/css/fonts.css',
-    'resources/css/output.css', // Tailwind CSS (needs to be built first)
-    'resources/css/style.css'
+    ...VENDOR_CSS_FILES,          // Vendor CSS files first
+    'resources/css/fonts.css',     // Custom fonts
+    'resources/css/output.css',    // Tailwind CSS (needs to be built first)
+    'resources/css/style.css'      // Custom styles last
 ];
 
 async function buildCSS() {
@@ -35,6 +41,10 @@ async function buildCSS() {
                 // Fix font URLs for bundled CSS
                 if (filePath === 'resources/css/fonts.css') {
                     content = content.replace(/url\("\.\.\/fonts\//g, 'url("resources/fonts/');
+                } else if (filePath === 'vendors/fontawesome/css/all.css') {
+                    // Fix FontAwesome webfont URLs for bundled CSS
+                    content = content.replace(/url\("\.\.\/webfonts\//g, 'url("vendors/fontawesome/webfonts/');
+                    content = content.replace(/url\('\.\.\/webfonts\//g, 'url(\'vendors/fontawesome/webfonts/');
                 }
                 
                 concatenatedCSS += `\n/* === ${filePath} === */\n`;
@@ -115,4 +125,4 @@ if (require.main === module) {
     buildCSS();
 }
 
-module.exports = { buildCSS, CSS_FILES_ORDER };
+module.exports = { buildCSS, CSS_FILES_ORDER, VENDOR_CSS_FILES };
