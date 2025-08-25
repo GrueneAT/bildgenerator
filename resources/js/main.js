@@ -101,12 +101,23 @@ function addLogo() {
 
   let logoFilename, textScaleTo;
   
-  if (logoText.length > AppConstants.LOGO.MAX_TEXT_LENGTH || logoText.lastIndexOf("%") > 0) {
+  // Check if text needs breaking (either has % or is too long)
+  if (logoText.includes("%") || logoText.length > AppConstants.LOGO.MAX_TEXT_LENGTH) {
     logoFilename = AppConstants.LOGO.FILES.LONG;
-    const lastSpace = Math.max(logoText.lastIndexOf("%"), logoText.lastIndexOf(" "));
-    if (lastSpace > 0) {
-      logoText = logoText.substring(0, lastSpace) + "\n" + logoText.substring(lastSpace + 1);
+    
+    if (logoText.includes("%")) {
+      // Split by % and trim each part to remove whitespace
+      const parts = logoText.split("%").map(part => part.trim());
+      logoText = parts.join("\n");
+    } else if (logoText.length > AppConstants.LOGO.MAX_TEXT_LENGTH) {
+      // For long names without %, break at last space
+      const lastSpace = logoText.lastIndexOf(" ");
+      if (lastSpace > 0) {
+        logoText = logoText.substring(0, lastSpace).trim() + "\n" + 
+                   logoText.substring(lastSpace).trim();
+      }
     }
+    
     textScaleTo = AppConstants.LOGO.TEXT_SCALE_LONG;
   } else {
     logoFilename = AppConstants.LOGO.FILES.SHORT;
