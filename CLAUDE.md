@@ -101,6 +101,51 @@ Logos are organized in a hierarchical structure:
 - When asked to create a Documentation file ALWYAS create the Documentation files in the root of the repository. They don't have to be created for each action.
 - ALWAYS use pixelmatch when comparing visual regression images to reference images
 
+## Testing Guidelines
+
+### Integration and Unit Testing Philosophy
+
+**CRITICAL: All tests MUST test actual application code, not just mocked implementations.**
+
+**Testing Requirements:**
+- **Test Real Code**: Tests should interact with actual application functions and modules
+- **Minimal Mocking**: Only mock external dependencies (APIs, file system, browser APIs) - NEVER mock the code being tested
+- **Real DOM Interaction**: Integration tests should use actual DOM elements and user interactions
+- **Actual Function Calls**: Unit tests should call the real functions with real parameters and validate real outputs
+
+**What TO Test:**
+- Real function behavior with various inputs
+- Actual DOM manipulation and event handling
+- Integration between actual modules
+- Error handling in real code paths
+- State changes in actual application objects
+
+**What NOT TO Test:**
+- Mock implementations that don't call real code
+- Stubbed functions that return fake data without testing logic
+- Tests that only verify mocks were called without testing actual behavior
+- Isolated tests that don't exercise the real application code
+
+**Example of GOOD testing:**
+```javascript
+// Tests actual searchable-select functionality
+test('should filter options based on search input', async () => {
+  const select = new SearchableSelect(realDOMElement, realOptions);
+  select.search('vienna');  // Calls actual search method
+  expect(select.getVisibleOptions()).toEqual(expectedResults); // Validates real output
+});
+```
+
+**Example of BAD testing:**
+```javascript
+// Only tests mocks, not real code
+test('should call search method', () => {
+  const mockSelect = { search: jest.fn() };
+  mockSelect.search('vienna');
+  expect(mockSelect.search).toHaveBeenCalled(); // Only verifies mock was called
+});
+```
+
 ## Visual Testing Management
 
 ### Playwright Configuration and Test Organization

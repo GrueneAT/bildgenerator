@@ -102,9 +102,16 @@ class SearchableSelect {
         
         this.originalOptions.forEach(item => {
             if (item.type === 'group') {
-                const groupOptions = item.options.filter(opt => 
-                    opt.text.toLowerCase().includes(searchTerm.toLowerCase())
-                );
+                const groupOptions = item.options.filter(opt => {
+                    // Search in both display text and original value (which may contain %)
+                    const searchLower = searchTerm.toLowerCase();
+                    const textMatch = opt.text.toLowerCase().includes(searchLower);
+                    const valueMatch = opt.value.toLowerCase().includes(searchLower);
+                    // Also search in value with % replaced by space for better matching
+                    const valueWithSpace = opt.value.replace(/%/g, ' ').toLowerCase();
+                    const valueSpaceMatch = valueWithSpace.includes(searchLower);
+                    return textMatch || valueMatch || valueSpaceMatch;
+                });
                 
                 if (groupOptions.length > 0) {
                     html += `<div class="searchable-select-option-group">${item.label}</div>`;
@@ -114,7 +121,15 @@ class SearchableSelect {
                     });
                 }
             } else if (item.type === 'option') {
-                if (item.text.toLowerCase().includes(searchTerm.toLowerCase())) {
+                // Search in both display text and original value (which may contain %)
+                const searchLower = searchTerm.toLowerCase();
+                const textMatch = item.text.toLowerCase().includes(searchLower);
+                const valueMatch = item.value.toLowerCase().includes(searchLower);
+                // Also search in value with % replaced by space for better matching
+                const valueWithSpace = item.value.replace(/%/g, ' ').toLowerCase();
+                const valueSpaceMatch = valueWithSpace.includes(searchLower);
+                
+                if (textMatch || valueMatch || valueSpaceMatch) {
                     const selectedClass = item.value === this.selectedValue ? 'selected' : '';
                     html += `<div class="searchable-select-option ${selectedClass}" data-value="${item.value}">${item.text}</div>`;
                 }
