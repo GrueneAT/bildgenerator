@@ -37,7 +37,8 @@
     "generate-references-script": "./scripts/generate-reference-images.sh",
     "test:all": "npm run test && npm run test:e2e",
     "serve:dev": "make server",
-    "serve:build": "cd build && python3 -m http.server 8000"
+    "serve:build": "cd build && python3 -m http.server 8000",
+    "validate:deployment": "scripts/validate-deployment.sh"
   },
   "devDependencies": {
     "@babel/core": "^7.27.4",

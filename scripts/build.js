@@ -65,6 +65,11 @@ async function createProductionHTML() {
     
     let html = fs.readFileSync(templatePath, 'utf8');
     
+    // Get build metadata
+    const buildTimestamp = new Date().toISOString();
+    const buildCommit = getBuildCommit();
+    const buildVersion = getBuildVersion();
+    
     // Replace vendor CSS and individual CSS files with bundled version
     html = html.replace(
         /<link rel="stylesheet" href="vendors\/fontawesome\/css\/all\.css"\s*\/?>[\s\S]*?<link rel="stylesheet"[\s\S]*?href="resources\/css\/style\.css\?v=[\d\.]+"\s*\/?>/g,
@@ -80,10 +85,10 @@ async function createProductionHTML() {
     const jsReplacePattern = /<!-- Core utilities - must load first -->[\s\S]*?<script src="resources\/js\/qrcode\/qrcode-handlers\.js"><\/script>/g;
     html = html.replace(jsReplacePattern, '<!-- Application bundle -->\n    <script src="app.min.js"></script>');
     
-    // Update title and add build info
+    // Add build metadata to head
     html = html.replace(
         /<title>([^<]+)<\/title>/,
-        `<title>$1</title>\n    <!-- Built: ${new Date().toISOString()} -->`
+        `<title>$1</title>\n    <!-- Build Metadata -->\n    <meta name="build-timestamp" content="${buildTimestamp}">\n    <meta name="build-commit" content="${buildCommit}">\n    <meta name="build-version" content="${buildVersion}">\n    <!-- Built: ${buildTimestamp} -->`
     );
     
     // Add cache busting with build timestamp
@@ -94,6 +99,25 @@ async function createProductionHTML() {
     html = html.replace(/jquery\.min\.js/g, `jquery.min.js?v=${timestamp}`);
     
     fs.writeFileSync(outputPath, html);
+}
+
+function getBuildCommit() {
+    try {
+        return execSync('git rev-parse HEAD', { encoding: 'utf8' }).trim();
+    } catch (error) {
+        console.warn('⚠️  Could not get git commit hash:', error.message);
+        return 'unknown';
+    }
+}
+
+function getBuildVersion() {
+    try {
+        const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'));
+        return packageJson.version;
+    } catch (error) {
+        console.warn('⚠️  Could not get package version:', error.message);
+        return 'unknown';
+    }
 }
 
 async function copyAssets() {

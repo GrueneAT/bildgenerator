@@ -280,10 +280,55 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
+  # Post-deployment validation
+  post-deploy-validation:
+    name: Post-Deployment Validation
+    needs: [deploy]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies for validation
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl
+
+      - name: Wait for deployment propagation
+        run: |
+          echo "⏳ Waiting for deployment to propagate..."
+          sleep 30
+
+      - name: Run post-deployment validation
+        env:
+          DEPLOY_URL: ${{ needs.deploy.outputs.page_url }}
+          EXPECTED_COMMIT: ${{ github.sha }}
+          EXPECTED_VERSION: "1.0.0"
+        run: |
+          echo "🔍 Validating deployment at: $DEPLOY_URL"
+          chmod +x scripts/validate-deployment.sh
+          ./scripts/validate-deployment.sh
+
+      - name: Report validation success
+        if: success()
+        run: |
+          echo "✅ Deployment validation completed successfully!"
+          echo "🌐 Application is live and functional at: ${{ needs.deploy.outputs.page_url }}"
+
+      - name: Report validation failure
+        if: failure()
+        run: |
+          echo "❌ Deployment validation failed!"
+          echo "Please check the deployment and validation logs above."
+          exit 1
+
   # Commit build artifacts to production branch
   commit-artifacts:
     name: Commit Build Artifacts to Production Branch
-    needs: [build, deploy]
+    needs: [build, deploy, post-deploy-validation]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
