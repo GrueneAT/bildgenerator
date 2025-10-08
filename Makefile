@@ -1,3 +1,35 @@
+# ==============================================================================
+# LOCAL DEVELOPMENT COMMANDS
+# ==============================================================================
+# Main command for local development with auto-rebuild on file changes
+dev: logo-json
+	@node scripts/inject-build-timestamp.js
+	@echo "🚀 Starting DEVELOPMENT server with auto-rebuild..."
+	@echo "📁 Watching: resources/css/ and resources/js/"
+	@echo "🌐 Server: http://localhost:8000"
+	@echo "⏱️  Timestamp banner shows last build time"
+	@echo ""
+	@echo "📝 When files change:"
+	@echo "   • CSS files → Auto-rebuild CSS + update timestamp"
+	@echo "   • JS files  → Update timestamp + notification"
+	@echo ""
+	@echo "Press Ctrl+C to stop"
+	@echo ""
+	@make -j3 _dev-server _dev-watch-css _dev-watch-js
+
+_dev-server:
+	@python3 -m http.server 8000
+
+_dev-watch-css:
+	@npm run watch:css
+
+_dev-watch-js:
+	@npm run watch:js
+
+# ==============================================================================
+# PRODUCTION COMMANDS (used by CI/CD)
+# ==============================================================================
+# Production server with embedded logo data
 server: logo-json-embedded
 	python3 -m http.server 8000
 
@@ -6,11 +38,6 @@ logo-json-embedded: logo-json
 	python3 embed_logos.py index.html index-production.html
 	@echo "Production HTML with embedded logos created: index-production.html"
 	@echo "For production, serve index-production.html instead of index.html"
-
-# Development server with separate JSON loading
-server-dev: logo-json
-	@echo "Starting development server with separate JSON loading..."
-	python3 -m http.server 8000
 
 logo-json:
 	rm -fr resources/images/logos/index
@@ -45,4 +72,4 @@ clean:
 	rm -fr build/
 	rm -f resources/css/output.css
 
-.PHONY: server server-dev logo-json logo-json-embedded build build-clean build-dev serve-build clean
+.PHONY: dev _dev-server _dev-watch-css _dev-watch-js server logo-json logo-json-embedded build build-clean build-dev serve-build clean
