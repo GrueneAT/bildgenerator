@@ -23,7 +23,9 @@ const AppConstants = {
         TARGET_FIND_TOLERANCE: 15,
         CORNER_SIZE_MULTIPLIER: 0.03,
         BORDER_SCALE_FACTOR: 2,
-        PADDING: 4
+        PADDING: 4,
+        ROTATION_SNAP_TOLERANCE: 2, // degrees
+        ROTATION_SNAP_ANGLES: [0, 90, 180, 270]
     },
 
     // Export Configuration

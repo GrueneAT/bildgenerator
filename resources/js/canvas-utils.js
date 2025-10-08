@@ -63,33 +63,167 @@ const CanvasUtils = {
     },
 
     // Canvas snapping functionality
-    enableSnap(snapZone = null) {
+    enableSnap(canvasInstance, snapZone = null) {
+        console.log('[CanvasUtils.enableSnap] Initializing snap with canvas:', canvasInstance ? 'defined' : 'undefined');
+
         if (!snapZone) {
-            snapZone = canvas.width / 20;
+            snapZone = canvasInstance.width / AppConstants.CANVAS.SNAP_ZONE_RATIO;
         }
-        
-        canvas.on("object:moving", function (options) {
-            if (options.target != contentImage) {
-                const objectWidth = options.target.getBoundingRect().width;
-                const objectMiddle = options.target.left + objectWidth / 2;
-                
-                if (
-                    objectMiddle > canvas.width / 2 - snapZone &&
-                    objectMiddle < canvas.width / 2 + snapZone
-                ) {
-                    options.target
-                        .set({
-                            left: canvas.width / 2 - objectWidth / 2,
-                        })
-                        .setCoords();
+
+        console.log('[CanvasUtils.enableSnap] Snap zone calculated:', snapZone);
+
+        canvasInstance.on("object:moving", function (options) {
+            const target = options.target;
+
+            // Skip if not eligible for snapping
+            if (target === contentImage || target === logo || target === logoName) {
+                return;
+            }
+
+            // Safety check for getCenterPoint method
+            if (!target || typeof target.getCenterPoint !== 'function') {
+                return;
+            }
+
+            const objectCenter = target.getCenterPoint();
+            const canvasCenter = canvasInstance.width / 2;
+            const distanceFromCenter = Math.abs(objectCenter.x - canvasCenter);
+
+            if (distanceFromCenter < snapZone) {
+                // Store center point before adjustment
+                const centerBefore = target.getCenterPoint();
+
+                // Calculate horizontal adjustment needed to center
+                const deltaX = canvasCenter - centerBefore.x;
+
+                // Apply adjustment while preserving vertical position
+                target.set({
+                    left: target.left + deltaX
+                });
+                target.setCoords();
+
+                // Verify center after adjustment
+                const centerAfter = target.getCenterPoint();
+
+                console.log(
+                    '%c[SNAP] CENTER SNAP',
+                    'background: #8ab414; color: white; font-weight: bold; padding: 2px 6px;',
+                    '\n  Object type:', target.type,
+                    '\n  Center before:', `(${centerBefore.x.toFixed(2)}, ${centerBefore.y.toFixed(2)})`,
+                    '\n  Center after:', `(${centerAfter.x.toFixed(2)}, ${centerAfter.y.toFixed(2)})`,
+                    '\n  Canvas center:', canvasCenter.toFixed(2),
+                    '\n  Adjustment:', deltaX.toFixed(2) + 'px',
+                    '\n  Snap zone:', snapZone.toFixed(2) + 'px'
+                );
+            }
+        });
+    },
+
+    // Rotation snapping functionality - snaps in real-time during rotation
+    enableRotationSnap(canvasInstance, tolerance = null) {
+        console.log('[CanvasUtils.enableRotationSnap] Initializing rotation snap with canvas:', canvasInstance ? 'defined' : 'undefined');
+
+        if (!tolerance) {
+            tolerance = AppConstants.CANVAS.ROTATION_SNAP_TOLERANCE;
+        }
+
+        const snapAngles = AppConstants.CANVAS.ROTATION_SNAP_ANGLES;
+        console.log('[CanvasUtils.enableRotationSnap] Tolerance:', tolerance, 'Snap angles:', snapAngles);
+
+        // Use object:rotating for real-time snapping while mouse is down
+        canvasInstance.on("object:rotating", function (e) {
+            const target = e.target;
+
+            if (!target) {
+                return;
+            }
+
+            // Exclude protected objects from rotation snapping
+            if (target === contentImage || target === logo || target === logoName) {
+                return;
+            }
+
+            // Safety check for getCenterPoint method
+            if (typeof target.getCenterPoint !== 'function') {
+                return;
+            }
+
+            // Normalize angle to 0-360 range
+            let currentAngle = target.angle % 360;
+            if (currentAngle < 0) {
+                currentAngle += 360;
+            }
+
+            // Find closest snap angle
+            let closestAngle = null;
+            let minDifference = Infinity;
+
+            for (const snapAngle of snapAngles) {
+                // Calculate difference considering angle wrapping
+                let difference = Math.abs(currentAngle - snapAngle);
+
+                // Handle wrap-around (e.g., 359° to 0°)
+                if (difference > 180) {
+                    difference = 360 - difference;
                 }
+
+                if (difference < minDifference) {
+                    minDifference = difference;
+                    closestAngle = snapAngle;
+                }
+            }
+
+            // Apply snap if within tolerance
+            if (closestAngle !== null && minDifference <= tolerance) {
+                // Store visual center point BEFORE rotation change
+                const centerBefore = target.getCenterPoint();
+
+                // Apply rotation snap
+                target.set({ angle: closestAngle });
+
+                // Get visual center point AFTER rotation change
+                const centerAfter = target.getCenterPoint();
+
+                // Calculate position adjustment to restore visual center
+                const deltaX = centerBefore.x - centerAfter.x;
+                const deltaY = centerBefore.y - centerAfter.y;
+
+                // Restore original visual position
+                target.set({
+                    left: target.left + deltaX,
+                    top: target.top + deltaY
+                });
+
+                target.setCoords();
+
+                // Only log once per snap (reduce console spam)
+                if (!target._isSnapped || target._snappedTo !== closestAngle) {
+                    console.log(
+                        '%c[SNAP] ROTATION SNAP',
+                        'background: #e10078; color: white; font-weight: bold; padding: 2px 6px;',
+                        '\n  Object type:', target.type,
+                        '\n  Original angle:', currentAngle.toFixed(2) + '°',
+                        '\n  Snapped to:', closestAngle + '°',
+                        '\n  Difference:', minDifference.toFixed(2) + '°',
+                        '\n  Tolerance:', tolerance + '°',
+                        '\n  Center before:', `(${centerBefore.x.toFixed(2)}, ${centerBefore.y.toFixed(2)})`,
+                        '\n  Center after:', `(${centerAfter.x.toFixed(2)}, ${centerAfter.y.toFixed(2)})`,
+                        '\n  Position adjustment:', `(${deltaX.toFixed(2)}, ${deltaY.toFixed(2)})`
+                    );
+                }
+                target._isSnapped = true;
+                target._snappedTo = closestAngle;
+            } else {
+                // Clear snap state when outside tolerance
+                target._isSnapped = false;
+                target._snappedTo = null;
             }
         });
     },
 
     // Picture movement constraints
-    enablePictureMove() {
-        canvas.on("object:moving", function (options) {
+    enablePictureMove(canvasInstance) {
+        canvasInstance.on("object:moving", function (options) {
             if (options.target === contentImage) {
                 const imageRelatedHeight = options.target.height * (contentRect.width / contentImage.width);
                 const imageRelatedWidth = options.target.width * (contentRect.height / contentImage.height);
