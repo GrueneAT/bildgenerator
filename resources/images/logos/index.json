@@ -3,9 +3,12 @@
     "ZELENI/ZÖLDEK/SELENE%BURGENLAND",
     "SALZBURG",
     "10. BUNDESLAND",
-    "STEIERMARK"
+    "STEIERMARK",
+    "Vorarlberg"
   ],
-  "Klubs": ["ZELENI/ZÖLDEK/SELENE%LANDTAGSKLUB BURGENLAND"],
+  "Klubs": [
+    "ZELENI/ZÖLDEK/SELENE%LANDTAGSKLUB BURGENLAND"
+  ],
   "Bezirke": [
     "BEZIRK NEUSIEDL",
     "BEZIRK EISENSTADT-UMGEBUNG",
@@ -33,7 +36,11 @@
     "BEZIRK % WEIZ",
     "BEZIRK Voitsberg"
   ],
-  "Gebiete": ["BURGENLAND SÜD", "BURGENLAND MITTE", "BURGENLAND NORD"],
+  "Gebiete": [
+    "BURGENLAND SÜD",
+    "BURGENLAND MITTE",
+    "BURGENLAND NORD"
+  ],
   "Gemeinden": [
     "BAD SAUERBRUNN",
     "BREITENBRUNN",
@@ -210,7 +217,8 @@
     "Wir in Röthis",
     "und Parteifreie % Schwarzach",
     "und Parteifreie % Wolfurt",
-    "mit Jung & Alt % Zwischenwasser"
+    "mit Jung & Alt % Zwischenwasser",
+    "Innsbruck"
   ],
   "Andere": [
     "Bäuerinnnen%& Bauern",
@@ -220,6 +228,7 @@
     "GENERATION plus%Kärnten",
     "GENERATION plus%Steiermark",
     "GENERATION plus%Salzburg",
+    "GENERATION plus%Vorarlberg",
     "GRÜNE FRAUEN%SALZBURG",
     "GENERATION plus"
   ]
