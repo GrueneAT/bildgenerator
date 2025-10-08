@@ -72,9 +72,11 @@ function replaceCanvas() {
   canvas.add(contentRect);
 
   // Initialize canvas features
+  console.log('[replaceCanvas] Initializing canvas features with canvas:', canvas ? 'defined' : 'undefined');
   resizeCanvas();
-  CanvasUtils.enableSnap();
-  CanvasUtils.enablePictureMove();
+  CanvasUtils.enableSnap(canvas);
+  CanvasUtils.enableRotationSnap(canvas);
+  CanvasUtils.enablePictureMove(canvas);
   enableScalingUpdates();
   addLogo();
 
@@ -190,7 +192,7 @@ function enableScalingUpdates() {
 }
 
 function enablePictureMove() {
-  CanvasUtils.enablePictureMove();
+  CanvasUtils.enablePictureMove(canvas);
 }
 
 function disableScalingControls(object) {
@@ -202,7 +204,7 @@ function relativeScalingControlsOnly(object) {
 }
 
 function enableSnap() {
-  CanvasUtils.enableSnap();
+  CanvasUtils.enableSnap(canvas);
 }
 
 // Application initialization function - called after fabric is ready
