@@ -628,8 +628,20 @@
                   >
                     <optgroup label="Allgemein">
                       <option value="">Logo auswählen...</option>
+                      <option value="GRUENE.AT">GRUENE.AT</option>
                     </optgroup>
                   </select>
+                </div>
+                <div class="mt-4 flex items-center">
+                  <input
+                    type="checkbox"
+                    id="logo-toggle"
+                    class="form-checkbox h-4 w-4 text-green-600 rounded border-gray-300 focus:ring-green-500"
+                    checked
+                  />
+                  <label for="logo-toggle" class="ml-2 text-sm text-gray-700">
+                    Logo am unteren Rand hinzufügen
+                  </label>
                 </div>
                 <button id="step-1-next" class="w-full btn-primary">
                   Weiter zum Hintergrundbild
@@ -1188,6 +1200,7 @@
     <!-- Core utilities - must load first -->
     <script src="resources/js/constants.js"></script>
     <script src="resources/js/validation.js"></script>
+    <script src="resources/js/logo-state.js"></script>
     <script src="resources/js/alert-system.js"></script>
     <script src="resources/js/canvas-utils.js"></script>
     <script src="resources/js/event-handlers.js"></script>

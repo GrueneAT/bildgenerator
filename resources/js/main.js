@@ -78,7 +78,11 @@ function replaceCanvas() {
   CanvasUtils.enableRotationSnap(canvas);
   CanvasUtils.enablePictureMove(canvas);
   enableScalingUpdates();
-  addLogo();
+
+  // Only add logo if enabled
+  if (LogoState.isLogoEnabled()) {
+    addLogo();
+  }
 
   canvas.renderAll();
 
@@ -91,6 +95,18 @@ function replaceCanvas() {
 }
 
 function addLogo() {
+  // If logo is disabled, remove existing logo and return early
+  if (!LogoState.isLogoEnabled()) {
+    if (logo != null) {
+      canvas.remove(logo);
+      canvas.remove(logoName);
+      logo = null;
+      logoName = null;
+      canvas.renderAll();
+    }
+    return;
+  }
+
   if (logo != null) {
     canvas.remove(logo);
     canvas.remove(logoName);

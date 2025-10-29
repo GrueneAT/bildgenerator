@@ -98,7 +98,10 @@ const EventHandlerUtils = {
             },
             '#logo-selection': {
                 'change': function() {
-                    addLogo();
+                    // Only add logo if feature is enabled
+                    if (LogoState.isLogoEnabled()) {
+                        addLogo();
+                    }
                 }
             },
             '#scale-direction': {
@@ -351,7 +354,7 @@ const EventHandlerUtils = {
     setupDownloadHandler() {
         this.bindHandler('#generate-meme', 'click', function() {
             const validation = ValidationUtils.validateDownload();
-            
+
             if (!validation.isValid) {
                 alert(validation.error);
                 return;
@@ -365,7 +368,7 @@ const EventHandlerUtils = {
 
                 try {
                     const exportResult = CanvasUtils.exportCanvas(format, quality, targetDPI);
-                    
+
                     const link = document.createElement("a");
                     link.href = exportResult.dataURL;
                     link.download = createImgName();
@@ -381,6 +384,34 @@ const EventHandlerUtils = {
         });
     },
 
+    // Logo toggle handler
+    setupLogoToggleHandler() {
+        this.bindHandler('#logo-toggle', 'change', function() {
+            const isChecked = jQuery(this).is(':checked');
+            LogoState.setLogoEnabled(isChecked);
+
+            if (isChecked) {
+                // Re-add logo
+                addLogo();
+
+                // Re-enable logo selection dropdown
+                jQuery('#logo-selection').prop('disabled', false).removeClass('opacity-50');
+            } else {
+                // Remove logo from canvas
+                if (logo != null) {
+                    canvas.remove(logo);
+                    canvas.remove(logoName);
+                    logo = null;
+                    logoName = null;
+                    canvas.renderAll();
+                }
+
+                // Disable logo selection dropdown
+                jQuery('#logo-selection').prop('disabled', true).addClass('opacity-50');
+            }
+        });
+    },
+
     // Initialize all handlers
     initializeAllHandlers() {
         this.setupCanvasObjectHandlers();
@@ -392,6 +423,7 @@ const EventHandlerUtils = {
         this.setupCrossHandler();
         this.setupQRCodeHandler();
         this.setupDownloadHandler();
+        this.setupLogoToggleHandler();
     }
 };
 

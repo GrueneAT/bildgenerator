@@ -365,18 +365,30 @@ function setupMobileEnhancements() {
 
 // Initialize everything when document is ready
 jQuery(document).ready(function() {
+    // Initialize logo state first
+    LogoState.initialize();
+
+    // Set initial UI state based on logo enabled/disabled
+    const isLogoEnabled = LogoState.isLogoEnabled();
+    jQuery('#logo-toggle').prop('checked', isLogoEnabled);
+
+    if (!isLogoEnabled) {
+        // If logo is disabled, disable the logo selection dropdown
+        jQuery('#logo-selection').prop('disabled', true).addClass('opacity-50');
+    }
+
     initializeWizard();
     setupAutoAdvance();
     enhanceCanvasIntegration();
     setupMobileEnhancements();
-    
+
     // Restore saved organization selection (now immediate with embedded logos)
     setTimeout(() => {
         restoreSelectedOrganization();
     }, 100);
-    
+
     // Initial state - no welcome message on first load
-    
+
     // Update dimensions after a short delay to ensure canvas is ready
     setTimeout(() => {
         updateCanvasDimensions();

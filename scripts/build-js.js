@@ -19,6 +19,7 @@ const JS_FILES_ORDER = [
   // Core utilities - must load first
   "resources/js/constants.js",
   "resources/js/validation.js",
+  "resources/js/logo-state.js",
   "resources/js/alert-system.js",
   "resources/js/canvas-utils.js",
   "resources/js/event-handlers.js",

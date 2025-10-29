@@ -27,17 +27,19 @@ const ValidationUtils = {
     validateStep1() {
         const template = jQuery('#canvas-template').val();
         const logo = jQuery('#logo-selection').val();
-        
+        const logoEnabled = LogoState.isLogoEnabled();
+
         const errors = [];
-        
+
         if (!template) {
             errors.push('Bitte wählen Sie eine Vorlage aus.');
         }
-        
-        if (!logo) {
+
+        // Only validate logo if logo feature is enabled
+        if (logoEnabled && !logo) {
             errors.push('Bitte wählen Sie ein Logo aus.');
         }
-        
+
         return {
             isValid: errors.length === 0,
             errors: errors
@@ -151,7 +153,10 @@ const ValidationUtils = {
 
     // Download validation
     validateDownload() {
-        if (!logoText || logoText === "") {
+        const logoEnabled = LogoState.isLogoEnabled();
+
+        // Only validate logo if logo feature is enabled
+        if (logoEnabled && (!logoText || logoText === "")) {
             return {
                 isValid: false,
                 error: 'Wähle bitte ein Logo aus vor dem Download!'

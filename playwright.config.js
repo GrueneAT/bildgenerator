@@ -35,7 +35,8 @@ export default defineConfig({
         "**/text-system.spec.js",
         "**/positioning.spec.js",
         "**/background-images.spec.js",
-        "**/qr-codes.spec.js"
+        "**/qr-codes.spec.js",
+        "**/logo-toggle.spec.js"
       ],
       use: { ...devices["Desktop Chrome"] }
     },
