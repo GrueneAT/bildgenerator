@@ -27,31 +27,20 @@ export async function setupBasicTemplate(page, templateType = 'post') {
     await page.waitForTimeout(2000);
   }
   
-  // Wait for canvas and logos to be properly initialized
+  // Wait for canvas to be properly initialized
   await page.waitForFunction(() => {
-    return typeof canvas !== 'undefined' && 
-           canvas !== null && 
-           document.getElementById('logo-selection') &&
-           document.getElementById('logo-selection').options.length > 1;
+    return typeof canvas !== 'undefined' && canvas !== null;
   }, { timeout: 30000 });
-  
-  // Check if we have a default logo available and select it
+
+  // Disable logo by default - tests that need logos should enable/select them explicitly
   await page.evaluate(() => {
-    const logoSelect = document.getElementById('logo-selection');
-    if (logoSelect && logoSelect.options.length > 1) {
-      // Select the first non-empty option
-      for (let i = 1; i < logoSelect.options.length; i++) {
-        if (logoSelect.options[i].value && logoSelect.options[i].value.trim()) {
-          logoSelect.value = logoSelect.options[i].value;
-          logoSelect.dispatchEvent(new Event('change', { bubbles: true }));
-          return logoSelect.options[i].value;
-        }
-      }
+    const logoToggle = document.getElementById('logo-toggle');
+    if (logoToggle && logoToggle.checked) {
+      logoToggle.click();
     }
-    return null;
   });
-  
-  await page.waitForTimeout(2000);
+
+  await page.waitForTimeout(1000);
   
   // Wait for step 1 next button to be visible and enabled
   await page.waitForSelector('#step-1-next:visible', { timeout: 10000 });
