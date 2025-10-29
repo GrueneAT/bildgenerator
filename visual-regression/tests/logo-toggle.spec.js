@@ -9,9 +9,25 @@ test.describe('Visual Regression - Logo Toggle', () => {
   test('Canvas with logo enabled (default) shows logo at bottom', async ({ page }) => {
     console.log('Testing canvas with logo enabled...');
 
-    // Select template
+    // Select template and wait for canvas initialization
     await page.selectOption('#canvas-template', 'post');
+
+    // Wait for canvas objects to be added
+    await page.waitForFunction(() => {
+      return typeof canvas !== 'undefined' && canvas !== null && canvas.getObjects().length > 0;
+    }, { timeout: 10000 });
+
     await page.waitForTimeout(1000);
+
+    // Verify canvas is initialized
+    const canvasInitialized = await page.evaluate(() => {
+      return {
+        canvasExists: typeof canvas !== 'undefined' && canvas !== null,
+        objectCount: typeof canvas !== 'undefined' ? canvas.getObjects().length : 0,
+        hasContentRect: typeof contentRect !== 'undefined' && contentRect !== null
+      };
+    });
+    console.log('Canvas after template selection:', canvasInitialized);
 
     // Verify logo toggle exists and is checked by default
     const logoToggleExists = await page.evaluate(() => {
@@ -26,27 +42,44 @@ test.describe('Visual Regression - Logo Toggle', () => {
     });
     expect(isLogoEnabled).toBe(true);
 
-    // Select a logo
-    await page.evaluate(() => {
-      const logoSelect = document.getElementById('logo-selection');
-      if (logoSelect && logoSelect.options.length > 1) {
-        for (let i = 1; i < logoSelect.options.length; i++) {
-          if (logoSelect.options[i].value && logoSelect.options[i].value.trim()) {
-            logoSelect.value = logoSelect.options[i].value;
-            logoSelect.dispatchEvent(new Event('change', { bubbles: true }));
+    // Select a logo using jQuery to trigger handlers properly
+    const logoSelectionResult = await page.evaluate(() => {
+      const logoSelect = jQuery('#logo-selection');
+      const result = { found: false, value: null, optionsCount: 0 };
+
+      if (logoSelect.length && logoSelect.find('option').length > 1) {
+        const options = logoSelect.find('option');
+        result.optionsCount = options.length;
+
+        for (let i = 1; i < options.length; i++) {
+          const value = jQuery(options[i]).val();
+          if (value && value.trim()) {
+            logoSelect.val(value).trigger('change');
+            result.found = true;
+            result.value = value;
             break;
           }
         }
       }
+      return result;
     });
 
-    await page.waitForTimeout(2000);
+    console.log('Logo selection result:', logoSelectionResult);
 
-    // Verify logo is on canvas
-    const hasLogoOnCanvas = await page.evaluate(() => {
-      return typeof logo !== 'undefined' && logo !== null;
+    // Wait for async logo image loading (longer timeout for CI)
+    await page.waitForTimeout(5000);
+
+    // Check logo state and canvas
+    const logoDebug = await page.evaluate(() => {
+      return {
+        logoOnCanvas: typeof logo !== 'undefined' && logo !== null,
+        logoStateEnabled: typeof LogoState !== 'undefined' ? LogoState.isLogoEnabled() : 'undefined',
+        canvasObjects: typeof canvas !== 'undefined' ? canvas.getObjects().length : 0
+      };
     });
-    expect(hasLogoOnCanvas).toBe(true);
+
+    console.log('Logo debug:', logoDebug);
+    expect(logoDebug.logoOnCanvas).toBe(true);
 
     // Navigate to download step and compare
     await page.click('#step-1-next');
@@ -67,7 +100,7 @@ test.describe('Visual Regression - Logo Toggle', () => {
     // Wait for logo toggle to be available
     await page.waitForSelector('#logo-toggle', { timeout: 5000 });
 
-    // Uncheck logo toggle
+    // Disable logo toggle
     await page.click('#logo-toggle');
     await page.waitForTimeout(500);
 
@@ -107,7 +140,8 @@ test.describe('Visual Regression - Logo Toggle', () => {
 
     // Select story template
     await page.selectOption('#canvas-template', 'story');
-    await page.waitForTimeout(1000);
+    // Wait longer for template change to complete
+    await page.waitForTimeout(2000);
 
     // Disable logo toggle
     await page.click('#logo-toggle');
@@ -163,21 +197,23 @@ test.describe('Visual Regression - Logo Toggle', () => {
     await page.selectOption('#canvas-template', 'post');
     await page.waitForTimeout(1000);
 
-    // Select a logo first
+    // Select a logo first using jQuery to trigger handlers properly
     await page.evaluate(() => {
-      const logoSelect = document.getElementById('logo-selection');
-      if (logoSelect && logoSelect.options.length > 1) {
-        for (let i = 1; i < logoSelect.options.length; i++) {
-          if (logoSelect.options[i].value && logoSelect.options[i].value.trim()) {
-            logoSelect.value = logoSelect.options[i].value;
-            logoSelect.dispatchEvent(new Event('change', { bubbles: true }));
+      const logoSelect = jQuery('#logo-selection');
+      if (logoSelect.length && logoSelect.find('option').length > 1) {
+        const options = logoSelect.find('option');
+        for (let i = 1; i < options.length; i++) {
+          const value = jQuery(options[i]).val();
+          if (value && value.trim()) {
+            logoSelect.val(value).trigger('change');
             break;
           }
         }
       }
     });
 
-    await page.waitForTimeout(1000);
+    // Wait for async logo image loading
+    await page.waitForTimeout(3000);
 
     // Verify logo is present
     let hasLogo = await page.evaluate(() => {
