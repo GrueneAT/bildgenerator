@@ -301,10 +301,14 @@ test.describe('Visual Regression - Error Handling & Edge Cases', () => {
       await page.waitForTimeout(200);
     }
 
-    // Add text content
-    await page.fill('#text', 'RAPID TEST');
+    // Add text content multiple times
+    await page.fill('#text', 'RAPID TEST 1');
     await page.click('#add-text');
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(500);
+
+    await page.fill('#text', 'RAPID TEST 2');
+    await page.click('#add-text');
+    await page.waitForTimeout(500);
 
     // Verify application stability
     const finalState = await page.evaluate(() => {
@@ -314,6 +318,8 @@ test.describe('Visual Regression - Error Handling & Edge Cases', () => {
         texts: canvas.getObjects().filter(obj => obj.type === 'text' && obj !== logoName).length
       };
     });
+
+    console.log('Final state:', finalState);
 
     expect(finalState.canvasExists).toBe(true);
     expect(finalState.objectCount).toBeGreaterThan(2);

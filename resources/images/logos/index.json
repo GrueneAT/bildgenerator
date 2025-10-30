@@ -4,11 +4,11 @@
     "SALZBURG",
     "10. BUNDESLAND",
     "STEIERMARK",
-    "Vorarlberg"
+    "Vorarlberg",
+    "Kärnten",
+    "Tirol"
   ],
-  "Klubs": [
-    "ZELENI/ZÖLDEK/SELENE%LANDTAGSKLUB BURGENLAND"
-  ],
+  "Klubs": ["ZELENI/ZÖLDEK/SELENE%LANDTAGSKLUB BURGENLAND"],
   "Bezirke": [
     "BEZIRK NEUSIEDL",
     "BEZIRK EISENSTADT-UMGEBUNG",
@@ -34,13 +34,10 @@
     "BEZIRK % HARTBERG-FÜRSTENFELD",
     "BEZIRK % SÜDOSTSTEIERMARK",
     "BEZIRK % WEIZ",
-    "BEZIRK Voitsberg"
+    "BEZIRK Voitsberg",
+    "BEZIRK Vöcklabruck"
   ],
-  "Gebiete": [
-    "BURGENLAND SÜD",
-    "BURGENLAND MITTE",
-    "BURGENLAND NORD"
-  ],
+  "Gebiete": ["BURGENLAND SÜD", "BURGENLAND MITTE", "BURGENLAND NORD"],
   "Gemeinden": [
     "BAD SAUERBRUNN",
     "BREITENBRUNN",
@@ -218,7 +215,13 @@
     "und Parteifreie % Schwarzach",
     "und Parteifreie % Wolfurt",
     "mit Jung & Alt % Zwischenwasser",
-    "Innsbruck"
+    "Innsbruck",
+    "Oberhofen/Irrsee",
+    "Mondsee",
+    "Tiefgraben",
+    "Innerschwand",
+    "Mondseeland",
+    "St. Lorenz"
   ],
   "Andere": [
     "Bäuerinnnen%& Bauern",
@@ -229,7 +232,18 @@
     "GENERATION plus%Steiermark",
     "GENERATION plus%Salzburg",
     "GENERATION plus%Vorarlberg",
-    "GRÜNE FRAUEN%SALZBURG",
-    "GENERATION plus"
+    "FRAUEN%SALZBURG",
+    "Frauen Österreich",
+    "Frauen Tirol",
+    "Frauen Wien",
+    "Frauen Oberösterreich",
+    "Frauen Vorarlberg",
+    "GENERATION plus",
+    "Andersrum",
+    "Andersrum Wien",
+    "Andersrum Tirol",
+    "Andersrum Oberösterreich",
+    "Andersrum Vorarlberg",
+    "Andersrum Salzburg"
   ]
 }

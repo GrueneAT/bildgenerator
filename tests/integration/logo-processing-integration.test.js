@@ -119,6 +119,12 @@ global.CanvasUtils = {
     disableScalingControls: jest.fn()
 };
 
+// Load LogoState module (required by main.js addLogo function)
+const logoStatePath = path.join(__dirname, '../../resources/js/logo-state.js');
+const logoStateCode = fs.readFileSync(logoStatePath, 'utf8');
+eval(logoStateCode);
+global.LogoState.initialize();
+
 // Read the actual main.js file
 const mainJsPath = path.join(__dirname, '../../resources/js/main.js');
 const mainJsCode = fs.readFileSync(mainJsPath, 'utf8');

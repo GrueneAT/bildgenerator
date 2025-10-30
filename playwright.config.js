@@ -18,6 +18,17 @@ export default defineConfig({
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
     headless: true,
+    launchOptions: {
+      args: [
+        '--font-render-hinting=none',           // Disable font hinting for consistency
+        '--disable-font-subpixel-positioning',  // Prevent subpixel positioning differences
+        '--disable-lcd-text',                   // Disable LCD text anti-aliasing
+        '--force-device-scale-factor=1',        // Consistent DPI scaling
+        '--disable-gpu',                         // Use software rendering for consistency
+        '--disable-dev-shm-usage',              // Prevent shared memory issues in CI
+        '--no-sandbox',                          // CI compatibility
+      ]
+    }
   },
   projects: [
     {
@@ -35,7 +46,8 @@ export default defineConfig({
         "**/text-system.spec.js",
         "**/positioning.spec.js",
         "**/background-images.spec.js",
-        "**/qr-codes.spec.js"
+        "**/qr-codes.spec.js",
+        "**/logo-toggle.spec.js"
       ],
       use: { ...devices["Desktop Chrome"] }
     },
