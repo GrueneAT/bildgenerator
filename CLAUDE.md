@@ -8,15 +8,49 @@ This is a browser-based image generator for GRÜNE (Austrian Green Party) politi
 
 ## Development Commands
 
+### Docker Development (Recommended)
+
+Docker-based development provides a consistent environment matching the CI/CD pipeline:
+
+**Quick Start:**
+```bash
+make docker-dev
+```
+This command will:
+1. Build the Docker image from `Dockerfile.claude`
+2. Run the development server with auto-rebuild on file changes
+3. Mount your local directory for live editing
+4. Expose the server at http://localhost:8000
+
+**Available Docker Commands:**
+
+- `make docker-dev` - Start interactive development server (Ctrl+C to stop)
+- `make docker-dev-detached` - Start server in background mode
+- `make docker-logs` - View logs from background server
+- `make docker-stop` - Stop the background server
+- `make docker-clean` - Stop and remove the container
+- `make docker-clean-image` - Remove container and Docker image
+- `make docker-shell` - Open shell in running container
+- `make docker-build` - Build Docker image only
+
+**File Watching:**
+When files change in the mounted directory:
+- **CSS files** (`resources/css/`) → Auto-rebuild CSS + update timestamp
+- **JS files** (`resources/js/`) → Update timestamp + show notification
+- Browser reload required to see changes
+
+### Local Development (Native)
+
+For development without Docker:
+
+- `make dev` - Start development server with auto-rebuild (requires Node.js, Python)
+- `make server` - Start Python HTTP server on port 8000
+- `make logo-json` - Generate logo index JSON files from image directories
+
 ### CSS Development
 
 - `npm run build-css` - Build Tailwind CSS with watch mode for development
 - `npm run build-css-prod` - Build minified CSS for production
-
-### Local Development
-
-- `make server` - Start Python HTTP server on port 8000 (automatically generates logo JSON files first)
-- `make logo-json` - Generate logo index JSON files from image directories
 
 ### Logo Management
 
@@ -61,11 +95,25 @@ The `logo_json.py` script processes logo filenames and generates searchable JSON
 
 ### Template System
 
-The application supports multiple image formats defined in `template_values`:
+The application supports multiple image formats defined in `TemplateConstants.TEMPLATES`:
 
-- Story format (1080x1920)
-- Post formats with configurable dimensions
-- Custom border and logo positioning
+**Social Media Templates**:
+- **Story format** (1080x1920) - Instagram/Facebook stories with border
+- **Post 4:5 with Border** (1080x1350) - Post format with 20px green border
+- **Post 4:5 without Border** (1080x1350) - Post format without border (full-bleed)
+- **Event format** (1920x1005) - Event headers without border
+- **Facebook Header** (820x360) - Facebook profile headers without border
+
+**Print Templates**:
+- A2, A3, A4, A5 formats (portrait and landscape variants with borders)
+
+**Key Features**:
+- Dynamic logo sizing based on canvas dimensions (formula: `(contentRect.width + contentRect.height) / 10`)
+- Percentage-based logo positioning for consistent placement across templates
+- Border control (0 = full-bleed, 10-20 = green border in pixels)
+- Default text font: Gotham Narrow Ultra (non-italic)
+- Text color options: Gelb (Yellow), Weiß (White)
+- Line-height options: Klein (0.8), Mittel (0.9), Groß (1.1)
 
 ### Logo System
 
