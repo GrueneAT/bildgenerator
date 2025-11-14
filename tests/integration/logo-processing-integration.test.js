@@ -34,8 +34,10 @@ global.fabric = {
     },
     Image: {
         fromURL: jest.fn((url, callback) => {
-            // Mock image object
+            // Mock image object with width/height for error handling validation
             const mockImage = {
+                width: 200,
+                height: 100,
                 getScaledWidth: () => 200,
                 getScaledHeight: () => 100,
                 scaleToWidth: jest.fn(),
@@ -129,14 +131,21 @@ global.LogoState.initialize();
 const mainJsPath = path.join(__dirname, '../../resources/js/main.js');
 const mainJsCode = fs.readFileSync(mainJsPath, 'utf8');
 
-// Extract just the addLogo function
+// Extract the calculateLogoTop function
+const calculateLogoTopMatch = mainJsCode.match(/function calculateLogoTop\([^)]*\) \{[\s\S]*?\n\}/);
+if (!calculateLogoTopMatch) {
+    throw new Error('Could not find calculateLogoTop function in main.js');
+}
+
+// Extract the addLogo function
 const addLogoMatch = mainJsCode.match(/function addLogo\(\) \{[\s\S]*?\n\}/);
 if (!addLogoMatch) {
     throw new Error('Could not find addLogo function in main.js');
 }
 
-// Execute the addLogo function in our test environment
-let addLogo;
+// Execute both functions in our test environment
+let calculateLogoTop, addLogo;
+eval('calculateLogoTop = ' + calculateLogoTopMatch[0]);
 eval('addLogo = ' + addLogoMatch[0]);
 
 describe('Logo Processing Integration Tests', () => {
