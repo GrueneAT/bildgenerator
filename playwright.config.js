@@ -35,8 +35,9 @@ export default defineConfig({
       name: "fast-tests",
       testMatch: [
         "**/core-functionality.spec.js",
-        "**/elements.spec.js", 
-        "**/layouts.spec.js"
+        "**/elements.spec.js",
+        "**/layouts.spec.js",
+        "**/logo-positioning-debug.spec.js"
       ],
       use: { ...devices["Desktop Chrome"] }
     },

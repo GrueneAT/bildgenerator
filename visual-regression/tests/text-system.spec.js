@@ -92,26 +92,10 @@ test.describe('Visual Regression - Text System', () => {
     await compareWithReference(page, 'text-color-white');
   });
 
-  test('Text Black Color - Standard black text', async ({ page }) => {
-    console.log('Testing black text...');
-
-    await setupBasicTemplate(page);
-    await page.click('#step-2-next');
-    await page.waitForTimeout(1000);
-
-    // Add text and set black color
-    await page.click('button[onclick="toggleSection(\'text-section\')"]');
-    await page.waitForTimeout(500);
-    await page.fill('#text', 'GRÜNE SCHWARZ TEST');
-    await page.click('#add-text');
-    await page.waitForTimeout(1000);
-    
-    // Set black color
-    await page.selectOption('#text-color', 'rgb(0,0,0)');
-    await page.waitForTimeout(1000);
-
-    await compareWithReference(page, 'text-color-black');
-  });
+  // Black text color option removed - REQ-010
+  // test('Text Black Color - Standard black text', async ({ page }) => {
+  //   Test removed because black text color option was removed from the UI
+  // });
 
   test('Text Left Alignment - Left-aligned text', async ({ page }) => {
     console.log('Testing left-aligned text...');

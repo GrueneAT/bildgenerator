@@ -15,7 +15,7 @@ test.describe('Complete Wizard Flow E2E', () => {
       
       // Select template
       const templateSelect = page.locator('#canvas-template');
-      await templateSelect.selectOption('post'); // Select post template
+      await templateSelect.selectOption('post_45_border'); // Select post template
       
       // Wait for logos to load and select one if available
       await page.waitForFunction(() => {
@@ -138,7 +138,7 @@ test.describe('Complete Wizard Flow E2E', () => {
   test('should handle template switching', async ({ page }) => {
     // Initial setup
     const templateSelect = page.locator('#canvas-template');
-    await templateSelect.selectOption('post');
+    await templateSelect.selectOption('post_45_border');
     
     // Switch template
     await templateSelect.selectOption('story');
@@ -159,7 +159,7 @@ test.describe('Complete Wizard Flow E2E', () => {
     
     // Select template and logo to enable next button
     const templateSelect = page.locator('#canvas-template');
-    await templateSelect.selectOption('post');
+    await templateSelect.selectOption('post_45_border');
     
     // Mock logo selection for navigation test
     await page.evaluate(() => {

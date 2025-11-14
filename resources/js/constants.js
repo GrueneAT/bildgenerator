@@ -74,9 +74,10 @@ const AppConstants = {
     // Font Configuration
     FONTS: {
         DEFAULT_LOGO: "Gotham Narrow Bold",
-        DEFAULT_TEXT: "Gotham Narrow Ultra Italic",
+        DEFAULT_TEXT: "Gotham Narrow Ultra",
         PRELOAD_FONTS: [
             'Gotham Narrow Ultra Italic',
+            'Gotham Narrow Ultra',
             'Gotham Narrow Book',
             'Gotham Narrow Bold'
         ]
@@ -91,6 +92,10 @@ const AppConstants = {
         LINE_HEIGHT: 0.8,
         ANGLE: -5.5,
         WIDTH_SCALE: 0.95,
+        PINK_BAR_RATIO: 0.89, // Position text top at 89% of logo height to center in pink bar
+        // Automatic positioning configuration
+        BORDER_CUT_RATIO: 0.91, // For bordered templates: border cuts at 91% of logo height (through pink bar center)
+        BORDERLESS_MARGIN_PERCENT: 0.02, // For borderless templates: logo bottom margin as percentage of canvas height (2%)
         FILES: {
             LONG: "Gruene_Logo_245_268.png",
             SHORT: "Gruene_Logo_245_248.png",
@@ -101,6 +106,10 @@ const AppConstants = {
 };
 
 // Template configurations
+// NOTE: logoTop values are now automatically calculated based on border configuration
+// - Bordered templates (border > 0): Border cuts through pink bar at 91% of logo height
+// - Borderless templates (border = 0): Logo positioned with 2% margin from canvas bottom
+// The logoTop values below are kept for reference but not used in calculations
 const TemplateConstants = {
     TEMPLATES: {
         story: {
@@ -108,44 +117,44 @@ const TemplateConstants = {
             height: 1920,
             topBorderMultiplier: 2,
             border: 10,
-            logoTop: 0.83,
+            logoTop: 0.8305,  // Border cuts through pink bar (87.3% of logo height)
             logoTextTop: 0.9423,
             dpi: 200,
         },
-        post: {
-            width: 1080,
-            height: 1080,
-            topBorderMultiplier: 1,
-            border: 20,
-            logoTop: 0.79,
-            logoTextTop: 0.948,
-            dpi: 200,
-        },
-        post_45: {
+        post_45_border: {
             width: 1080,
             height: 1350,
             topBorderMultiplier: 1,
             border: 20,
-            logoTop: 0.815,
+            logoTop: 0.8151,  // Border cuts through pink bar (87.3% of logo height)
+            logoTextTop: 0.959,
+            dpi: 200,
+        },
+        post_45_no_border: {
+            width: 1080,
+            height: 1350,
+            topBorderMultiplier: 1,
+            border: 0,
+            logoTop: 0.7988,  // 25.6px margin (matches post_45_border)
             logoTextTop: 0.959,
             dpi: 200,
         },
         event: {
-            width: 1200,
-            height: 628,
+            width: 1920,
+            height: 1005,
             topBorderMultiplier: 1,
-            border: 20,
-            logoTop: 0.678,
-            logoTextTop: 0.9,
+            border: 0,
+            logoTop: 0.6799,  // 25.6px margin (matches post_45_border)
+            logoTextTop: 0.9449,
             dpi: 200,
         },
         facebook_header: {
-            width: 1958,
-            height: 745,
+            width: 820,
+            height: 360,
             topBorderMultiplier: 1,
-            border: 20,
-            logoTop: 0.6,
-            logoTextTop: 0.872,
+            border: 0,
+            logoTop: 0.5971,  // 25.6px margin (matches post_45_border)
+            logoTextTop: 0.8462,
             dpi: 150,
         },
         a2: {
@@ -153,7 +162,7 @@ const TemplateConstants = {
             height: 7016,
             topBorderMultiplier: 1,
             border: 10,
-            logoTop: 0.804,
+            logoTop: 0.8034,  // Border cuts through pink bar (87.3% of logo height)
             logoTextTop: 0.929,
             dpi: 150,
         },
@@ -162,7 +171,7 @@ const TemplateConstants = {
             height: 4961,
             topBorderMultiplier: 1,
             border: 10,
-            logoTop: 0.694,
+            logoTop: 0.6952,  // Border cuts through pink bar (87.3% of logo height)
             logoTextTop: 0.856,
             dpi: 150,
         },
@@ -171,7 +180,7 @@ const TemplateConstants = {
             height: 4961,
             topBorderMultiplier: 1,
             border: 10,
-            logoTop: 0.804,
+            logoTop: 0.8034,  // Border cuts through pink bar (87.3% of logo height)
             logoTextTop: 0.929,
             dpi: 200,
         },
@@ -180,7 +189,7 @@ const TemplateConstants = {
             height: 3508,
             topBorderMultiplier: 1,
             border: 10,
-            logoTop: 0.694,
+            logoTop: 0.6952,  // Border cuts through pink bar (87.3% of logo height)
             logoTextTop: 0.856,
             dpi: 200,
         },
@@ -189,7 +198,7 @@ const TemplateConstants = {
             height: 3508,
             topBorderMultiplier: 1,
             border: 10,
-            logoTop: 0.804,
+            logoTop: 0.8035,  // Border cuts through pink bar (87.3% of logo height)
             logoTextTop: 0.929,
             dpi: 250,
         },
@@ -198,7 +207,7 @@ const TemplateConstants = {
             height: 2480,
             topBorderMultiplier: 1,
             border: 10,
-            logoTop: 0.694,
+            logoTop: 0.6952,  // Border cuts through pink bar (87.3% of logo height)
             logoTextTop: 0.856,
             dpi: 250,
         },
@@ -207,7 +216,7 @@ const TemplateConstants = {
             height: 2480,
             topBorderMultiplier: 1,
             border: 10,
-            logoTop: 0.804,
+            logoTop: 0.8038,  // Border cuts through pink bar (87.3% of logo height)
             logoTextTop: 0.929,
             dpi: 300,
         },
@@ -216,7 +225,7 @@ const TemplateConstants = {
             height: 1748,
             topBorderMultiplier: 1,
             border: 10,
-            logoTop: 0.694,
+            logoTop: 0.6945,  // Border cuts through pink bar (87.3% of logo height)
             logoTextTop: 0.856,
             dpi: 300,
         },

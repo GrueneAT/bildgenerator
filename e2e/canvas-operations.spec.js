@@ -8,7 +8,7 @@ test.describe('Canvas Operations E2E', () => {
     
     // Basic setup: select template and logo
     const templateSelect = page.locator('#canvas-template');
-    await templateSelect.selectOption('post');
+    await templateSelect.selectOption('post_45_border');
     
     // Mock logo selection to enable navigation
     await page.evaluate(() => {

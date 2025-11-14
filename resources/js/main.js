@@ -56,7 +56,8 @@ function replaceCanvas() {
   jQuery("#scale").attr("max", scaleMax);
 
   // Calculate border distances
-  const borderDistance = canvas.width / border;
+  // For borderless templates (border: 0), borderDistance should be 0
+  const borderDistance = border > 0 ? canvas.width / border : 0;
   const topDistance = borderDistance * topBorderMultiplier;
 
   // Create content rectangle
@@ -94,6 +95,39 @@ function replaceCanvas() {
   }
 }
 
+/**
+ * Calculate the optimal logo top position based on template configuration
+ * For bordered templates: border should cut through pink bar at BORDER_CUT_RATIO of logo height
+ * For borderless templates: logo bottom margin is BORDERLESS_MARGIN_PERCENT of canvas height
+ */
+function calculateLogoTop(logoHeight, template) {
+  // Validate inputs
+  if (!canvas || !template) {
+    console.error('calculateLogoTop: canvas or template is not defined');
+    return 0;
+  }
+
+  if (typeof logoHeight !== 'number' || logoHeight <= 0) {
+    console.error('calculateLogoTop: invalid logoHeight', logoHeight);
+    return 0;
+  }
+
+  const borderDistance = template.border > 0 ? canvas.width / template.border : 0;
+
+  if (template.border > 0) {
+    // Bordered template: border should cut at BORDER_CUT_RATIO of logo height from logo top
+    const bottomBorderTop = canvas.height - borderDistance;
+    const logoTop = bottomBorderTop - (logoHeight * AppConstants.LOGO.BORDER_CUT_RATIO);
+    return logoTop;
+  } else {
+    // Borderless template: use percentage-based margin from canvas bottom
+    const marginFromBottom = canvas.height * AppConstants.LOGO.BORDERLESS_MARGIN_PERCENT;
+    const logoBottom = canvas.height - marginFromBottom;
+    const logoTop = logoBottom - logoHeight;
+    return logoTop;
+  }
+}
+
 function addLogo() {
   // If logo is disabled, remove existing logo and return early
   if (!LogoState.isLogoEnabled()) {
@@ -118,11 +152,11 @@ function addLogo() {
     .toUpperCase();
 
   let logoFilename, textScaleTo;
-  
+
   // Check if text needs breaking (either has % or is too long)
   if (logoText.includes("%") || logoText.length > AppConstants.LOGO.MAX_TEXT_LENGTH) {
     logoFilename = AppConstants.LOGO.FILES.LONG;
-    
+
     if (logoText.includes("%")) {
       // Split by % and trim each part to remove whitespace
       const parts = logoText.split("%").map(part => part.trim());
@@ -131,11 +165,11 @@ function addLogo() {
       // For long names without %, break at last space
       const lastSpace = logoText.lastIndexOf(" ");
       if (lastSpace > 0) {
-        logoText = logoText.substring(0, lastSpace).trim() + "\n" + 
+        logoText = logoText.substring(0, lastSpace).trim() + "\n" +
                    logoText.substring(lastSpace).trim();
       }
     }
-    
+
     textScaleTo = AppConstants.LOGO.TEXT_SCALE_LONG;
   } else {
     logoFilename = AppConstants.LOGO.FILES.SHORT;
@@ -152,46 +186,72 @@ function addLogo() {
   fabric.Image.fromURL(
     generatorApplicationURL + "resources/images/logos/" + logoFilename,
     function (image) {
-      image.scaleToWidth(scaleTo);
-      image.lockMovementX = true;
-      image.lockMovementY = true;
-      image.top = canvas.height * currentTemplate().logoTop;
-      CanvasUtils.disableScalingControls(image);
-      image.selectable = false;
-      canvas.add(image);
-      canvas.centerObjectH(image);
-      canvas.bringToFront(image);
-      logo = image;
-
-      logoName = new fabric.Text(logoText, {
-        top: canvas.height * currentTemplate().logoTextTop,
-        fontFamily: AppConstants.FONTS.DEFAULT_LOGO,
-        fontSize: Math.floor(image.getScaledWidth() / 10),
-        fontStyle: "normal",
-        textAlign: "right",
-        fill: AppConstants.COLORS.LOGO_TEXT,
-        stroke: AppConstants.COLORS.TEXT_STROKE,
-        strokeWidth: 0,
-        objectCaching: false,
-        lineHeight: AppConstants.LOGO.LINE_HEIGHT,
-        angle: AppConstants.LOGO.ANGLE,
-        selectable: false,
-      });
-
-      canvas.add(logoName);
-
-      const linebreak = logoText.lastIndexOf("\n");
-      if (linebreak > 17 || logoText.length - linebreak > 17) {
-        logoName.scaleToWidth(image.getScaledWidth() * AppConstants.LOGO.WIDTH_SCALE);
-        const topAdd = Math.floor((logoName.height - logoName.getScaledHeight()) / 2);
-        logoName.top = logoName.top + topAdd;
-      } else {
-        logoName.width = image.getScaledWidth() * AppConstants.LOGO.WIDTH_SCALE;
+      // Error handling: Check if image loaded successfully
+      if (!image || !image.width || !image.height) {
+        console.error('Failed to load logo image:', logoFilename);
+        return;
       }
 
-      canvas.centerObjectH(logoName);
-      CanvasUtils.bringLogoToFront();
-      canvas.renderAll();
+      try {
+        image.scaleToWidth(scaleTo);
+        image.lockMovementX = true;
+        image.lockMovementY = true;
+
+        // Calculate optimal logo position automatically based on template type
+        const logoHeight = image.getScaledHeight();
+        const template = currentTemplate();
+        image.top = calculateLogoTop(logoHeight, template);
+
+        CanvasUtils.disableScalingControls(image);
+        image.selectable = false;
+        canvas.add(image);
+        canvas.centerObjectH(image);
+        canvas.bringToFront(image);
+        logo = image;
+
+        // Calculate text position relative to logo image
+        // Position text in the pink bar area (89% down from logo top)
+        const textTopPosition = image.top + (logoHeight * AppConstants.LOGO.PINK_BAR_RATIO);
+
+        logoName = new fabric.Text(logoText, {
+          top: textTopPosition,
+          fontFamily: AppConstants.FONTS.DEFAULT_LOGO,
+          fontSize: Math.floor(image.getScaledWidth() / 10),
+          fontStyle: "normal",
+          textAlign: "right",
+          fill: AppConstants.COLORS.LOGO_TEXT,
+          stroke: AppConstants.COLORS.TEXT_STROKE,
+          strokeWidth: 0,
+          objectCaching: false,
+          lineHeight: AppConstants.LOGO.LINE_HEIGHT,
+          angle: AppConstants.LOGO.ANGLE,
+          selectable: false,
+        });
+
+        canvas.add(logoName);
+
+        const linebreak = logoText.lastIndexOf("\n");
+        if (linebreak > 17 || logoText.length - linebreak > 17) {
+          logoName.scaleToWidth(image.getScaledWidth() * AppConstants.LOGO.WIDTH_SCALE);
+          const topAdd = Math.floor((logoName.height - logoName.getScaledHeight()) / 2);
+          logoName.top = logoName.top + topAdd;
+        } else {
+          logoName.width = image.getScaledWidth() * AppConstants.LOGO.WIDTH_SCALE;
+        }
+
+        canvas.centerObjectH(logoName);
+        CanvasUtils.bringLogoToFront();
+        canvas.renderAll();
+      } catch (error) {
+        console.error('Error while adding logo to canvas:', error);
+      }
+    },
+    null, // crossOrigin
+    {
+      // Error callback for image loading failure
+      onError: function() {
+        console.error('Failed to load logo image file:', logoFilename);
+      }
     }
   );
 }

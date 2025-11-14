@@ -21,7 +21,7 @@ test.describe('Visual Regression - Logo Toggle', () => {
     console.log('Testing canvas with logo enabled...');
 
     // Select template
-    await page.selectOption('#canvas-template', 'post');
+    await page.selectOption('#canvas-template', 'post_45_border');
     await page.waitForTimeout(3000);
 
     // Verify logo toggle exists and is checked by default
@@ -86,7 +86,7 @@ test.describe('Visual Regression - Logo Toggle', () => {
     console.log('Testing canvas with logo disabled...');
 
     // Select template
-    await page.selectOption('#canvas-template', 'post');
+    await page.selectOption('#canvas-template', 'post_45_border');
     await page.waitForTimeout(3000);
 
     // Wait for logo toggle to be available
@@ -163,7 +163,7 @@ test.describe('Visual Regression - Logo Toggle', () => {
 
     // Select post template using jQuery to trigger change handlers
     await page.evaluate(() => {
-      jQuery('#canvas-template').val('post').trigger('change');
+      jQuery('#canvas-template').val('post_45_border').trigger('change');
     });
 
     // Wait for canvas re-initialization
@@ -188,7 +188,7 @@ test.describe('Visual Regression - Logo Toggle', () => {
     console.log('Testing logo re-enable...');
 
     // Select template
-    await page.selectOption('#canvas-template', 'post');
+    await page.selectOption('#canvas-template', 'post_45_border');
     await page.waitForTimeout(3000);
 
     // Select a logo using the SearchableSelect component
@@ -252,7 +252,7 @@ test.describe('Visual Regression - Logo Toggle', () => {
     console.log('Testing validation bypass with logo disabled...');
 
     // Select template
-    await page.selectOption('#canvas-template', 'post');
+    await page.selectOption('#canvas-template', 'post_45_border');
     await page.waitForTimeout(3000);
 
     // Disable logo
@@ -278,7 +278,7 @@ test.describe('Visual Regression - Logo Toggle', () => {
     console.log('Testing validation requires logo when enabled...');
 
     // Select template
-    await page.selectOption('#canvas-template', 'post');
+    await page.selectOption('#canvas-template', 'post_45_border');
     await page.waitForTimeout(3000);
 
     // Ensure logo is enabled (default)
@@ -330,7 +330,7 @@ test.describe('Visual Regression - Logo Toggle', () => {
     console.log('Testing template change with logo disabled...');
 
     // Select initial template
-    await page.selectOption('#canvas-template', 'post');
+    await page.selectOption('#canvas-template', 'post_45_border');
     await page.waitForTimeout(3000);
 
     // Disable logo
@@ -348,7 +348,7 @@ test.describe('Visual Regression - Logo Toggle', () => {
     expect(hasNoLogo).toBe(true);
 
     // Change back to post
-    await page.selectOption('#canvas-template', 'post');
+    await page.selectOption('#canvas-template', 'post_45_border');
     await page.waitForTimeout(3000);
 
     // Still no logo

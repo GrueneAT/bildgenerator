@@ -1,0 +1,46 @@
+# Git files
+.git
+.gitignore
+.gitattributes
+
+# Node.js
+node_modules
+npm-debug.log
+yarn-error.log
+.npm
+
+# Build outputs
+build/
+dist/
+
+# Test outputs
+test-results/
+playwright-report/
+coverage/
+screenshots/
+
+# Development files
+.development/
+.devcontainer/
+.vscode/
+.idea/
+
+# Temporary files
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# Documentation (not needed in container)
+*.md
+!package.json
+!package-lock.json
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Docker files (avoid recursive copying)
+Dockerfile*
+docker-compose*.yml
+.dockerignore

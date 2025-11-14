@@ -455,7 +455,7 @@ test.describe('Visual Regression - Element Positioning', () => {
     console.log('Testing responsive positioning...');
 
     // Start with post template (square) - use setupBasicTemplate which handles template selection
-    await setupBasicTemplate(page, 'post');
+    await setupBasicTemplate(page, 'post_45_border');
     await navigateToStep(page, 2, 3);
 
     // Add elements
