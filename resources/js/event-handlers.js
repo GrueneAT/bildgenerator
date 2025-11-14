@@ -147,7 +147,7 @@ const EventHandlerUtils = {
             }
 
             const initialFontSize = canvas.width / 2;
-            const selectedFont = jQuery("#font-style-select").val() || "Gotham Narrow Ultra Italic";
+            const selectedFont = jQuery("#font-style-select").val() || "Gotham Narrow Ultra";
             
             const text = new fabric.Text(jQuery("#text").val(), {
                 fontFamily: selectedFont,

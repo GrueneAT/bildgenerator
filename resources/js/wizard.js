@@ -21,10 +21,11 @@ function initializeWizard() {
 function preloadFonts() {
     const fonts = [
         new FontFaceObserver('Gotham Narrow Ultra Italic'),
+        new FontFaceObserver('Gotham Narrow Ultra'),
         new FontFaceObserver('Gotham Narrow Book'),
         new FontFaceObserver('Gotham Narrow Bold')
     ];
-    
+
     fonts.forEach(font => {
         font.load().then(function() {
             console.log('Font loaded successfully:', font.family);
@@ -307,16 +308,40 @@ function setupAutoAdvance() {
         if (this.id === 'logo-selection') {
             saveSelectedOrganization();
         }
-        
+
         // Always update dimensions when template changes
         setTimeout(() => {
             updateCanvasDimensions();
         }, 200);
-        
+
+        // Show Facebook mobile format warning when Facebook Header template is selected
+        if (this.id === 'canvas-template') {
+            const templateName = jQuery('#canvas-template').val();
+
+            // Clear previous template warnings
+            if (window.AlertSystem) {
+                window.AlertSystem.closeAll();
+            }
+
+            // Show Facebook mobile warning
+            if (templateName === 'facebook_header') {
+                if (window.AlertSystem) {
+                    window.AlertSystem.show(
+                        'Hinweis: Facebook verwendet auf Mobilgeräten ein anderes Header-Format. Bitte Text möglichst mittig platzieren für optimale Darstellung.',
+                        'info',
+                        {
+                            autoClose: false,
+                            scrollIntoView: false
+                        }
+                    );
+                }
+            }
+        }
+
         if (currentStep === 1) {
             const template = jQuery('#canvas-template').val();
             const logo = jQuery('#logo-selection').val();
-            
+
             // Template selection notification removed
         }
     });
