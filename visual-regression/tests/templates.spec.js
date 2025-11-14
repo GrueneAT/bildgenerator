@@ -7,30 +7,30 @@ test.describe('Visual Regression - Templates', () => {
   });
 
   // Social Media Templates
-  test('Template Post Square - Test post layout 1080x1080', async ({ page }) => {
-    console.log('Testing post square template...');
+  test('Template Post 4:5 with Border - Test post layout 1080x1350 with border', async ({ page }) => {
+    console.log('Testing post 4:5 with border template...');
 
-    await page.selectOption('#canvas-template', 'post');
+    await page.selectOption('#canvas-template', 'post_45_border');
     await page.waitForTimeout(2000);
-    
+
     await setupBasicTemplate(page);
     await page.click('#step-2-next');
     await page.waitForTimeout(1000);
-    
-    await compareWithReference(page, 'template-post-square');
+
+    await compareWithReference(page, 'template-post-45-border');
   });
 
-  test('Template Post 4:5 - Test post layout 1080x1350', async ({ page }) => {
-    console.log('Testing post 4:5 template...');
+  test('Template Post 4:5 without Border - Test post layout 1080x1350 no border', async ({ page }) => {
+    console.log('Testing post 4:5 without border template...');
 
-    await page.selectOption('#canvas-template', 'post_45');
+    await page.selectOption('#canvas-template', 'post_45_no_border');
     await page.waitForTimeout(2000);
-    
+
     await setupBasicTemplate(page);
     await page.click('#step-2-next');
     await page.waitForTimeout(1000);
-    
-    await compareWithReference(page, 'template-post-45');
+
+    await compareWithReference(page, 'template-post-45-no-border');
   });
 
   test('Template Story Format - Test vertical story layout', async ({ page }) => {

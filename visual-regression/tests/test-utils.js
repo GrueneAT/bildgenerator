@@ -15,7 +15,7 @@ export const GENERATE_REFERENCE_MODE = process.env.GENERATE_REFERENCE === 'true'
  * @param {import('@playwright/test').Page} page 
  * @param {string} templateType - Template type to select
  */
-export async function setupBasicTemplate(page, templateType = 'post') {
+export async function setupBasicTemplate(page, templateType = 'post_45_border') {
   // Only set template if it's not already set
   const currentTemplate = await page.evaluate(() => {
     const templateSelect = document.getElementById('canvas-template');

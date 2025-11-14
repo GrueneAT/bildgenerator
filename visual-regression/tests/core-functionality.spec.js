@@ -10,13 +10,13 @@ test.describe('Visual Regression - Core Functionality', () => {
     console.log('Testing application functionality...');
 
     // Test template selection
-    await page.selectOption('#canvas-template', 'post');
+    await page.selectOption('#canvas-template', 'post_45_border');
     await page.waitForTimeout(1000);
     
     const templateValue = await page.evaluate(() => {
       return document.getElementById('canvas-template').value;
     });
-    expect(templateValue).toBe('post');
+    expect(templateValue).toBe('post_45_border');
 
     // Test logo loading
     const hasLogo = await page.evaluate(async () => {
