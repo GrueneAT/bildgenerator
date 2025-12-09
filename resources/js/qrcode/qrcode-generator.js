@@ -241,20 +241,44 @@ function generateQRCode(data, foregroundColor, backgroundColor) {
                         ctx.fillStyle = backgroundColor;
                         ctx.fillRect(0, 0, finalSize, finalSize);
                     }
-                    
+
+                    // Helper function to make white pixels transparent
+                    const makeWhiteTransparent = () => {
+                        if (backgroundColor === 'transparent') {
+                            const imageData = ctx.getImageData(0, 0, finalSize, finalSize);
+                            const data = imageData.data;
+
+                            // Convert white pixels (and near-white) to transparent
+                            for (let i = 0; i < data.length; i += 4) {
+                                const r = data[i];
+                                const g = data[i + 1];
+                                const b = data[i + 2];
+
+                                // Check if pixel is white or near-white (threshold for anti-aliasing)
+                                if (r > 250 && g > 250 && b > 250) {
+                                    data[i + 3] = 0; // Set alpha to 0 (fully transparent)
+                                }
+                            }
+
+                            ctx.putImageData(imageData, 0, 0);
+                        }
+                    };
+
                     // Draw QR code
                     qrImg.onload = () => {
                         ctx.drawImage(qrImg, quietZoneSize, quietZoneSize, qrSize, qrSize);
-                        
+                        makeWhiteTransparent();
+
                         // Clean up
                         document.body.removeChild(tempDiv);
-                        
+
                         resolve(canvas);
                     };
-                    
+
                     // If image is already loaded
                     if (qrImg.complete) {
                         ctx.drawImage(qrImg, quietZoneSize, quietZoneSize, qrSize, qrSize);
+                        makeWhiteTransparent();
                         document.body.removeChild(tempDiv);
                         resolve(canvas);
                     }
