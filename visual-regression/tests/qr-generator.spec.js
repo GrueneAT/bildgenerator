@@ -384,13 +384,159 @@ test.describe('Visual Regression - QR Generator with Pixelmatch', () => {
 
   test('QR Generator - Yellow on Transparent (Bright Overlay)', async ({ page }) => {
     console.log('Testing yellow QR on transparent background...');
-    
+
     await setupQRTest(page);
-    
+
     const data = { url: 'https://gruene.at/yellow-transparent' };
     const colors = { foreground: '#FFED00', background: 'transparent' };
     await completeQRWorkflow(page, 'url', data, colors);
-    
+
     await compareQRWithReference(page, 'qr-yellow-transparent');
+  });
+
+  // Transparency Validation Tests - verify PNG alpha channel is actually transparent
+  test('QR Generator - Transparency Validation - Verify transparent background has alpha channel', async ({ page }) => {
+    console.log('Validating transparent background produces actual transparency in PNG...');
+
+    await setupQRTest(page);
+
+    const data = { url: 'https://gruene.at/transparency-test' };
+    const colors = { foreground: '#000000', background: 'transparent' };
+    await completeQRWorkflow(page, 'url', data, colors);
+
+    // Wait for QR preview to be ready
+    await page.waitForSelector('.qr-preview-container canvas', { state: 'visible' });
+    await page.waitForSelector('#qr-download:visible', { timeout: 10000 });
+
+    // Set up download listener
+    const downloadPromise = page.waitForEvent('download');
+
+    // Handle confirmation dialogs
+    page.on('dialog', async dialog => {
+      await dialog.accept();
+    });
+
+    // Click the QR download button
+    await page.click('#qr-download');
+
+    // Wait for the download to complete
+    const download = await downloadPromise;
+
+    // Save the downloaded file
+    const tempDownloadPath = path.join(COMPARISON_DIR, 'temp-transparency-validation.png');
+    await download.saveAs(tempDownloadPath);
+
+    // Read the PNG and verify it has transparent pixels
+    const pngImage = PNG.sync.read(fs.readFileSync(tempDownloadPath));
+
+    // Count transparent pixels (alpha = 0)
+    let transparentPixelCount = 0;
+    let opaquePixelCount = 0;
+    const totalPixels = pngImage.width * pngImage.height;
+
+    for (let i = 0; i < pngImage.data.length; i += 4) {
+      const alpha = pngImage.data[i + 3];
+      if (alpha === 0) {
+        transparentPixelCount++;
+      } else if (alpha === 255) {
+        opaquePixelCount++;
+      }
+    }
+
+    const transparentPercentage = (transparentPixelCount / totalPixels) * 100;
+    const opaquePercentage = (opaquePixelCount / totalPixels) * 100;
+
+    console.log(`Image dimensions: ${pngImage.width}x${pngImage.height}`);
+    console.log(`Transparent pixels: ${transparentPixelCount} (${transparentPercentage.toFixed(2)}%)`);
+    console.log(`Opaque pixels: ${opaquePixelCount} (${opaquePercentage.toFixed(2)}%)`);
+
+    // Clean up temp file
+    fs.unlinkSync(tempDownloadPath);
+
+    // CRITICAL ASSERTION: Verify that the image has significant transparent area
+    // QR codes have roughly 40-50% white/transparent area depending on data density
+    // We expect at least 40% of pixels to be transparent for a valid transparent QR code
+    expect(transparentPercentage).toBeGreaterThan(40);
+
+    // Verify we also have opaque pixels (the QR code modules)
+    expect(opaquePixelCount).toBeGreaterThan(0);
+
+    console.log('✓ Transparency validation passed - PNG has actual transparent pixels');
+  });
+
+  test('QR Generator - Transparency Validation - Compare white vs transparent backgrounds', async ({ page }) => {
+    console.log('Comparing white background vs transparent background pixel data...');
+
+    // First, generate QR with WHITE background
+    await setupQRTest(page);
+    const data = { url: 'https://gruene.at/compare-test' };
+    const whiteColors = { foreground: '#000000', background: '#FFFFFF' };
+    await completeQRWorkflow(page, 'url', data, whiteColors);
+
+    await page.waitForSelector('.qr-preview-container canvas', { state: 'visible' });
+    await page.waitForSelector('#qr-download:visible', { timeout: 10000 });
+
+    // Download white background QR
+    let downloadPromise = page.waitForEvent('download');
+    page.on('dialog', async dialog => await dialog.accept());
+    await page.click('#qr-download');
+    let download = await downloadPromise;
+
+    const whiteBgPath = path.join(COMPARISON_DIR, 'temp-white-bg-test.png');
+    await download.saveAs(whiteBgPath);
+
+    // Read white background PNG
+    const whitePng = PNG.sync.read(fs.readFileSync(whiteBgPath));
+
+    // Count transparent pixels in white background version
+    let whiteTransparentCount = 0;
+    for (let i = 0; i < whitePng.data.length; i += 4) {
+      if (whitePng.data[i + 3] === 0) {
+        whiteTransparentCount++;
+      }
+    }
+
+    // Fresh page load to generate QR with TRANSPARENT background
+    await setupQRTest(page);
+    const transparentColors = { foreground: '#000000', background: 'transparent' };
+    await completeQRWorkflow(page, 'url', data, transparentColors);
+
+    await page.waitForSelector('.qr-preview-container canvas', { state: 'visible' });
+    await page.waitForSelector('#qr-download:visible', { timeout: 10000 });
+
+    // Download transparent background QR
+    downloadPromise = page.waitForEvent('download');
+    await page.click('#qr-download');
+    download = await downloadPromise;
+
+    const transparentBgPath = path.join(COMPARISON_DIR, 'temp-transparent-bg-test.png');
+    await download.saveAs(transparentBgPath);
+
+    // Read transparent background PNG
+    const transparentPng = PNG.sync.read(fs.readFileSync(transparentBgPath));
+
+    // Count transparent pixels in transparent background version
+    let transparentBgTransparentCount = 0;
+    for (let i = 0; i < transparentPng.data.length; i += 4) {
+      if (transparentPng.data[i + 3] === 0) {
+        transparentBgTransparentCount++;
+      }
+    }
+
+    // Clean up temp files
+    fs.unlinkSync(whiteBgPath);
+    fs.unlinkSync(transparentBgPath);
+
+    console.log(`White background - Transparent pixels: ${whiteTransparentCount}`);
+    console.log(`Transparent background - Transparent pixels: ${transparentBgTransparentCount}`);
+
+    // CRITICAL ASSERTION: Transparent background version must have significantly more transparent pixels
+    // White background should have ~0 transparent pixels
+    // Transparent background should have many transparent pixels (the white area converted to transparent)
+    expect(whiteTransparentCount).toBeLessThan(1000); // White BG should have very few/no transparent pixels
+    expect(transparentBgTransparentCount).toBeGreaterThan(100000); // Transparent BG should have many transparent pixels
+    expect(transparentBgTransparentCount).toBeGreaterThan(whiteTransparentCount * 100); // Should be dramatically more
+
+    console.log('✓ Transparency comparison passed - Transparent background has significantly more transparent pixels than white background');
   });
 });

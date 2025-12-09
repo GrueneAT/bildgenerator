@@ -1,7 +1,7 @@
 # Extend the base Claude Flow container for GRÜNE Bildgenerator development
 FROM claude-flow:latest
 
-# Switch to root for system package installation
+# Run as root
 USER root
 
 # Install Playwright system dependencies and Python
@@ -37,20 +37,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-# Switch back to claudeuser for application setup
-USER claudeuser
+# Set working directory
+WORKDIR /root/workspace
 
-# Create workspace directory
-RUN mkdir -p /home/claudeuser/workspace
-WORKDIR /home/claudeuser/workspace
-
-# Install Playwright browsers in user cache
+# Install Playwright browsers
 # This is the only thing that makes sense to pre-install since it's large and slow
 # The workspace will be mounted, so no need to copy any files
 RUN npx playwright install chromium
-
-# Set working directory
-WORKDIR /home/claudeuser/workspace
 
 # Note: All project files will be mounted via volume at runtime
 # No need to copy or build anything - that happens on the mounted volume
@@ -59,7 +52,7 @@ WORKDIR /home/claudeuser/workspace
 # This means Claude Code will start automatically when you run the container
 
 # Environment variables for consistent test behavior
-ENV PLAYWRIGHT_BROWSERS_PATH=/home/claudeuser/.cache/ms-playwright
+ENV PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright
 ENV NODE_ENV=development
 
 # Expose port for development server
