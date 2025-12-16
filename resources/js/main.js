@@ -151,11 +151,12 @@ function addLogo() {
     .trim()
     .toUpperCase();
 
-  let logoFilename, textScaleTo;
+  let logoFilename, textScaleTo, isLongLogo;
 
   // Check if text needs breaking (either has % or is too long)
   if (logoText.includes("%") || logoText.length > AppConstants.LOGO.MAX_TEXT_LENGTH) {
     logoFilename = AppConstants.LOGO.FILES.LONG;
+    isLongLogo = true;
 
     if (logoText.includes("%")) {
       // Split by % and trim each part to remove whitespace
@@ -173,6 +174,7 @@ function addLogo() {
     textScaleTo = AppConstants.LOGO.TEXT_SCALE_LONG;
   } else {
     logoFilename = AppConstants.LOGO.FILES.SHORT;
+    isLongLogo = false;
     textScaleTo = AppConstants.LOGO.TEXT_SCALE_SHORT;
   }
 
@@ -209,9 +211,11 @@ function addLogo() {
         canvas.bringToFront(image);
         logo = image;
 
-        // Calculate text position relative to logo image
-        // Position text in the pink bar area (89% down from logo top)
-        const textTopPosition = image.top + (logoHeight * AppConstants.LOGO.PINK_BAR_RATIO);
+        // Calculate text position relative to logo top
+        // The pink bar starts at the same ABSOLUTE distance from the logo top in both variants
+        // Using logo WIDTH as reference since it's constant (245px) between short and long logos
+        const offsetFromTop = image.getScaledWidth() * AppConstants.LOGO.PINK_BAR_OFFSET_FROM_TOP;
+        const textTopPosition = image.top + offsetFromTop;
 
         logoName = new fabric.Text(logoText, {
           top: textTopPosition,

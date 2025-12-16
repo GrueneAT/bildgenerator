@@ -92,7 +92,10 @@ const AppConstants = {
         LINE_HEIGHT: 0.8,
         ANGLE: -5.5,
         WIDTH_SCALE: 0.95,
-        PINK_BAR_RATIO: 0.89, // Position text top at 89% of logo height to center in pink bar
+        // Pink bar text positioning - use WIDTH as reference since it's constant (245px)
+        // Original single-line positioning: 248px * 0.89 = 220.72px from top
+        // Converted to width ratio: 220.72 / 245 = 0.90
+        PINK_BAR_OFFSET_FROM_TOP: 0.90, // Text starts at 90% of logo WIDTH from logo top
         // Automatic positioning configuration
         BORDER_CUT_RATIO: 0.91, // For bordered templates: border cuts at 91% of logo height (through pink bar center)
         BORDERLESS_MARGIN_PERCENT: 0.02, // For borderless templates: logo bottom margin as percentage of canvas height (2%)
