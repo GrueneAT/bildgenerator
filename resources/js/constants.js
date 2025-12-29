@@ -232,6 +232,24 @@ const TemplateConstants = {
             logoTextTop: 0.856,
             dpi: 300,
         },
+        a6: {
+            width: 1240,
+            height: 1748,
+            topBorderMultiplier: 1,
+            border: 10,
+            logoTop: 0.8038,  // Border cuts through pink bar (87.3% of logo height)
+            logoTextTop: 0.929,
+            dpi: 300,
+        },
+        a6_quer: {
+            width: 1748,
+            height: 1240,
+            topBorderMultiplier: 1,
+            border: 10,
+            logoTop: 0.6945,  // Border cuts through pink bar (87.3% of logo height)
+            logoTextTop: 0.856,
+            dpi: 300,
+        },
     },
 
     // Get template by name
