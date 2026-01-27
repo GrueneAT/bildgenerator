@@ -186,31 +186,44 @@ function generateQRCode(data, foregroundColor, backgroundColor) {
             const tempDiv = document.createElement('div');
             tempDiv.style.display = 'none';
             document.body.appendChild(tempDiv);
-            
+
             // Determine QR code size
             const qrSize = 512; // High resolution for quality
-            
+
+            // Check if foreground is white or near-white
+            const isWhiteForeground = isColorWhiteOrNearWhite(foregroundColor);
+
+            // Use a placeholder color for background when:
+            // 1. We want transparency AND
+            // 2. The foreground is white/near-white
+            // This prevents white foreground pixels from being made transparent
+            const PLACEHOLDER_COLOR = '#FF00FF'; // Magenta as placeholder
+            const useBackgroundPlaceholder = backgroundColor === 'transparent' && isWhiteForeground;
+            const actualColorLight = backgroundColor === 'transparent'
+                ? (useBackgroundPlaceholder ? PLACEHOLDER_COLOR : '#FFFFFF')
+                : backgroundColor;
+
             // QR code options
             const options = {
                 text: data,
                 width: qrSize,
                 height: qrSize,
                 colorDark: foregroundColor,
-                colorLight: backgroundColor === 'transparent' ? '#FFFFFF' : backgroundColor,
+                colorLight: actualColorLight,
                 correctLevel: QRCode.CorrectLevel.M, // Medium error correction
                 quietZone: backgroundColor !== 'transparent' ? Math.floor(qrSize * 0.05) : 0,
                 quietZoneColor: backgroundColor === 'transparent' ? 'transparent' : backgroundColor
             };
-            
+
             // Check for contrast issues
             if (foregroundColor === backgroundColor && backgroundColor !== 'transparent') {
                 reject(new Error('Vordergrund- und Hintergrundfarbe müssen unterschiedlich sein.'));
                 return;
             }
-            
+
             // Generate QR code
             const qr = new QRCode(tempDiv, options);
-            
+
             // Wait for generation and extract canvas
             setTimeout(() => {
                 try {
@@ -220,43 +233,51 @@ function generateQRCode(data, foregroundColor, backgroundColor) {
                         reject(new Error('QR-Code Bild konnte nicht generiert werden.'));
                         return;
                     }
-                    
+
                     // Create final canvas with proper quiet zone
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
-                    
+
                     let finalSize = qrSize;
                     let quietZoneSize = 0;
-                    
+
                     if (backgroundColor !== 'transparent') {
                         quietZoneSize = Math.floor(qrSize * 0.05);
                         finalSize = qrSize + (quietZoneSize * 2);
                     }
-                    
+
                     canvas.width = finalSize;
                     canvas.height = finalSize;
-                    
+
                     // Fill background
                     if (backgroundColor !== 'transparent') {
                         ctx.fillStyle = backgroundColor;
                         ctx.fillRect(0, 0, finalSize, finalSize);
                     }
 
-                    // Helper function to make white pixels transparent
-                    const makeWhiteTransparent = () => {
+                    // Helper function to make background pixels transparent
+                    const makeBackgroundTransparent = () => {
                         if (backgroundColor === 'transparent') {
                             const imageData = ctx.getImageData(0, 0, finalSize, finalSize);
-                            const data = imageData.data;
+                            const pixelData = imageData.data;
 
-                            // Convert white pixels (and near-white) to transparent
-                            for (let i = 0; i < data.length; i += 4) {
-                                const r = data[i];
-                                const g = data[i + 1];
-                                const b = data[i + 2];
+                            for (let i = 0; i < pixelData.length; i += 4) {
+                                const r = pixelData[i];
+                                const g = pixelData[i + 1];
+                                const b = pixelData[i + 2];
 
-                                // Check if pixel is white or near-white (threshold for anti-aliasing)
-                                if (r > 250 && g > 250 && b > 250) {
-                                    data[i + 3] = 0; // Set alpha to 0 (fully transparent)
+                                if (useBackgroundPlaceholder) {
+                                    // When using placeholder, only make magenta pixels transparent
+                                    // Magenta is RGB(255, 0, 255)
+                                    if (r > 250 && g < 5 && b > 250) {
+                                        pixelData[i + 3] = 0; // Set alpha to 0 (fully transparent)
+                                    }
+                                } else {
+                                    // Standard case: make white/near-white pixels transparent
+                                    // This is safe because foreground is NOT white
+                                    if (r > 250 && g > 250 && b > 250) {
+                                        pixelData[i + 3] = 0; // Set alpha to 0 (fully transparent)
+                                    }
                                 }
                             }
 
@@ -267,7 +288,7 @@ function generateQRCode(data, foregroundColor, backgroundColor) {
                     // Draw QR code
                     qrImg.onload = () => {
                         ctx.drawImage(qrImg, quietZoneSize, quietZoneSize, qrSize, qrSize);
-                        makeWhiteTransparent();
+                        makeBackgroundTransparent();
 
                         // Clean up
                         document.body.removeChild(tempDiv);
@@ -278,21 +299,35 @@ function generateQRCode(data, foregroundColor, backgroundColor) {
                     // If image is already loaded
                     if (qrImg.complete) {
                         ctx.drawImage(qrImg, quietZoneSize, quietZoneSize, qrSize, qrSize);
-                        makeWhiteTransparent();
+                        makeBackgroundTransparent();
                         document.body.removeChild(tempDiv);
                         resolve(canvas);
                     }
-                    
+
                 } catch (error) {
                     document.body.removeChild(tempDiv);
                     reject(error);
                 }
             }, 200); // Wait for QR generation
-            
+
         } catch (error) {
             reject(error);
         }
     });
+}
+
+// Helper function to check if a color is white or near-white
+function isColorWhiteOrNearWhite(hexColor) {
+    // Remove # if present
+    const hex = hexColor.replace('#', '');
+
+    // Parse RGB values
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+
+    // Check if all RGB values are above 250 (near-white threshold)
+    return r > 250 && g > 250 && b > 250;
 }
 
 // Display QR Preview
