@@ -57,6 +57,7 @@ export default defineConfig({
       name: "complex-tests",
       testMatch: [
         "**/qr-generator.spec.js",
+        "**/qr-transparency.spec.js",
         "**/templates.spec.js",
         "**/error-handling.spec.js",
         "**/wizard-navigation.spec.js"
