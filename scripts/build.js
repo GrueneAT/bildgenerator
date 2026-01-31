@@ -122,34 +122,46 @@ function getBuildVersion() {
 
 async function copyAssets() {
     const buildDir = path.join(__dirname, '..', 'build');
-    
+    const rootDir = path.join(__dirname, '..');
+
     // Copy vendor directories that need to be preserved (CSS/fonts only)
     const vendorDirs = [
         'vendors/fontawesome'
     ];
-    
+
     const vendorDir = path.join(buildDir, 'vendors');
     if (!fs.existsSync(vendorDir)) {
         fs.mkdirSync(vendorDir, { recursive: true });
     }
-    
+
     // Copy vendor directories (FontAwesome CSS and fonts)
     for (const dir of vendorDirs) {
         const srcPath = path.join(__dirname, '..', dir);
         const destPath = path.join(buildDir, dir);
-        
+
         if (fs.existsSync(srcPath)) {
             execSync(`cp -r "${srcPath}" "${path.dirname(destPath)}/"`, { cwd: path.join(__dirname, '..') });
             console.log(`   📋 Copied: ${dir}/`);
         }
     }
-    
+
     console.log('   ✅ Vendor JavaScript libraries are now bundled in vendors.min.js and jquery.min.js');
-    
+
     // Copy resources directory (fonts, images, etc.)
     const resourcesDir = path.join(buildDir, 'resources');
     execSync(`cp -r resources/ "${resourcesDir}/"`, { cwd: path.join(__dirname, '..') });
     console.log('   📋 Copied: resources/');
+
+    // Copy root-level files needed for GitHub Pages deployment
+    const rootFiles = ['robots.txt', '.nojekyll', 'CNAME'];
+    for (const file of rootFiles) {
+        const srcPath = path.join(rootDir, file);
+        const destPath = path.join(buildDir, file);
+        if (fs.existsSync(srcPath)) {
+            fs.copyFileSync(srcPath, destPath);
+            console.log(`   📋 Copied: ${file}`);
+        }
+    }
 }
 
 // Run if called directly
