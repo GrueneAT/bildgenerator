@@ -26,10 +26,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User can search for any of the 7 Organisationen (Grüne Frauen, Grüne Jugend, GRAS, etc.) and select from the dropdown
   4. All entries within Bezirke, Gemeinden, Andere, and Bundesländer categories appear in alphabetical order in the dropdown
   5. The production build (embed_logos.py) runs without errors and the application loads correctly with no duplicate entries
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 01-01: Update index.json — add Bezirke, Gemeinden, Organisationen, sort all categories, validate no duplicates
+- [ ] 01-01-PLAN.md — Add all Tiroler entries to index.json, sort all categories, verify build
 
 ## Progress
 
