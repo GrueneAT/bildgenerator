@@ -137,7 +137,7 @@ test.describe('QR Code Integration E2E', () => {
     await expect(page.locator('#qr-step-3')).toBeVisible();
     
     const colorSelect = page.locator('#qr-color-select');
-    await colorSelect.selectOption('#538430'); // Dark green
+    await colorSelect.selectOption('#257639'); // Dark green
     
     const downloadButton = page.locator('#qr-download');
     await expect(downloadButton).toBeVisible();

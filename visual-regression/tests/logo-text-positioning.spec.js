@@ -21,7 +21,7 @@ test.describe('Visual Regression - Logo Text Positioning', () => {
     console.log('Testing single-line logo text positioning (visual regression)...');
 
     // Select template
-    await page.selectOption('#canvas-template', 'post_45_border');
+    await page.selectOption('#canvas-template', 'feed_post_45');
     await page.waitForTimeout(3000);
 
     // Wait for page to be fully loaded
@@ -104,7 +104,7 @@ test.describe('Visual Regression - Logo Text Positioning', () => {
     console.log('Testing two-line logo text positioning (visual regression)...');
 
     // Select template
-    await page.selectOption('#canvas-template', 'post_45_border');
+    await page.selectOption('#canvas-template', 'feed_post_45');
     await page.waitForTimeout(3000);
 
     // Wait for page to be fully loaded
@@ -184,7 +184,7 @@ test.describe('Visual Regression - Logo Text Positioning', () => {
     console.log('Testing position consistency between single and two-line logo text...');
 
     // Select template
-    await page.selectOption('#canvas-template', 'post_45_border');
+    await page.selectOption('#canvas-template', 'feed_post_45');
     await page.waitForTimeout(3000);
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(1000);

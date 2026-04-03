@@ -7,9 +7,9 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'gruene-primary': '#8AB414',
-        'gruene-secondary': '#538430',
-        'gruene-dark': '#2D5016',
+        'gruene-primary': '#257639',
+        'gruene-secondary': '#56AF31',
+        'gruene-dark': '#1a5428',
       },
       fontFamily: {
         'gotham': ['Gotham Narrow', 'Arial', 'sans-serif'],

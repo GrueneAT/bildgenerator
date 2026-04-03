@@ -231,7 +231,7 @@ test.describe('QR Code Transparency Bug Tests', () => {
     await setupQRTest(page);
 
     const data = { text: 'GRUENE' };
-    const colors = { foreground: '#82B624', background: 'transparent' };
+    const colors = { foreground: '#56AF31', background: 'transparent' };
     await completeQRWorkflow(page, 'text', data, colors);
 
     const { pngImage, filePath } = await downloadQRCodeForAnalysis(page, 'lightgreen-on-transparent');
@@ -398,7 +398,7 @@ test.describe('QR Download Transparency Verification', () => {
     await setupQRTest(page);
 
     const data = { text: 'RELOAD-TEST' };
-    const colors = { foreground: '#538430', background: 'transparent' };
+    const colors = { foreground: '#257639', background: 'transparent' };
     await completeQRWorkflow(page, 'text', data, colors);
 
     const { pngImage, filePath } = await downloadQRCodeForAnalysis(page, 'reload-test');
@@ -422,7 +422,7 @@ test.describe('QR Download Transparency Verification', () => {
     await setupQRTest(page);
 
     const data = { text: 'PIXELMATCH-TEST' };
-    const colors = { foreground: '#538430', background: 'transparent' };
+    const colors = { foreground: '#257639', background: 'transparent' };
     await completeQRWorkflow(page, 'text', data, colors);
 
     const { pngImage, filePath } = await downloadQRCodeForAnalysis(page, 'pixelmatch-transparent');

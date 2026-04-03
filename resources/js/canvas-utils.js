@@ -107,7 +107,7 @@ const CanvasUtils = {
 
                 console.log(
                     '%c[SNAP] CENTER SNAP',
-                    'background: #8ab414; color: white; font-weight: bold; padding: 2px 6px;',
+                    'background: #257639; color: white; font-weight: bold; padding: 2px 6px;',
                     '\n  Object type:', target.type,
                     '\n  Center before:', `(${centerBefore.x.toFixed(2)}, ${centerBefore.y.toFixed(2)})`,
                     '\n  Center after:', `(${centerAfter.x.toFixed(2)}, ${centerAfter.y.toFixed(2)})`,

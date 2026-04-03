@@ -60,15 +60,6 @@ const EventHandlerUtils = {
                     setValue("shadow", createShadow('black', jQuery(this).val()));
                 }
             },
-            '#font-style-select': {
-                'change': function() {
-                    const activeObject = canvas.getActiveObject();
-                    if (activeObject && activeObject.get('type') === "text") {
-                        const selectedFont = jQuery(this).val();
-                        setValue("fontFamily", selectedFont);
-                    }
-                }
-            },
             '#line-height': {
                 'change': function() {
                     const activeObject = canvas.getActiveObject();
@@ -147,7 +138,7 @@ const EventHandlerUtils = {
             }
 
             const initialFontSize = canvas.width / 2;
-            const selectedFont = jQuery("#font-style-select").val() || "Gotham Narrow Ultra";
+            const selectedFont = "Gotham Narrow Ultra";
             
             const text = new fabric.Text(jQuery("#text").val(), {
                 fontFamily: selectedFont,
@@ -274,7 +265,7 @@ const EventHandlerUtils = {
     setupCrossHandler() {
         this.bindHandler('#add-cross', 'click', function() {
             fabric.Image.fromURL(
-                generatorApplicationURL + "resources/images/Ankreuzen.png",
+                generatorApplicationURL + "resources/images/Wahlkreuz.png",
                 function(image) {
                     CanvasUtils.scaleElementToFit(image, 0.4, 0.3);
                     canvas.add(image);

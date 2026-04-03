@@ -61,10 +61,10 @@ const AppConstants = {
 
     // Colors
     COLORS: {
-        BACKGROUND_PRIMARY: "rgba(138, 180, 20)",
-        BACKGROUND_SECONDARY: "rgba(83,132,48)",
+        BACKGROUND_PRIMARY: "#257639",
+        BACKGROUND_SECONDARY: "#257639",
         PINK_CIRCLE: "rgb(225,0,120)",
-        LOGO_TEXT: "rgb(255,255,255)",
+        LOGO_TEXT: "#257639",
         TEXT_STROKE: "#000000",
         CORNER_COLOR: "yellow",
         BORDER_COLOR: "rgba(88,42,114)",
@@ -85,170 +85,59 @@ const AppConstants = {
 
     // Logo Configuration
     LOGO: {
-        SCALE_RATIO: 10, // (contentRect.width + contentRect.height) / 10
         TEXT_SCALE_LONG: 4.8,
         TEXT_SCALE_SHORT: 6,
         MAX_TEXT_LENGTH: 16,
         LINE_HEIGHT: 0.8,
         ANGLE: -5.5,
         WIDTH_SCALE: 0.95,
-        // Pink bar text positioning - use WIDTH as reference since it's constant (245px)
-        // Original single-line positioning: 248px * 0.89 = 220.72px from top
-        // Converted to width ratio: 220.72 / 245 = 0.90
-        PINK_BAR_OFFSET_FROM_TOP: 0.90, // Text starts at 90% of logo WIDTH from logo top
+        // Bar text positioning - use WIDTH as reference since it's constant
+        BAR_OFFSET_FROM_TOP: 0.90, // Single-line text starts at 90% of logo WIDTH from logo top
+        BAR_OFFSET_FROM_TOP_LONG: 0.89, // Two-line text starts slightly higher to fit within the taller bar
         // Automatic positioning configuration
-        BORDER_CUT_RATIO: 0.91, // For bordered templates: border cuts at 91% of logo height (through pink bar center)
         BORDERLESS_MARGIN_PERCENT: 0.02, // For borderless templates: logo bottom margin as percentage of canvas height (2%)
         FILES: {
-            LONG: "Gruene_Logo_245_268.png",
-            SHORT: "Gruene_Logo_245_248.png",
-            SMALL_LONG: "Gruene_Logo_120_131.png",
-            SMALL_SHORT: "Gruene_Logo_120_121.png"
+            LONG: "Logo-zweizeilig_blanko.png",
+            SHORT: "Logo-einzeilig_blanko.png"
         }
     }
 };
 
 // Template configurations
-// NOTE: logoTop values are now automatically calculated based on border configuration
-// - Bordered templates (border > 0): Border cuts through pink bar at 91% of logo height
-// - Borderless templates (border = 0): Logo positioned with 2% margin from canvas bottom
-// The logoTop values below are kept for reference but not used in calculations
+// NOTE: All templates are borderless (border: 0).
+// Logo positioned with 2% margin from canvas bottom (BORDERLESS_MARGIN_PERCENT).
+// The white bar offset is at 90% of logo width (BAR_OFFSET_FROM_TOP).
 const TemplateConstants = {
     TEMPLATES: {
+        feed_post_45: {
+            width: 1080, height: 1350, topBorderMultiplier: 1, border: 0, dpi: 200, logoWidth: 163,
+        },
         story: {
-            width: 1080,
-            height: 1920,
-            topBorderMultiplier: 2,
-            border: 10,
-            logoTop: 0.8305,  // Border cuts through pink bar (87.3% of logo height)
-            logoTextTop: 0.9423,
-            dpi: 200,
-        },
-        post_45_border: {
-            width: 1080,
-            height: 1350,
-            topBorderMultiplier: 1,
-            border: 20,
-            logoTop: 0.8151,  // Border cuts through pink bar (87.3% of logo height)
-            logoTextTop: 0.959,
-            dpi: 200,
-        },
-        post_45_no_border: {
-            width: 1080,
-            height: 1350,
-            topBorderMultiplier: 1,
-            border: 0,
-            logoTop: 0.7988,  // 25.6px margin (matches post_45_border)
-            logoTextTop: 0.959,
-            dpi: 200,
+            width: 1080, height: 1920, topBorderMultiplier: 1, border: 0, dpi: 200, logoWidth: 163,
         },
         event: {
-            width: 1920,
-            height: 1005,
-            topBorderMultiplier: 1,
-            border: 0,
-            logoTop: 0.6799,  // 25.6px margin (matches post_45_border)
-            logoTextTop: 0.9449,
-            dpi: 200,
+            width: 1920, height: 1005, topBorderMultiplier: 1, border: 0, dpi: 200, logoWidth: 163,
         },
         facebook_header: {
-            width: 820,
-            height: 360,
-            topBorderMultiplier: 1,
-            border: 0,
-            logoTop: 0.5971,  // 25.6px margin (matches post_45_border)
-            logoTextTop: 0.8462,
-            dpi: 150,
-        },
-        a2: {
-            width: 4961,
-            height: 7016,
-            topBorderMultiplier: 1,
-            border: 10,
-            logoTop: 0.8034,  // Border cuts through pink bar (87.3% of logo height)
-            logoTextTop: 0.929,
-            dpi: 150,
-        },
-        a2_quer: {
-            width: 7016,
-            height: 4961,
-            topBorderMultiplier: 1,
-            border: 10,
-            logoTop: 0.6952,  // Border cuts through pink bar (87.3% of logo height)
-            logoTextTop: 0.856,
-            dpi: 150,
-        },
-        a3: {
-            width: 3508,
-            height: 4961,
-            topBorderMultiplier: 1,
-            border: 10,
-            logoTop: 0.8034,  // Border cuts through pink bar (87.3% of logo height)
-            logoTextTop: 0.929,
-            dpi: 200,
-        },
-        a3_quer: {
-            width: 4961,
-            height: 3508,
-            topBorderMultiplier: 1,
-            border: 10,
-            logoTop: 0.6952,  // Border cuts through pink bar (87.3% of logo height)
-            logoTextTop: 0.856,
-            dpi: 200,
+            width: 820, height: 360, topBorderMultiplier: 1, border: 0, dpi: 150, logoWidth: 163,
         },
         a4: {
-            width: 2480,
-            height: 3508,
-            topBorderMultiplier: 1,
-            border: 10,
-            logoTop: 0.8035,  // Border cuts through pink bar (87.3% of logo height)
-            logoTextTop: 0.929,
-            dpi: 250,
+            width: 2480, height: 3508, topBorderMultiplier: 1, border: 0, dpi: 250, logoWidth: 374,
         },
         a4_quer: {
-            width: 3508,
-            height: 2480,
-            topBorderMultiplier: 1,
-            border: 10,
-            logoTop: 0.6952,  // Border cuts through pink bar (87.3% of logo height)
-            logoTextTop: 0.856,
-            dpi: 250,
+            width: 3508, height: 2480, topBorderMultiplier: 1, border: 0, dpi: 250, logoWidth: 374,
         },
         a5: {
-            width: 1748,
-            height: 2480,
-            topBorderMultiplier: 1,
-            border: 10,
-            logoTop: 0.8038,  // Border cuts through pink bar (87.3% of logo height)
-            logoTextTop: 0.929,
-            dpi: 300,
+            width: 1748, height: 2480, topBorderMultiplier: 1, border: 0, dpi: 300, logoWidth: 319,
         },
         a5_quer: {
-            width: 2480,
-            height: 1748,
-            topBorderMultiplier: 1,
-            border: 10,
-            logoTop: 0.6945,  // Border cuts through pink bar (87.3% of logo height)
-            logoTextTop: 0.856,
-            dpi: 300,
+            width: 2480, height: 1748, topBorderMultiplier: 1, border: 0, dpi: 300, logoWidth: 319,
         },
         a6: {
-            width: 1240,
-            height: 1748,
-            topBorderMultiplier: 1,
-            border: 10,
-            logoTop: 0.8038,  // Border cuts through pink bar (87.3% of logo height)
-            logoTextTop: 0.929,
-            dpi: 300,
+            width: 1240, height: 1748, topBorderMultiplier: 1, border: 0, dpi: 300, logoWidth: 224,
         },
         a6_quer: {
-            width: 1748,
-            height: 1240,
-            topBorderMultiplier: 1,
-            border: 10,
-            logoTop: 0.6945,  // Border cuts through pink bar (87.3% of logo height)
-            logoTextTop: 0.856,
-            dpi: 300,
+            width: 1748, height: 1240, topBorderMultiplier: 1, border: 0, dpi: 300, logoWidth: 224,
         },
     },
 

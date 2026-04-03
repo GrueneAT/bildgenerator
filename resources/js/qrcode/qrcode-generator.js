@@ -6,8 +6,8 @@ let qrPreviewCanvas = null;
 const QR_COLORS = {
     '#000000': 'Schwarz',
     '#FFFFFF': 'Weiß',
-    '#538430': 'Dunkelgrün',
-    '#82B624': 'Hellgrün',
+    '#257639': 'Dunkelgrün',
+    '#56AF31': 'Hellgrün',
     '#FFED00': 'Gelb',
     '#E6007E': 'Magenta'
 };

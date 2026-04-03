@@ -19,7 +19,7 @@ test.describe('Template Operations E2E', () => {
     await expect(canvas).toBeVisible();
     
     // Test post template
-    await templateSelect.selectOption('post_45_border');
+    await templateSelect.selectOption('feed_post_45');
     await page.waitForTimeout(1000);
     
     canvas = page.locator('#meme-canvas');
@@ -45,7 +45,7 @@ test.describe('Template Operations E2E', () => {
     expect(dimensionsText).toMatch(/\d+\s*[×x]\s*\d+/); // Should show dimensions
     
     // Switch to post template
-    await templateSelect.selectOption('post_45_border');
+    await templateSelect.selectOption('feed_post_45');
     await page.waitForTimeout(1000);
     
     dimensionsText = await dimensionsElement.textContent();

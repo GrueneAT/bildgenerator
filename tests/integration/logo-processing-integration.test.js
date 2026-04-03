@@ -92,11 +92,12 @@ global.generatorApplicationURL = '/';
 // Mock AppConstants
 global.AppConstants = {
     LOGO: {
-        SCALE_RATIO: 10,
         MAX_TEXT_LENGTH: 16,
+        BORDERLESS_MARGIN_PERCENT: 0.02,
+        BAR_OFFSET_FROM_TOP: 0.90,
         FILES: {
-            LONG: 'logo_long.png',
-            SHORT: 'logo_short.png'
+            LONG: 'Logo-zweizeilig_blanko.png',
+            SHORT: 'Logo-einzeilig_blanko.png'
         },
         TEXT_SCALE_LONG: 0.9,
         TEXT_SCALE_SHORT: 1.0,
@@ -278,7 +279,7 @@ describe('Logo Processing Integration Tests', () => {
             // Check that fabric.Image.fromURL was called with long logo file
             expect(fabric.Image.fromURL).toHaveBeenCalled();
             const urlCall = fabric.Image.fromURL.mock.calls[0][0];
-            expect(urlCall).toContain('logo_long.png');
+            expect(urlCall).toContain('Logo-zweizeilig_blanko.png');
         });
         
         test('should use long logo file for long names', () => {
@@ -289,7 +290,7 @@ describe('Logo Processing Integration Tests', () => {
             addLogo();
             
             const urlCall = fabric.Image.fromURL.mock.calls[0][0];
-            expect(urlCall).toContain('logo_long.png');
+            expect(urlCall).toContain('Logo-zweizeilig_blanko.png');
         });
         
         test('should use short logo file for short names', () => {
@@ -300,7 +301,7 @@ describe('Logo Processing Integration Tests', () => {
             addLogo();
             
             const urlCall = fabric.Image.fromURL.mock.calls[0][0];
-            expect(urlCall).toContain('logo_short.png');
+            expect(urlCall).toContain('Logo-einzeilig_blanko.png');
         });
     });
     
