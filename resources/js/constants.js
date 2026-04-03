@@ -103,10 +103,9 @@ const AppConstants = {
 };
 
 // Template configurations
-// NOTE: logoTop values are now automatically calculated based on border configuration
-// - Bordered templates (border > 0): Border cuts through pink bar at 91% of logo height
-// - Borderless templates (border = 0): Logo positioned with 2% margin from canvas bottom
-// The logoTop values below are kept for reference but not used in calculations
+// NOTE: All templates are borderless (border: 0).
+// Logo positioned with 2% margin from canvas bottom (BORDERLESS_MARGIN_PERCENT).
+// The white bar offset is at 90% of logo width (BAR_OFFSET_FROM_TOP).
 const TemplateConstants = {
     TEMPLATES: {
         feed_post_45: {

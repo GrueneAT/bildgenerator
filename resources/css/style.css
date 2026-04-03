@@ -234,7 +234,7 @@ canvas {
 
 .form-input:focus, .form-select:focus {
     border-color: #257639;
-    box-shadow: 0 0 0 3px rgb(138 180 20 / 0.1);
+    box-shadow: 0 0 0 3px rgb(37 118 57 / 0.1);
 }
 
 .meme-preview {

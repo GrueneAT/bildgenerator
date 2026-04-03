@@ -96,9 +96,9 @@ function replaceCanvas() {
 }
 
 /**
- * Calculate the optimal logo top position based on template configuration
- * Note: All templates are now borderless (border: 0). The bordered branch is kept dormant.
- * For borderless templates: logo bottom margin is BORDERLESS_MARGIN_PERCENT of canvas height
+ * Calculate the optimal logo top position based on template configuration.
+ * All templates are borderless (border: 0).
+ * Logo bottom margin is BORDERLESS_MARGIN_PERCENT of canvas height.
  */
 function calculateLogoTop(logoHeight, template) {
   // Validate inputs
@@ -112,20 +112,10 @@ function calculateLogoTop(logoHeight, template) {
     return 0;
   }
 
-  const borderDistance = template.border > 0 ? canvas.width / template.border : 0;
-
-  if (template.border > 0) {
-    // Bordered template: border should cut at BORDER_CUT_RATIO of logo height from logo top
-    const bottomBorderTop = canvas.height - borderDistance;
-    const logoTop = bottomBorderTop - (logoHeight * AppConstants.LOGO.BORDER_CUT_RATIO);
-    return logoTop;
-  } else {
-    // Borderless template: use percentage-based margin from canvas bottom
-    const marginFromBottom = canvas.height * AppConstants.LOGO.BORDERLESS_MARGIN_PERCENT;
-    const logoBottom = canvas.height - marginFromBottom;
-    const logoTop = logoBottom - logoHeight;
-    return logoTop;
-  }
+  const marginFromBottom = canvas.height * AppConstants.LOGO.BORDERLESS_MARGIN_PERCENT;
+  const logoBottom = canvas.height - marginFromBottom;
+  const logoTop = logoBottom - logoHeight;
+  return logoTop;
 }
 
 function addLogo() {
