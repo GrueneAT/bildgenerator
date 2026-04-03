@@ -7,30 +7,14 @@ test.describe('Visual Regression - Templates', () => {
   });
 
   // Social Media Templates
-  test('Template Post 4:5 with Border - Test post layout 1080x1350 with border', async ({ page }) => {
-    console.log('Testing post 4:5 with border template...');
-
-    await page.selectOption('#canvas-template', 'post_45_border');
+  test('Template Feed-Post 4:5 - Test feed post layout 1080x1350', async ({ page }) => {
+    console.log('Testing feed post 4:5 template...');
+    await page.selectOption('#canvas-template', 'feed_post_45');
     await page.waitForTimeout(2000);
-
     await setupBasicTemplate(page);
     await page.click('#step-2-next');
     await page.waitForTimeout(1000);
-
-    await compareWithReference(page, 'template-post-45-border');
-  });
-
-  test('Template Post 4:5 without Border - Test post layout 1080x1350 no border', async ({ page }) => {
-    console.log('Testing post 4:5 without border template...');
-
-    await page.selectOption('#canvas-template', 'post_45_no_border');
-    await page.waitForTimeout(2000);
-
-    await setupBasicTemplate(page);
-    await page.click('#step-2-next');
-    await page.waitForTimeout(1000);
-
-    await compareWithReference(page, 'template-post-45-no-border');
+    await compareWithReference(page, 'template-feed-post-45');
   });
 
   test('Template Story Format - Test vertical story layout', async ({ page }) => {
@@ -99,33 +83,6 @@ test.describe('Visual Regression - Templates', () => {
     await compareWithReference(page, 'template-a4-landscape');
   });
 
-  // Print Templates - A3 Format
-  test('Template A3 Portrait - Test A3 poster layout', async ({ page }) => {
-    console.log('Testing A3 portrait template...');
-
-    await page.selectOption('#canvas-template', 'a3');
-    await page.waitForTimeout(2000);
-    
-    await setupBasicTemplate(page);
-    await page.click('#step-2-next');
-    await page.waitForTimeout(1000);
-    
-    await compareWithReference(page, 'template-a3-portrait');
-  });
-
-  test('Template A3 Landscape - Test A3 landscape layout', async ({ page }) => {
-    console.log('Testing A3 landscape template...');
-
-    await page.selectOption('#canvas-template', 'a3_quer');
-    await page.waitForTimeout(2000);
-    
-    await setupBasicTemplate(page);
-    await page.click('#step-2-next');
-    await page.waitForTimeout(1000);
-    
-    await compareWithReference(page, 'template-a3-landscape');
-  });
-
   // Print Templates - A5 Format
   test('Template A5 Portrait - Test A5 flyer layout', async ({ page }) => {
     console.log('Testing A5 portrait template...');
@@ -153,31 +110,25 @@ test.describe('Visual Regression - Templates', () => {
     await compareWithReference(page, 'template-a5-landscape');
   });
 
-  // Large Print Templates - A2 Format
-  test('Template A2 Portrait - Test A2 poster layout', async ({ page }) => {
-    console.log('Testing A2 portrait template...');
-
-    await page.selectOption('#canvas-template', 'a2');
+  // Print Templates - A6 Format
+  test('Template A6 Portrait - Test A6 flyer layout', async ({ page }) => {
+    console.log('Testing A6 portrait template...');
+    await page.selectOption('#canvas-template', 'a6');
     await page.waitForTimeout(2000);
-    
     await setupBasicTemplate(page);
     await page.click('#step-2-next');
     await page.waitForTimeout(1000);
-    
-    await compareWithReference(page, 'template-a2-portrait');
+    await compareWithReference(page, 'template-a6-portrait');
   });
 
-  test('Template A2 Landscape - Test A2 landscape layout', async ({ page }) => {
-    console.log('Testing A2 landscape template...');
-
-    await page.selectOption('#canvas-template', 'a2_quer');
+  test('Template A6 Landscape - Test A6 landscape layout', async ({ page }) => {
+    console.log('Testing A6 landscape template...');
+    await page.selectOption('#canvas-template', 'a6_quer');
     await page.waitForTimeout(2000);
-    
     await setupBasicTemplate(page);
     await page.click('#step-2-next');
     await page.waitForTimeout(1000);
-    
-    await compareWithReference(page, 'template-a2-landscape');
+    await compareWithReference(page, 'template-a6-landscape');
   });
 
   // Template Switching Test

@@ -334,7 +334,7 @@ test.describe('Visual Regression - Error Handling & Edge Cases', () => {
     await setupTestEnvironment(page);
     
     // Select template only (no logo selection)
-    await page.selectOption('#canvas-template', 'post_45_border');
+    await page.selectOption('#canvas-template', 'feed_post_45');
     await page.waitForTimeout(2000);
 
     // Wait for canvas to be ready
@@ -352,7 +352,7 @@ test.describe('Visual Regression - Error Handling & Edge Cases', () => {
     });
 
     expect(canvasState.canvasExists).toBe(true);
-    expect(canvasState.templateSelected).toBe('post_45_border');
+    expect(canvasState.templateSelected).toBe('feed_post_45');
 
     // Test passes - the app successfully handles missing logo without crashing
     console.log('✓ Missing logo handling test passed - app handles missing logo gracefully');

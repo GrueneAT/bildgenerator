@@ -13,14 +13,14 @@ test.describe('Visual Regression - Wizard Navigation', () => {
     await waitForWizardStep(page, 1);
 
     // Select template
-    await page.selectOption('#canvas-template', 'post_45_border');
+    await page.selectOption('#canvas-template', 'feed_post_45');
     await page.waitForTimeout(2000);
 
     // Check template selection worked
     const templateValue = await page.evaluate(() => {
       return document.getElementById('canvas-template').value;
     });
-    expect(templateValue).toBe('post_45_border');
+    expect(templateValue).toBe('feed_post_45');
 
     // Wait for logos to be loaded and select one
     await page.waitForFunction(() => {
