@@ -60,15 +60,6 @@ const EventHandlerUtils = {
                     setValue("shadow", createShadow('black', jQuery(this).val()));
                 }
             },
-            '#font-style-select': {
-                'change': function() {
-                    const activeObject = canvas.getActiveObject();
-                    if (activeObject && activeObject.get('type') === "text") {
-                        const selectedFont = jQuery(this).val();
-                        setValue("fontFamily", selectedFont);
-                    }
-                }
-            },
             '#line-height': {
                 'change': function() {
                     const activeObject = canvas.getActiveObject();
@@ -147,7 +138,7 @@ const EventHandlerUtils = {
             }
 
             const initialFontSize = canvas.width / 2;
-            const selectedFont = jQuery("#font-style-select").val() || "Gotham Narrow Ultra";
+            const selectedFont = "Gotham Narrow Ultra";
             
             const text = new fabric.Text(jQuery("#text").val(), {
                 fontFamily: selectedFont,

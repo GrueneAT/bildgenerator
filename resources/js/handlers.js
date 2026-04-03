@@ -27,7 +27,6 @@ function updateInputs() {
         jQuery('#text').val(activeObject.text);
         jQuery('#text-color').val(activeObject.fill);
         jQuery('#line-height').val(activeObject.lineHeight);
-        jQuery('#font-style-select').val(activeObject.fontFamily);
         jQuery(`input[value="${activeObject.textAlign}"]`).parent().trigger('update-status');
         updateScale(activeObject);
     }
