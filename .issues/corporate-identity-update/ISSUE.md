@@ -2,7 +2,7 @@
 title: "Corporate Identity Update — New GRÜNE Branding"
 slug: corporate-identity-update
 priority: critical
-status: discussed
+status: researched
 labels: [ci-update, branding]
 created: 2026-04-03
 source: BildgeneratorUpdates.txt
