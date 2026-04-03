@@ -97,7 +97,7 @@ function replaceCanvas() {
 
 /**
  * Calculate the optimal logo top position based on template configuration
- * For bordered templates: border should cut through pink bar at BORDER_CUT_RATIO of logo height
+ * Note: All templates are now borderless (border: 0). The bordered branch is kept dormant.
  * For borderless templates: logo bottom margin is BORDERLESS_MARGIN_PERCENT of canvas height
  */
 function calculateLogoTop(logoHeight, template) {
@@ -146,7 +146,8 @@ function addLogo() {
     canvas.remove(logoName);
   }
 
-  const scaleTo = (contentRect.width + contentRect.height) / AppConstants.LOGO.SCALE_RATIO;
+  const template = currentTemplate();
+  const scaleTo = template.logoWidth;
   logoText = (jQuery("#logo-selection").find(":selected").attr("value") || "")
     .trim()
     .toUpperCase();
@@ -178,13 +179,6 @@ function addLogo() {
     textScaleTo = AppConstants.LOGO.TEXT_SCALE_SHORT;
   }
 
-  if (scaleTo < 121) {
-    logoFilename = logoFilename
-      .replace("245", "120")
-      .replace("248", "121")
-      .replace("268", "131");
-  }
-
   fabric.Image.fromURL(
     generatorApplicationURL + "resources/images/logos/" + logoFilename,
     function (image) {
@@ -201,7 +195,6 @@ function addLogo() {
 
         // Calculate optimal logo position automatically based on template type
         const logoHeight = image.getScaledHeight();
-        const template = currentTemplate();
         image.top = calculateLogoTop(logoHeight, template);
 
         CanvasUtils.disableScalingControls(image);
@@ -212,9 +205,9 @@ function addLogo() {
         logo = image;
 
         // Calculate text position relative to logo top
-        // The pink bar starts at the same ABSOLUTE distance from the logo top in both variants
-        // Using logo WIDTH as reference since it's constant (245px) between short and long logos
-        const offsetFromTop = image.getScaledWidth() * AppConstants.LOGO.PINK_BAR_OFFSET_FROM_TOP;
+        // The bar starts at the same ABSOLUTE distance from the logo top in both variants
+        // Using logo WIDTH as reference since it's constant between short and long logos
+        const offsetFromTop = image.getScaledWidth() * AppConstants.LOGO.BAR_OFFSET_FROM_TOP;
         const textTopPosition = image.top + offsetFromTop;
 
         logoName = new fabric.Text(logoText, {
