@@ -292,7 +292,7 @@ test.describe('Visual Regression - QR Generator with Pixelmatch', () => {
     await setupQRTest(page);
     
     const data = { text: 'Test' };
-    const colors = { foreground: '#538430', background: '#FFFFFF' };
+    const colors = { foreground: '#257639', background: '#FFFFFF' };
     await completeQRWorkflow(page, 'text', data, colors);
     
     await compareQRWithReference(page, 'qr-darkgreen-white');
@@ -304,7 +304,7 @@ test.describe('Visual Regression - QR Generator with Pixelmatch', () => {
     await setupQRTest(page);
     
     const data = { url: 'https://gruene.at/light-green-style' };
-    const colors = { foreground: '#82B624', background: '#000000' };
+    const colors = { foreground: '#56AF31', background: '#000000' };
     await completeQRWorkflow(page, 'url', data, colors);
     
     await compareQRWithReference(page, 'qr-lightgreen-black');
@@ -352,7 +352,7 @@ test.describe('Visual Regression - QR Generator with Pixelmatch', () => {
     await setupQRTest(page);
     
     const data = { text: 'Style' };
-    const colors = { foreground: '#538430', background: 'transparent' };
+    const colors = { foreground: '#257639', background: 'transparent' };
     await completeQRWorkflow(page, 'text', data, colors);
     
     await compareQRWithReference(page, 'qr-darkgreen-transparent');
@@ -376,7 +376,7 @@ test.describe('Visual Regression - QR Generator with Pixelmatch', () => {
     await setupQRTest(page);
     
     const data = { text: 'Umwelt' };
-    const colors = { foreground: '#82B624', background: '#FFFFFF' };
+    const colors = { foreground: '#56AF31', background: '#FFFFFF' };
     await completeQRWorkflow(page, 'text', data, colors);
     
     await compareQRWithReference(page, 'qr-lightgreen-white');

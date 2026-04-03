@@ -39,7 +39,7 @@ test.describe('Visual Regression - QR Codes', () => {
     await page.click('#show-qr-section');
     await page.waitForTimeout(500);
     await page.fill('#qr-text', 'https://gruene.at/test-green');
-    await page.selectOption('#qr-color', '#538430');
+    await page.selectOption('#qr-color', '#257639');
     await page.click('#add-qr-code');
     await page.waitForTimeout(3000);
 

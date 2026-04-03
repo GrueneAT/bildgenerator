@@ -65,7 +65,7 @@ test.describe('Visual Regression - Text System', () => {
     await page.waitForTimeout(1000);
     
     // Set yellow color
-    await page.selectOption('#text-color', 'rgb(255,240,0)');
+    await page.selectOption('#text-color', '#FFED00');
     await page.waitForTimeout(1000);
 
     await compareWithReference(page, 'text-color-yellow');
@@ -86,7 +86,7 @@ test.describe('Visual Regression - Text System', () => {
     await page.waitForTimeout(1000);
     
     // Set white color
-    await page.selectOption('#text-color', 'rgb(255,255,255)');
+    await page.selectOption('#text-color', '#FFFFFF');
     await page.waitForTimeout(1000);
 
     await compareWithReference(page, 'text-color-white');
