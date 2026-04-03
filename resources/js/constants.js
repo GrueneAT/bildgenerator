@@ -92,8 +92,8 @@ const AppConstants = {
         ANGLE: -5.5,
         WIDTH_SCALE: 0.95,
         // Bar text positioning - use WIDTH as reference since it's constant
-        BAR_OFFSET_FROM_TOP: 0.85, // Single-line text starts at 85% of logo WIDTH from logo top
-        BAR_OFFSET_FROM_TOP_LONG: 0.84, // Two-line text starts slightly higher to fit within the taller bar
+        BAR_OFFSET_FROM_TOP: 0.90, // Single-line text starts at 90% of logo WIDTH from logo top
+        BAR_OFFSET_FROM_TOP_LONG: 0.89, // Two-line text starts slightly higher to fit within the taller bar
         // Automatic positioning configuration
         BORDERLESS_MARGIN_PERCENT: 0.02, // For borderless templates: logo bottom margin as percentage of canvas height (2%)
         FILES: {
