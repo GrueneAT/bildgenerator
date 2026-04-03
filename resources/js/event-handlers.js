@@ -274,7 +274,7 @@ const EventHandlerUtils = {
     setupCrossHandler() {
         this.bindHandler('#add-cross', 'click', function() {
             fabric.Image.fromURL(
-                generatorApplicationURL + "resources/images/Ankreuzen.png",
+                generatorApplicationURL + "resources/images/Wahlkreuz.png",
                 function(image) {
                     CanvasUtils.scaleElementToFit(image, 0.4, 0.3);
                     canvas.add(image);
