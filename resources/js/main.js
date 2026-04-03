@@ -195,9 +195,9 @@ function addLogo() {
         logo = image;
 
         // Calculate text position relative to logo top
-        // The bar starts at the same ABSOLUTE distance from the logo top in both variants
         // Using logo WIDTH as reference since it's constant between short and long logos
-        const offsetFromTop = image.getScaledWidth() * AppConstants.LOGO.BAR_OFFSET_FROM_TOP;
+        const barOffset = isLongLogo ? AppConstants.LOGO.BAR_OFFSET_FROM_TOP_LONG : AppConstants.LOGO.BAR_OFFSET_FROM_TOP;
+        const offsetFromTop = image.getScaledWidth() * barOffset;
         const textTopPosition = image.top + offsetFromTop;
 
         logoName = new fabric.Text(logoText, {
