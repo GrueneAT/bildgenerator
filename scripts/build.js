@@ -30,6 +30,7 @@ async function build() {
         // Step 4: Create production HTML
         console.log('📄 Creating production HTML...');
         await createProductionHTML();
+        await createStaticPage('impressum.html');
         console.log('✅ Production HTML created\n');
         
         // Step 5: Copy assets
@@ -98,6 +99,24 @@ async function createProductionHTML() {
     html = html.replace(/vendors\.min\.js/g, `vendors.min.js?v=${timestamp}`);
     html = html.replace(/jquery\.min\.js/g, `jquery.min.js?v=${timestamp}`);
     
+    fs.writeFileSync(outputPath, html);
+}
+
+async function createStaticPage(filename) {
+    const templatePath = path.join(__dirname, '..', filename);
+    const outputPath = path.join(__dirname, '..', 'build', filename);
+    if (!fs.existsSync(templatePath)) return;
+
+    let html = fs.readFileSync(templatePath, 'utf8');
+
+    html = html.replace(
+        /<link rel="stylesheet" href="vendors\/fontawesome\/css\/all\.css"\s*\/?>[\s\S]*?<link rel="stylesheet"[\s\S]*?href="resources\/css\/style\.css\?v=[\d\.]+"\s*\/?>/g,
+        '<link rel="stylesheet" href="app.min.css">'
+    );
+
+    const timestamp = Date.now();
+    html = html.replace(/app\.min\.css/g, `app.min.css?v=${timestamp}`);
+
     fs.writeFileSync(outputPath, html);
 }
 
