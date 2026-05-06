@@ -1,7 +1,9 @@
 # Issue system configuration
 # Generated: 2026-04-03
 
-model: opus
+research_model: opus
+plan_model: opus
+execute_model: sonnet
 
 source:
   type: github
