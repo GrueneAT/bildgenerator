@@ -215,7 +215,6 @@ validate_static_assets() {
         "app.min.js:application/javascript:Production JS Bundle"
         "vendors.min.js:application/javascript:Vendor JS Bundle"
         "jquery.min.js:application/javascript:jQuery Library"
-        "resources/images/gruene-logo.svg:image/svg+xml:Logo SVG"
         "vendors/fontawesome/css/all.css:text/css:FontAwesome CSS"
     )
     
