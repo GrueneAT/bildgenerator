@@ -346,18 +346,11 @@ function renderQRForm() {
                             placeholder="https://www.gruene.at"
                         />
                     </div>
-                    <div class="bg-blue-50 border border-blue-200 rounded-md p-3">
-                        <div class="flex">
-                            <div class="flex-shrink-0">
-                                <i class="fas fa-info-circle text-blue-400"></i>
-                            </div>
-                            <div class="ml-3">
-                                <p class="text-sm text-blue-700">
-                                    Alle Felder außer dem Nachnamen sind optional. 
-                                    Der QR-Code wird auch bei Teilbefüllung erstellt.
-                                </p>
-                            </div>
-                        </div>
+                    <div class="gat-callout gat-callout--info">
+                        <p>
+                            Alle Felder außer dem Nachnamen sind optional.
+                            Der QR-Code wird auch bei Teilbefüllung erstellt.
+                        </p>
                     </div>
                 </div>
             `;
