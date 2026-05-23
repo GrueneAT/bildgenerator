@@ -71,12 +71,14 @@ async function createProductionHTML() {
     const buildCommit = getBuildCommit();
     const buildVersion = getBuildVersion();
     
-    // Replace vendor CSS and individual CSS files with bundled version
+    // Replace vendor CSS and individual CSS files with bundled version.
+    // Keeps the Gruene-AT design-system CDN <link> intact so the brand
+    // tokens (var(--gat-*)) used by the bundled Tailwind utilities resolve.
     html = html.replace(
         /<link rel="stylesheet" href="vendors\/fontawesome\/css\/all\.css"\s*\/?>[\s\S]*?<link rel="stylesheet"[\s\S]*?href="resources\/css\/style\.css\?v=[\d\.]+"\s*\/?>/g,
-        '<link rel="stylesheet" href="app.min.css">'
+        '<link rel="stylesheet" href="https://grueneat.github.io/design-system/design-system.css">\n    <link rel="stylesheet" href="app.min.css">'
     );
-    
+
     // Replace vendor JavaScript files with bundled version
     const vendorReplacePattern = /<script src="vendors\/jquery\/jquery-3\.7\.1\.min\.js"><\/script>[\s\S]*?<script src="vendors\/qrcode\.min\.js"><\/script>/g;
     html = html.replace(vendorReplacePattern, 
@@ -111,7 +113,7 @@ async function createStaticPage(filename) {
 
     html = html.replace(
         /<link rel="stylesheet" href="vendors\/fontawesome\/css\/all\.css"\s*\/?>[\s\S]*?<link rel="stylesheet"[\s\S]*?href="resources\/css\/style\.css\?v=[\d\.]+"\s*\/?>/g,
-        '<link rel="stylesheet" href="app.min.css">'
+        '<link rel="stylesheet" href="https://grueneat.github.io/design-system/design-system.css">\n    <link rel="stylesheet" href="app.min.css">'
     );
 
     const timestamp = Date.now();
