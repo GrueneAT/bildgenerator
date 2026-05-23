@@ -191,10 +191,7 @@ canvas {
    .btn-lg: px-6 py-3 text-base min-h-12
 */
 
-.form-input:focus, .form-select:focus {
-    border-color: #257639;
-    box-shadow: 0 0 0 3px rgb(37 118 57 / 0.1);
-}
+/* .gat-input / .gat-select focus styling now provided by design-system.css */
 
 .meme-preview {
     border: 1px solid #e5e7eb;

@@ -170,7 +170,7 @@ function renderQRForm() {
                     </label>
                     <textarea
                         id="qr-text-input"
-                        class="form-input w-full"
+                        class="gat-textarea w-full"
                         rows="5"
                         placeholder="Geben Sie Ihren Text hier ein..."
                         required
@@ -188,7 +188,7 @@ function renderQRForm() {
                     <input
                         type="url"
                         id="qr-url-input"
-                        class="form-input w-full"
+                        class="gat-input w-full"
                         placeholder="https://www.beispiel.de"
                         required
                     />
@@ -206,7 +206,7 @@ function renderQRForm() {
                         <input
                             type="email"
                             id="qr-email-address"
-                            class="form-input w-full"
+                            class="gat-input w-full"
                             placeholder="beispiel@gruene.at"
                             required
                         />
@@ -218,7 +218,7 @@ function renderQRForm() {
                         <input
                             type="text"
                             id="qr-email-subject"
-                            class="form-input w-full"
+                            class="gat-input w-full"
                             placeholder="Betreff der E-Mail"
                         />
                     </div>
@@ -228,7 +228,7 @@ function renderQRForm() {
                         </label>
                         <textarea
                             id="qr-email-body"
-                            class="form-input w-full"
+                            class="gat-textarea w-full"
                             rows="5"
                             placeholder="Nachrichtentext..."
                         ></textarea>
@@ -248,7 +248,7 @@ function renderQRForm() {
                             <input
                                 type="text"
                                 id="qr-vcard-title"
-                                class="form-input w-full"
+                                class="gat-input w-full"
                                 placeholder="Dr., Mag., etc."
                             />
                         </div>
@@ -259,7 +259,7 @@ function renderQRForm() {
                             <input
                                 type="text"
                                 id="qr-vcard-firstname"
-                                class="form-input w-full"
+                                class="gat-input w-full"
                                 placeholder="Max"
                             />
                         </div>
@@ -271,7 +271,7 @@ function renderQRForm() {
                         <input
                             type="text"
                             id="qr-vcard-lastname"
-                            class="form-input w-full"
+                            class="gat-input w-full"
                             placeholder="Mustermann"
                             required
                         />
@@ -284,7 +284,7 @@ function renderQRForm() {
                             <input
                                 type="tel"
                                 id="qr-vcard-phone"
-                                class="form-input w-full"
+                                class="gat-input w-full"
                                 placeholder="+43 1 234 5678"
                             />
                         </div>
@@ -295,7 +295,7 @@ function renderQRForm() {
                             <input
                                 type="email"
                                 id="qr-vcard-email"
-                                class="form-input w-full"
+                                class="gat-input w-full"
                                 placeholder="max.mustermann@gruene.at"
                             />
                         </div>
@@ -307,7 +307,7 @@ function renderQRForm() {
                         <input
                             type="text"
                             id="qr-vcard-address"
-                            class="form-input w-full"
+                            class="gat-input w-full"
                             placeholder="Musterstraße 123"
                         />
                     </div>
@@ -319,7 +319,7 @@ function renderQRForm() {
                             <input
                                 type="text"
                                 id="qr-vcard-zip"
-                                class="form-input w-full"
+                                class="gat-input w-full"
                                 placeholder="1010"
                             />
                         </div>
@@ -330,7 +330,7 @@ function renderQRForm() {
                             <input
                                 type="text"
                                 id="qr-vcard-city"
-                                class="form-input w-full"
+                                class="gat-input w-full"
                                 placeholder="Wien"
                             />
                         </div>
@@ -342,7 +342,7 @@ function renderQRForm() {
                         <input
                             type="url"
                             id="qr-vcard-website"
-                            class="form-input w-full"
+                            class="gat-input w-full"
                             placeholder="https://www.gruene.at"
                         />
                     </div>

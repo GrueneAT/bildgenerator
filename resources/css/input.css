@@ -37,15 +37,10 @@
     @apply w-full;
   }
   
-  /* Form components */
-  .form-input {
-    @apply mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gruene-primary focus:ring focus:ring-gruene-primary focus:ring-opacity-50;
-  }
-  
-  .form-select {
-    @apply mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gruene-primary focus:ring focus:ring-gruene-primary focus:ring-opacity-50;
-  }
-  
+  /* Form components: .gat-input, .gat-select, .gat-textarea, .gat-checkbox, .gat-radio, .gat-range
+     and the .gat-field wrapper (with __label/__hint/__error) are provided by the
+     Gruene-AT design system (loaded via the CDN <link> in index.html / impressum.html). */
+
   /* Searchable select component */
   .searchable-select {
     @apply relative w-full;
