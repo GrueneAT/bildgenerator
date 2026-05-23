@@ -42,39 +42,39 @@
      Gruene-AT design system (loaded via the CDN <link> in index.html / impressum.html). */
 
   /* Searchable select component */
-  .searchable-select {
+  .app-searchable-select {
     @apply relative w-full;
   }
   
-  .searchable-select-button {
+  .app-searchable-select-button {
     @apply w-full bg-white border border-gray-300 rounded-md py-2 px-3 pr-10 text-left shadow-sm focus:outline-none focus:ring-1 focus:ring-gruene-primary focus:border-gruene-primary cursor-pointer;
   }
   
-  .searchable-select-dropdown {
+  .app-searchable-select-dropdown {
     @apply absolute z-20 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-hidden focus:outline-none;
   }
   
-  .searchable-select-search {
+  .app-searchable-select-search {
     @apply w-full px-3 py-2 border-b border-gray-200 focus:outline-none focus:ring-1 focus:ring-gruene-primary focus:border-gruene-primary;
   }
   
-  .searchable-select-options {
+  .app-searchable-select-options {
     @apply max-h-48 overflow-auto;
   }
   
-  .searchable-select-option {
+  .app-searchable-select-option {
     @apply cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-gruene-primary hover:text-white;
   }
   
-  .searchable-select-option.selected {
+  .app-searchable-select-option.selected {
     @apply bg-gruene-secondary text-white;
   }
   
-  .searchable-select-option-group {
+  .app-searchable-select-option-group {
     @apply px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50;
   }
   
-  .searchable-select-chevron {
+  .app-searchable-select-chevron {
     @apply absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none;
   }
   
@@ -118,27 +118,27 @@
   }
 
   /* QR Code specific components */
-  .qr-type-button {
+  .app-qr-type-button {
     @apply p-6 border-2 border-gray-300 rounded-lg text-center hover:border-gruene-primary hover:bg-gruene-primary hover:text-white transition-all duration-200 cursor-pointer bg-white text-gray-700;
   }
   
-  .qr-type-button.active {
+  .app-qr-type-button.active {
     @apply border-gruene-primary bg-gruene-primary text-white;
   }
   
-  .qr-preview-container {
+  .app-qr-preview-container {
     @apply relative w-full;
   }
   
-  .qr-preview-container canvas {
+  .app-qr-preview-container canvas {
     @apply mx-auto;
   }
   
-  .qr-step-content {
+  .app-qr-step-content {
     @apply transition-all duration-300 ease-in-out;
   }
   
-  .qr-form-section {
+  .app-qr-form-section {
     @apply space-y-4 p-4 border border-gray-200 rounded-lg bg-gray-50;
   }
   
@@ -161,21 +161,21 @@
   }
   
   /* Step indicator enhancements for QR */
-  .step-indicator {
+  .app-step-indicator {
     @apply w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300;
   }
   
-  .step-indicator.active {
+  .app-step-indicator.active {
     @apply transform scale-110;
   }
   
   /* Mobile enhancements */
   @media (max-width: 768px) {
-    .qr-type-button {
+    .app-qr-type-button {
       @apply p-4 text-sm;
     }
     
-    .qr-type-button i {
+    .app-qr-type-button i {
       @apply text-xl mb-2;
     }
     
@@ -186,7 +186,7 @@
   
   /* Print styles for QR codes */
   @media print {
-    .qr-preview-container {
+    .app-qr-preview-container {
       @apply shadow-none border-none;
     }
     

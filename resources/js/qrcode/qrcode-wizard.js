@@ -51,7 +51,7 @@ function setupQRStepNavigation() {
 
 // QR Code Type Selection Setup
 function setupQRTypeSelection() {
-    jQuery('.qr-type-button').on('click', function() {
+    jQuery('.app-qr-type-button').on('click', function() {
         const type = jQuery(this).data('type');
         selectQRType(type);
     });
@@ -62,10 +62,10 @@ function selectQRType(type) {
     qrSelectedType = type;
     
     // Update button states
-    jQuery('.qr-type-button').removeClass('active bg-gruene-primary text-white')
+    jQuery('.app-qr-type-button').removeClass('active bg-gruene-primary text-white')
                              .addClass('bg-white text-gray-700 border-gray-300');
     
-    jQuery(`.qr-type-button[data-type="${type}"]`)
+    jQuery(`.app-qr-type-button[data-type="${type}"]`)
         .removeClass('bg-white text-gray-700 border-gray-300')
         .addClass('active bg-gruene-primary text-white');
     
@@ -94,7 +94,7 @@ function qrGoToStep(stepNumber) {
     if (stepNumber < 1 || stepNumber > qrTotalSteps) return;
     
     // Hide current step
-    jQuery('.qr-step-content').addClass('hidden');
+    jQuery('.app-qr-step-content').addClass('hidden');
     
     // Show target step
     jQuery(`#qr-step-${stepNumber}`).removeClass('hidden');
@@ -455,7 +455,7 @@ function resetQRWizard() {
     jQuery('#qr-form-container').empty();
     
     // Reset type buttons
-    jQuery('.qr-type-button').removeClass('active bg-gruene-primary text-white')
+    jQuery('.app-qr-type-button').removeClass('active bg-gruene-primary text-white')
                              .addClass('bg-white text-gray-700 border-gray-300');
     
     // Disable next button

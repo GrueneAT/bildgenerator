@@ -124,7 +124,7 @@ function goToStep(stepNumber) {
     if (stepNumber < 1 || stepNumber > totalSteps) return;
     
     // Hide current step
-    jQuery(`.step-content`).addClass('hidden');
+    jQuery(`.app-step-content`).addClass('hidden');
     
     // Show target step
     jQuery(`#step-${stepNumber}`).removeClass('hidden');
@@ -381,7 +381,7 @@ function setupMobileEnhancements() {
     // Better mobile navigation
     if (window.innerWidth <= 768) {
         // Simplified step indicators for mobile
-        jQuery('.step-indicator').addClass('mobile-compact');
+        jQuery('.app-step-indicator').addClass('mobile-compact');
         
         // Touch-friendly buttons
         jQuery('.btn-primary, .btn-secondary').addClass('touch-friendly');

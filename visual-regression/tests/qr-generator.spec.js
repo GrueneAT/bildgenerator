@@ -85,7 +85,7 @@ async function completeQRWorkflow(page, type, data, colors = null) {
   }
   
   // Wait for QR code generation
-  await page.waitForSelector('.qr-preview-container canvas', { state: 'visible', timeout: 15000 });
+  await page.waitForSelector('.app-qr-preview-container canvas', { state: 'visible', timeout: 15000 });
   
   await page.waitForTimeout(2000);
   
@@ -104,7 +104,7 @@ async function compareQRWithReference(page, testName) {
   const referenceImagePath = path.join(REFERENCE_DIR, `${testName}-reference.png`);
   
   // Ensure we're at the QR download step (step 3)
-  await page.waitForSelector('.qr-preview-container canvas', { state: 'visible' });
+  await page.waitForSelector('.app-qr-preview-container canvas', { state: 'visible' });
   await page.waitForSelector('#qr-download:visible', { timeout: 10000 });
   
   // Set up download listener
@@ -405,7 +405,7 @@ test.describe('Visual Regression - QR Generator with Pixelmatch', () => {
     await completeQRWorkflow(page, 'url', data, colors);
 
     // Wait for QR preview to be ready
-    await page.waitForSelector('.qr-preview-container canvas', { state: 'visible' });
+    await page.waitForSelector('.app-qr-preview-container canvas', { state: 'visible' });
     await page.waitForSelector('#qr-download:visible', { timeout: 10000 });
 
     // Set up download listener
@@ -473,7 +473,7 @@ test.describe('Visual Regression - QR Generator with Pixelmatch', () => {
     const whiteColors = { foreground: '#000000', background: '#FFFFFF' };
     await completeQRWorkflow(page, 'url', data, whiteColors);
 
-    await page.waitForSelector('.qr-preview-container canvas', { state: 'visible' });
+    await page.waitForSelector('.app-qr-preview-container canvas', { state: 'visible' });
     await page.waitForSelector('#qr-download:visible', { timeout: 10000 });
 
     // Download white background QR
@@ -501,7 +501,7 @@ test.describe('Visual Regression - QR Generator with Pixelmatch', () => {
     const transparentColors = { foreground: '#000000', background: 'transparent' };
     await completeQRWorkflow(page, 'url', data, transparentColors);
 
-    await page.waitForSelector('.qr-preview-container canvas', { state: 'visible' });
+    await page.waitForSelector('.app-qr-preview-container canvas', { state: 'visible' });
     await page.waitForSelector('#qr-download:visible', { timeout: 10000 });
 
     // Download transparent background QR

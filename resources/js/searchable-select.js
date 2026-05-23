@@ -68,18 +68,18 @@ class SearchableSelect {
     
     createCustomSelect() {
         const customSelect = `
-            <div class="searchable-select">
-                <button type="button" class="searchable-select-button" aria-expanded="false">
-                    <span class="searchable-select-text">${this.options.placeholder}</span>
-                    <span class="searchable-select-chevron">
+            <div class="app-searchable-select">
+                <button type="button" class="app-searchable-select-button" aria-expanded="false">
+                    <span class="app-searchable-select-text">${this.options.placeholder}</span>
+                    <span class="app-searchable-select-chevron">
                         <svg class="h-5 w-5 text-gray-400 transform transition-transform" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                         </svg>
                     </span>
                 </button>
-                <div class="searchable-select-dropdown hidden">
-                    <input type="text" class="searchable-select-search" placeholder="${this.options.searchPlaceholder}">
-                    <div class="searchable-select-options">
+                <div class="app-searchable-select-dropdown hidden">
+                    <input type="text" class="app-searchable-select-search" placeholder="${this.options.searchPlaceholder}">
+                    <div class="app-searchable-select-options">
                         ${this.renderOptions()}
                     </div>
                 </div>
@@ -90,11 +90,11 @@ class SearchableSelect {
         this.element.after(this.customSelect);
         
         // Cache elements
-        this.button = this.customSelect.find('.searchable-select-button');
-        this.dropdown = this.customSelect.find('.searchable-select-dropdown');
-        this.searchInput = this.customSelect.find('.searchable-select-search');
-        this.optionsContainer = this.customSelect.find('.searchable-select-options');
-        this.textElement = this.customSelect.find('.searchable-select-text');
+        this.button = this.customSelect.find('.app-searchable-select-button');
+        this.dropdown = this.customSelect.find('.app-searchable-select-dropdown');
+        this.searchInput = this.customSelect.find('.app-searchable-select-search');
+        this.optionsContainer = this.customSelect.find('.app-searchable-select-options');
+        this.textElement = this.customSelect.find('.app-searchable-select-text');
     }
     
     renderOptions(searchTerm = '') {
@@ -114,10 +114,10 @@ class SearchableSelect {
                 });
                 
                 if (groupOptions.length > 0) {
-                    html += `<div class="searchable-select-option-group">${item.label}</div>`;
+                    html += `<div class="app-searchable-select-option-group">${item.label}</div>`;
                     groupOptions.forEach(option => {
                         const selectedClass = option.value === this.selectedValue ? 'selected' : '';
-                        html += `<div class="searchable-select-option ${selectedClass}" data-value="${option.value}">${option.text}</div>`;
+                        html += `<div class="app-searchable-select-option ${selectedClass}" data-value="${option.value}">${option.text}</div>`;
                     });
                 }
             } else if (item.type === 'option') {
@@ -131,7 +131,7 @@ class SearchableSelect {
                 
                 if (textMatch || valueMatch || valueSpaceMatch) {
                     const selectedClass = item.value === this.selectedValue ? 'selected' : '';
-                    html += `<div class="searchable-select-option ${selectedClass}" data-value="${item.value}">${item.text}</div>`;
+                    html += `<div class="app-searchable-select-option ${selectedClass}" data-value="${item.value}">${item.text}</div>`;
                 }
             }
         });
@@ -176,7 +176,7 @@ class SearchableSelect {
     }
     
     bindOptionEvents() {
-        this.optionsContainer.find('.searchable-select-option').off('click').on('click', (e) => {
+        this.optionsContainer.find('.app-searchable-select-option').off('click').on('click', (e) => {
             const value = jQuery(e.target).data('value');
             const text = jQuery(e.target).text();
             
@@ -220,7 +220,7 @@ class SearchableSelect {
     }
     
     updateOptionStates() {
-        this.optionsContainer.find('.searchable-select-option').removeClass('selected');
+        this.optionsContainer.find('.app-searchable-select-option').removeClass('selected');
         this.optionsContainer.find(`[data-value="${this.selectedValue}"]`).addClass('selected');
     }
     
@@ -235,7 +235,7 @@ class SearchableSelect {
     open() {
         this.dropdown.removeClass('hidden');
         this.button.attr('aria-expanded', 'true');
-        this.customSelect.find('.searchable-select-chevron svg').addClass('rotate-180');
+        this.customSelect.find('.app-searchable-select-chevron svg').addClass('rotate-180');
         this.isOpen = true;
         
         // Focus search input
@@ -252,7 +252,7 @@ class SearchableSelect {
     close() {
         this.dropdown.addClass('hidden');
         this.button.attr('aria-expanded', 'false');
-        this.customSelect.find('.searchable-select-chevron svg').removeClass('rotate-180');
+        this.customSelect.find('.app-searchable-select-chevron svg').removeClass('rotate-180');
         this.isOpen = false;
     }
     

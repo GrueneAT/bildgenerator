@@ -245,12 +245,12 @@ function setupQRResponsiveBehavior() {
         
         // Adjust QR preview size on mobile
         if (width < 640) { // sm breakpoint
-            jQuery('.qr-preview-container canvas').css({
+            jQuery('.app-qr-preview-container canvas').css({
                 'max-width': '280px',
                 'max-height': '280px'
             });
         } else {
-            jQuery('.qr-preview-container canvas').css({
+            jQuery('.app-qr-preview-container canvas').css({
                 'max-width': '300px',
                 'max-height': '300px'
             });
