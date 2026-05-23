@@ -59,11 +59,18 @@ const AppConstants = {
         SMALL: { value: 4, percentage: 0.5 }
     },
 
-    // Colors
+    // Canvas colors. These are hex/css literals because they are applied to
+    // fabric.js canvas objects, which do not resolve CSS custom properties.
+    // The brand colors are kept in sync with the Gruene-AT design-system tokens:
+    //   var(--gat-color-primary) = #257639  -> BACKGROUND_*, LOGO_TEXT
+    //   var(--gat-color-magenta) = #E6007E  -> PINK_CIRCLE
+    // (CORNER_COLOR / BORDER_COLOR are fabric.js selection-handle colors,
+    //  not part of the rendered output, and are intentionally left unchanged.)
+    // If the DS palette changes, update these constants in lockstep.
     COLORS: {
         BACKGROUND_PRIMARY: "#257639",
         BACKGROUND_SECONDARY: "#257639",
-        PINK_CIRCLE: "rgb(225,0,120)",
+        PINK_CIRCLE: "#E6007E",
         LOGO_TEXT: "#257639",
         TEXT_STROKE: "#000000",
         CORNER_COLOR: "yellow",

@@ -29,7 +29,7 @@ function replaceCanvas() {
 
   // Setup responsive canvas container
   function resizeCanvas() {
-    const wrapperWidth = jQuery(".fabric-canvas-wrapper").width();
+    const wrapperWidth = jQuery(".app-canvas-wrapper").width();
     const $container = jQuery(".canvas-container");
     $container.css({
       width: wrapperWidth,

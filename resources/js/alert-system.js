@@ -39,10 +39,10 @@ const AlertSystem = {
 
     // Get alert container
     getContainer() {
-        let container = jQuery('.alert-container');
+        let container = jQuery('.app-alert-container');
         if (container.length === 0) {
             // Create container if it doesn't exist
-            container = jQuery('<div class="alert-container max-w-7xl mx-auto px-4 mt-4 hidden"></div>');
+            container = jQuery('<div class="app-alert-container max-w-7xl mx-auto px-4 mt-4 hidden"></div>');
             jQuery('body').prepend(container);
         }
         return container;

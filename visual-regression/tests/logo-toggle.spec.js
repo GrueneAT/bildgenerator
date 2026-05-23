@@ -288,7 +288,7 @@ test.describe('Visual Regression - Logo Toggle', () => {
     });
     expect(isLogoEnabled).toBe(true);
 
-    // Clear logo selection using JavaScript (searchable-select hides the select)
+    // Clear logo selection using JavaScript (app-searchable-select hides the select)
     await page.evaluate(() => {
       const logoSelect = document.getElementById('logo-selection');
       if (logoSelect) {

@@ -1,6 +1,6 @@
 jQuery(function () {
     // Event: Choice meme from gallery
-    jQuery('.memes-container').delegate('img', 'click', function () {
+    jQuery('.app-memes-container').delegate('img', 'click', function () {
         var $img = jQuery(this);
         var imgInfo = {
             url: $img.attr('src'),

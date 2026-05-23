@@ -144,7 +144,7 @@ test.describe('Canvas Operations E2E', () => {
     await expect(page.locator('#meme-canvas')).toBeVisible();
     
     // Canvas should be in a wrapper
-    await expect(page.locator('.fabric-canvas-wrapper')).toBeVisible();
+    await expect(page.locator('.app-canvas-wrapper')).toBeVisible();
     
     // Should show canvas dimensions
     const dimensionsElement = page.locator('#canvas-dimensions');

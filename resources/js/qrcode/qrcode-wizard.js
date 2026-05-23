@@ -51,7 +51,7 @@ function setupQRStepNavigation() {
 
 // QR Code Type Selection Setup
 function setupQRTypeSelection() {
-    jQuery('.qr-type-button').on('click', function() {
+    jQuery('.app-qr-type-button').on('click', function() {
         const type = jQuery(this).data('type');
         selectQRType(type);
     });
@@ -62,10 +62,10 @@ function selectQRType(type) {
     qrSelectedType = type;
     
     // Update button states
-    jQuery('.qr-type-button').removeClass('active bg-gruene-primary text-white')
+    jQuery('.app-qr-type-button').removeClass('active bg-gruene-primary text-white')
                              .addClass('bg-white text-gray-700 border-gray-300');
     
-    jQuery(`.qr-type-button[data-type="${type}"]`)
+    jQuery(`.app-qr-type-button[data-type="${type}"]`)
         .removeClass('bg-white text-gray-700 border-gray-300')
         .addClass('active bg-gruene-primary text-white');
     
@@ -94,7 +94,7 @@ function qrGoToStep(stepNumber) {
     if (stepNumber < 1 || stepNumber > qrTotalSteps) return;
     
     // Hide current step
-    jQuery('.qr-step-content').addClass('hidden');
+    jQuery('.app-qr-step-content').addClass('hidden');
     
     // Show target step
     jQuery(`#qr-step-${stepNumber}`).removeClass('hidden');
@@ -170,7 +170,7 @@ function renderQRForm() {
                     </label>
                     <textarea
                         id="qr-text-input"
-                        class="form-input w-full"
+                        class="gat-textarea w-full"
                         rows="5"
                         placeholder="Geben Sie Ihren Text hier ein..."
                         required
@@ -188,7 +188,7 @@ function renderQRForm() {
                     <input
                         type="url"
                         id="qr-url-input"
-                        class="form-input w-full"
+                        class="gat-input w-full"
                         placeholder="https://www.beispiel.de"
                         required
                     />
@@ -206,7 +206,7 @@ function renderQRForm() {
                         <input
                             type="email"
                             id="qr-email-address"
-                            class="form-input w-full"
+                            class="gat-input w-full"
                             placeholder="beispiel@gruene.at"
                             required
                         />
@@ -218,7 +218,7 @@ function renderQRForm() {
                         <input
                             type="text"
                             id="qr-email-subject"
-                            class="form-input w-full"
+                            class="gat-input w-full"
                             placeholder="Betreff der E-Mail"
                         />
                     </div>
@@ -228,7 +228,7 @@ function renderQRForm() {
                         </label>
                         <textarea
                             id="qr-email-body"
-                            class="form-input w-full"
+                            class="gat-textarea w-full"
                             rows="5"
                             placeholder="Nachrichtentext..."
                         ></textarea>
@@ -248,7 +248,7 @@ function renderQRForm() {
                             <input
                                 type="text"
                                 id="qr-vcard-title"
-                                class="form-input w-full"
+                                class="gat-input w-full"
                                 placeholder="Dr., Mag., etc."
                             />
                         </div>
@@ -259,7 +259,7 @@ function renderQRForm() {
                             <input
                                 type="text"
                                 id="qr-vcard-firstname"
-                                class="form-input w-full"
+                                class="gat-input w-full"
                                 placeholder="Max"
                             />
                         </div>
@@ -271,7 +271,7 @@ function renderQRForm() {
                         <input
                             type="text"
                             id="qr-vcard-lastname"
-                            class="form-input w-full"
+                            class="gat-input w-full"
                             placeholder="Mustermann"
                             required
                         />
@@ -284,7 +284,7 @@ function renderQRForm() {
                             <input
                                 type="tel"
                                 id="qr-vcard-phone"
-                                class="form-input w-full"
+                                class="gat-input w-full"
                                 placeholder="+43 1 234 5678"
                             />
                         </div>
@@ -295,7 +295,7 @@ function renderQRForm() {
                             <input
                                 type="email"
                                 id="qr-vcard-email"
-                                class="form-input w-full"
+                                class="gat-input w-full"
                                 placeholder="max.mustermann@gruene.at"
                             />
                         </div>
@@ -307,7 +307,7 @@ function renderQRForm() {
                         <input
                             type="text"
                             id="qr-vcard-address"
-                            class="form-input w-full"
+                            class="gat-input w-full"
                             placeholder="Musterstraße 123"
                         />
                     </div>
@@ -319,7 +319,7 @@ function renderQRForm() {
                             <input
                                 type="text"
                                 id="qr-vcard-zip"
-                                class="form-input w-full"
+                                class="gat-input w-full"
                                 placeholder="1010"
                             />
                         </div>
@@ -330,7 +330,7 @@ function renderQRForm() {
                             <input
                                 type="text"
                                 id="qr-vcard-city"
-                                class="form-input w-full"
+                                class="gat-input w-full"
                                 placeholder="Wien"
                             />
                         </div>
@@ -342,22 +342,15 @@ function renderQRForm() {
                         <input
                             type="url"
                             id="qr-vcard-website"
-                            class="form-input w-full"
+                            class="gat-input w-full"
                             placeholder="https://www.gruene.at"
                         />
                     </div>
-                    <div class="bg-blue-50 border border-blue-200 rounded-md p-3">
-                        <div class="flex">
-                            <div class="flex-shrink-0">
-                                <i class="fas fa-info-circle text-blue-400"></i>
-                            </div>
-                            <div class="ml-3">
-                                <p class="text-sm text-blue-700">
-                                    Alle Felder außer dem Nachnamen sind optional. 
-                                    Der QR-Code wird auch bei Teilbefüllung erstellt.
-                                </p>
-                            </div>
-                        </div>
+                    <div class="gat-callout gat-callout--info">
+                        <p>
+                            Alle Felder außer dem Nachnamen sind optional.
+                            Der QR-Code wird auch bei Teilbefüllung erstellt.
+                        </p>
                     </div>
                 </div>
             `;
@@ -462,7 +455,7 @@ function resetQRWizard() {
     jQuery('#qr-form-container').empty();
     
     // Reset type buttons
-    jQuery('.qr-type-button').removeClass('active bg-gruene-primary text-white')
+    jQuery('.app-qr-type-button').removeClass('active bg-gruene-primary text-white')
                              .addClass('bg-white text-gray-700 border-gray-300');
     
     // Disable next button

@@ -1,37 +1,57 @@
-// Modal functionality
+// Modal functionality - uses the native <dialog> API
+// (the design-system .gat-modal class is applied to a <dialog> element).
 jQuery(function() {
-    // Video modal functionality
+    const dialog = document.getElementById('videoModal');
+    const iframe = document.getElementById('video-iframe');
+
+    function closeVideoModal() {
+        if (!dialog) return;
+        if (dialog.open) {
+            dialog.close();
+        }
+        if (iframe) {
+            iframe.setAttribute('src', '');
+        }
+    }
+
+    // Open modal
     jQuery('#video-modal-btn').on('click', function() {
+        if (!dialog) return;
         const videoUrl = jQuery(this).data('video');
-        jQuery('#video-iframe').attr('src', videoUrl);
-        jQuery('#videoModal').removeClass('hidden');
-        jQuery('body').addClass('overflow-hidden');
-    });
-
-    // Close modal functionality
-    jQuery('#close-modal').on('click', function(e) {
-        jQuery('#videoModal').addClass('hidden');
-        jQuery('#video-iframe').attr('src', '');
-        jQuery('body').removeClass('overflow-hidden');
-    });
-    
-    // Close modal when clicking background
-    jQuery('#videoModal').on('click', function(e) {
-        if (e.target === this) {
-            jQuery('#videoModal').addClass('hidden');
-            jQuery('#video-iframe').attr('src', '');
-            jQuery('body').removeClass('overflow-hidden');
+        if (iframe) {
+            iframe.setAttribute('src', videoUrl);
+        }
+        // showModal() puts the dialog in the top-layer and triggers ::backdrop.
+        if (typeof dialog.showModal === 'function') {
+            dialog.showModal();
+        } else {
+            dialog.setAttribute('open', '');
         }
     });
 
-    // Close modal on escape key
-    jQuery(document).on('keydown', function(e) {
-        if (e.key === 'Escape') {
-            jQuery('#videoModal').addClass('hidden');
-            jQuery('#video-iframe').attr('src', '');
-            jQuery('body').removeClass('overflow-hidden');
-        }
-    });
+    // Close via the close button
+    jQuery('#close-modal').on('click', closeVideoModal);
+
+    // Close when clicking the backdrop (clicks on the <dialog> element itself,
+    // not its child content). With native <dialog> the backdrop is the dialog
+    // element's own click area outside the content box.
+    if (dialog) {
+        dialog.addEventListener('click', function(e) {
+            if (e.target === dialog) {
+                closeVideoModal();
+            }
+        });
+
+        // Reset iframe when the dialog is closed (Esc, form submit, etc.).
+        dialog.addEventListener('close', function() {
+            if (iframe) {
+                iframe.setAttribute('src', '');
+            }
+        });
+
+        // The native <dialog> handles Esc automatically; the 'close' listener
+        // above will then clear the iframe src.
+    }
 });
 
 // Button group functionality

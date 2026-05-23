@@ -85,7 +85,7 @@ async function completeQRWorkflow(page, type, data, colors = null) {
   }
 
   // Wait for QR code generation
-  await page.waitForSelector('.qr-preview-container canvas', { state: 'visible', timeout: 15000 });
+  await page.waitForSelector('.app-qr-preview-container canvas', { state: 'visible', timeout: 15000 });
 
   await page.waitForTimeout(2000);
 }
@@ -97,7 +97,7 @@ async function completeQRWorkflow(page, type, data, colors = null) {
  * @returns {Promise<{pngImage: PNG, filePath: string}>}
  */
 async function downloadQRCodeForAnalysis(page, testName) {
-  await page.waitForSelector('.qr-preview-container canvas', { state: 'visible' });
+  await page.waitForSelector('.app-qr-preview-container canvas', { state: 'visible' });
   await page.waitForSelector('#qr-download:visible', { timeout: 10000 });
 
   const downloadPromise = page.waitForEvent('download');
@@ -378,7 +378,7 @@ test.describe('QR Transparency Comparison Tests', () => {
 
     // Check if error alert appeared or if QR preview is hidden/empty
     const hasError = await page.isVisible('.qr-alert-error');
-    const previewHidden = await page.isHidden('.qr-preview-container canvas');
+    const previewHidden = await page.isHidden('.app-qr-preview-container canvas');
 
     console.log(`Same color validation - Error shown: ${hasError}, Preview hidden: ${previewHidden}`);
 
