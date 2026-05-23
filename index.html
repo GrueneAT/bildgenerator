@@ -8,7 +8,7 @@
     <link rel="icon" href="resources/favicon/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" sizes="16x16" href="resources/favicon/favicon-16x16.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="resources/favicon/favicon-32x32.png" />
-    <link rel="icon" type="image/svg+xml" href="resources/images/gruene-logo.svg" />
+    <link rel="icon" type="image/svg+xml" href="https://grueneat.github.io/design-system/assets/gruene-logo.svg" />
     <link rel="apple-touch-icon" sizes="180x180" href="resources/favicon/apple-touch-icon.png" />
     <link rel="mask-icon" href="resources/favicon/safari-pinned-tab.svg" color="#2d793c" />
     <link rel="manifest" href="resources/favicon/site.webmanifest" />
@@ -21,6 +21,8 @@
     <meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
     <!-- Fontawesome -->
     <link rel="stylesheet" href="vendors/fontawesome/css/all.css" />
+    <!-- Gruene Design System -->
+    <link rel="stylesheet" href="https://grueneat.github.io/design-system/design-system.css" />
     <!-- Tailwind CSS -->
     <link rel="stylesheet" href="resources/css/output.css?v=1.5" />
     <!-- Fonts -->
@@ -35,6 +37,7 @@
   </head>
 
   <body class="bg-gray-50 pb-12">
+    <a class="gat-skiplink" href="#main">Zum Hauptinhalt springen</a>
     <!-- Development Mode Timestamp -->
     <div id="dev-timestamp" class="bg-yellow-100 border-b border-yellow-300 px-4 py-2 text-center text-xs text-gray-700" style="display: none;">
       <strong>Development Mode</strong> - Last built: <span id="dev-timestamp-value">14.11.2025 16:12:19</span>
@@ -50,9 +53,9 @@
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
             <img
-              src="resources/images/gruene-logo.svg"
+              src="https://grueneat.github.io/design-system/assets/gruene-logo.svg"
               width="32"
-              alt="GRÜNE Logo"
+              alt="Die Gruenen"
             />
             <h1 class="text-gray-900 text-xl font-bold">
               Grüner Bildgenerator
@@ -159,6 +162,8 @@
       </div>
     </div>
     
+    <!-- Skiplink target: main content begins here -->
+    <a id="main" tabindex="-1" aria-hidden="true"></a>
     <!-- QR Code Generator Container -->
     <div id="qrcode-container" class="container-fluid d-none">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
