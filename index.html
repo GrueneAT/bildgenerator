@@ -105,32 +105,16 @@
         </div>
       </div>
     </div>
-    <!-- Video Modal -->
-    <div id="videoModal" class="modal-overlay hidden">
-      <div class="modal-container max-w-3xl">
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-medium text-gray-900">Erklärungsvideo</h3>
-          <button
-            type="button"
-            class="text-gray-400 hover:text-gray-600"
-            id="close-modal"
-          >
-            <span class="sr-only">Schließen</span>
-            <svg
-              class="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
+    <!-- Video Modal (gat-modal = native <dialog>) -->
+    <dialog id="videoModal" class="gat-modal gat-modal--wide gat-modal--blur" aria-labelledby="videoModalTitle">
+      <div class="gat-modal__head">
+        <h3 class="gat-modal__title" id="videoModalTitle">Erklärungsvideo</h3>
+        <button type="button" class="gat-modal__close" id="close-modal" aria-label="Schließen">
+          <span class="sr-only">Schließen</span>
+          <i class="fas fa-times" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="gat-modal__body">
         <div class="aspect-video">
           <iframe
             id="video-iframe"
@@ -142,7 +126,7 @@
           ></iframe>
         </div>
       </div>
-    </div>
+    </dialog>
     
     <!-- Mobile Navigation Tabs -->
     <div class="md:hidden px-4 sm:px-6 lg:px-8 pb-4">

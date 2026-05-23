@@ -96,15 +96,10 @@
     @apply bg-gray-800 text-white;
   }
   
-  /* Modal components */
-  .modal-overlay {
-    @apply fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50;
-  }
-  
-  .modal-container {
-    @apply relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white;
-  }
-  
+  /* Modal components: .gat-modal (and __head/__title/__close/__body/__actions slots,
+     plus --blur/--narrow/--wide modifiers) are provided by the design system.
+     They map onto the native <dialog> element; open via dialog.showModal(). */
+
   /* Button group components */
   .btn-group {
     @apply inline-flex rounded-md shadow-sm;
