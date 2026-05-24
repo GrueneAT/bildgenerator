@@ -1,4 +1,11 @@
-// Unified Alert System - Consolidates all alert functionality
+// Unified Alert System - DS v2.2 .gat-toast / .gat-toaster + inline .gat-callout
+//
+// - Toaster (top-fixed global container) -> .gat-toaster with .gat-toast children
+// - Inline alert containers (e.g. #qr-alert-container) -> .gat-callout
+//
+// Legacy hooks preserved for tests and back-compat:
+// - container still accessible via .app-alert-container selector
+// - rendered alert nodes still carry the .alert class
 
 const AlertSystem = {
     // Configuration
@@ -8,42 +15,31 @@ const AlertSystem = {
         maxAlerts: 3
     },
 
-    // Alert type configurations - Updated for consistency
+    // Map legacy alert types to DS v2.2 .gat-toast--* variants
+    // and DS v2.1 .gat-callout--* variants (for inline qr-alert container).
     alertTypes: {
-        success: {
-            classes: 'bg-green-50 border-green-200 text-green-800',
-            iconColor: 'text-green-500',
-            icon: 'fas fa-check-circle'
-        },
-        warning: {
-            classes: 'bg-yellow-50 border-yellow-200 text-yellow-800',
-            iconColor: 'text-yellow-500',
-            icon: 'fas fa-exclamation-triangle'
-        },
-        danger: {
-            classes: 'bg-red-50 border-red-200 text-red-800',
-            iconColor: 'text-red-500',
-            icon: 'fas fa-exclamation-circle'
-        },
-        error: {
-            classes: 'bg-red-50 border-red-200 text-red-800',
-            iconColor: 'text-red-500',
-            icon: 'fas fa-exclamation-circle'
-        },
-        info: {
-            classes: 'bg-blue-50 border-blue-200 text-blue-800',
-            iconColor: 'text-blue-500',
-            icon: 'fas fa-info-circle'
-        }
+        success: { toast: 'gat-toast--success', callout: 'gat-callout--success', icon: 'fas fa-check-circle' },
+        warning: { toast: 'gat-toast--warn',    callout: 'gat-callout--warn',    icon: 'fas fa-exclamation-triangle' },
+        warn:    { toast: 'gat-toast--warn',    callout: 'gat-callout--warn',    icon: 'fas fa-exclamation-triangle' },
+        danger:  { toast: 'gat-toast--error',   callout: 'gat-callout--error',   icon: 'fas fa-exclamation-circle' },
+        error:   { toast: 'gat-toast--error',   callout: 'gat-callout--error',   icon: 'fas fa-exclamation-circle' },
+        info:    { toast: 'gat-toast--info',    callout: 'gat-callout--info',    icon: 'fas fa-info-circle' }
     },
 
-    // Get alert container
+    // Get the global toast region (.gat-toaster). Reuses the legacy
+    // .app-alert-container element if it is in the DOM so existing
+    // markup/tests keep working.
     getContainer() {
-        let container = jQuery('.app-alert-container');
+        let container = jQuery('.gat-toaster').first();
         if (container.length === 0) {
-            // Create container if it doesn't exist
-            container = jQuery('<div class="app-alert-container max-w-7xl mx-auto px-4 mt-4 hidden"></div>');
-            jQuery('body').prepend(container);
+            const legacy = jQuery('.app-alert-container').first();
+            if (legacy.length) {
+                legacy.addClass('gat-toaster').removeClass('hidden');
+                container = legacy;
+            } else {
+                container = jQuery('<div class="gat-toaster app-alert-container" role="region" aria-live="polite" aria-label="Benachrichtigungen"></div>');
+                jQuery('body').append(container);
+            }
         }
         return container;
     },
@@ -54,15 +50,19 @@ const AlertSystem = {
         return this.showInContainer(message, type, container, options);
     },
 
-    // Show alert in specific container
+    // Show alert in specific container.
+    // - .gat-toaster region -> render as .gat-toast (fixed corner)
+    // - any other container -> render as inline .gat-callout
     showInContainer(message, type = 'info', container, options = {}) {
         const alertConfig = this.alertTypes[type] || this.alertTypes['info'];
-        
+
         if (container.length === 0) {
             console.warn('Alert container not found');
             return null;
         }
-        
+
+        const isToastRegion = container.hasClass('gat-toaster') || container.hasClass('app-alert-container');
+
         // Clear existing alerts if specified in options
         if (options.clearExisting) {
             container.empty();
@@ -74,28 +74,32 @@ const AlertSystem = {
             }
         }
 
-        const alertHTML = `
-            <div class="alert ${alertConfig.classes} border rounded-lg p-4 mb-4 shadow-sm fade-in flex items-start space-x-3" role="alert">
-                <div class="flex-shrink-0">
-                    <i class="${alertConfig.icon} ${alertConfig.iconColor}"></i>
-                </div>
-                <div class="flex-1">
-                    <p class="text-sm font-medium">${message}</p>
-                </div>
-                <div class="flex-shrink-0">
-                    <button type="button" class="text-gray-400 hover:text-gray-600 focus:outline-none alert-close-btn">
-                        <span class="sr-only">Schließen</span>
-                        <i class="fas fa-times"></i>
+        const alertHTML = isToastRegion
+            ? `
+                <div class="gat-toast ${alertConfig.toast} alert" role="alert">
+                    <span class="gat-toast__icon" aria-hidden="true">
+                        <i class="${alertConfig.icon}"></i>
+                    </span>
+                    <div class="gat-toast__body">${message}</div>
+                    <button type="button" class="gat-toast__close alert-close-btn" aria-label="Schließen">
+                        <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-            </div>
-        `;
+            `
+            : `
+                <div class="gat-callout ${alertConfig.callout} alert" role="alert">
+                    <div class="gat-callout__body">${message}</div>
+                    <button type="button" class="gat-callout__close alert-close-btn" aria-label="Schließen">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            `;
 
         container.removeClass('hidden').append(alertHTML);
-        
+
         // Get the newly added alert
         const newAlert = container.find('.alert').last();
-        
+
         // Add click handler for close button
         newAlert.find('.alert-close-btn').on('click', () => {
             this.closeAlertInContainer(newAlert, container);
@@ -126,9 +130,10 @@ const AlertSystem = {
     closeAlertInContainer(alertElement, container) {
         alertElement.fadeOut(this.config.fadeSpeed, () => {
             alertElement.remove();
-            
-            // Hide container if no more alerts
-            if (container.find('.alert').length === 0) {
+
+            // Hide container if no more alerts (only for inline containers;
+            // .gat-toaster is fixed-positioned and harmless when empty)
+            if (container.find('.alert').length === 0 && !container.hasClass('gat-toaster')) {
                 container.addClass('hidden');
             }
         });
@@ -146,9 +151,11 @@ const AlertSystem = {
         container.find('.alert').fadeOut(this.config.fadeSpeed, function() {
             jQuery(this).remove();
         });
-        setTimeout(() => {
-            container.addClass('hidden');
-        }, this.config.fadeSpeed);
+        if (!container.hasClass('gat-toaster')) {
+            setTimeout(() => {
+                container.addClass('hidden');
+            }, this.config.fadeSpeed);
+        }
     },
 
     // Specialized alert methods
@@ -180,13 +187,13 @@ const AlertSystem = {
             scrollIntoView: true,
             ...options
         };
-        
-        // Show in QR container
+
+        // Show inline in QR container as .gat-callout
         const qrAlert = this.showInContainer(message, type, jQuery('#qr-alert-container'), qrOptions);
-        
-        // Also show in main container for dual display
+
+        // Also show in global toaster region for dual display
         const mainAlert = this.show(message, type, { autoClose: options.autoClose });
-        
+
         return { qrAlert, mainAlert };
     },
 
@@ -214,31 +221,3 @@ window.AlertSystem = AlertSystem;
 window.showAlert = showAlert;
 window.showTailwindAlert = showTailwindAlert;
 window.showQRAlert = showQRAlert;
-
-// Add CSS for fade-in animation
-jQuery(document).ready(function() {
-    if (!jQuery('#alert-system-styles').length) {
-        jQuery('head').append(`
-            <style id="alert-system-styles">
-                .fade-in {
-                    animation: fadeIn 0.3s ease-in-out;
-                }
-                
-                @keyframes fadeIn {
-                    from {
-                        opacity: 0;
-                        transform: translateY(-10px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
-                }
-                
-                .alert-close-btn:hover {
-                    opacity: 0.75;
-                }
-            </style>
-        `);
-    }
-});
