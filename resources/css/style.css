@@ -104,43 +104,6 @@ canvas {
     border-bottom: 1px solid #cecece;
 }
 
-.app-alert-container {
-    position: fixed;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 99999;
-    padding: 1rem;
-    max-width: 32rem;
-    width: 90%;
-}
-
-.alert button[type="button"] {
-    padding: 0.25rem;
-    border-radius: 0.25rem;
-    transition: all 0.2s ease;
-    width: 1.5rem;
-    height: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.alert button[type="button"]:hover {
-    background-color: rgba(0, 0, 0, 0.1);
-    transform: scale(1.1);
-}
-
-.alert button[type="button"]:focus {
-    outline: 2px solid transparent;
-    outline-offset: 2px;
-    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2);
-}
-
-.alert button[type="button"] i {
-    font-size: 0.75rem;
-}
-
 .app-step-indicator {
     width: 2rem;
     height: 2rem;
@@ -248,13 +211,7 @@ canvas {
         min-height: 44px;
         padding: 0.75rem 1rem;
     }
-    
-    .app-alert-container {
-        width: 95%;
-        max-width: 100%;
-        padding: 0.5rem;
-    }
-    
+
     .app-element-buttons-grid {
         grid-template-columns: 1fr;
         gap: 0.5rem;
