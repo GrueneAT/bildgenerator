@@ -104,12 +104,6 @@ canvas {
     border-bottom: 1px solid #cecece;
 }
 
-/* .app-alert-container / .alert close-button styling removed.
-   - .app-alert-container is now an alias on the DS .gat-toaster element
-     (bottom-right fixed positioning provided by design-system v2.2).
-   - close-button styling provided by .gat-toast__close (toaster region)
-     and .gat-callout__close (inline qr-alert-container). */
-
 .app-step-indicator {
     width: 2rem;
     height: 2rem;
