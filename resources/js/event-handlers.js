@@ -138,11 +138,12 @@ const EventHandlerUtils = {
             }
 
             const initialFontSize = canvas.width / 2;
-            const selectedFont = "Gotham Narrow Ultra";
-            
+            const selectedFont = AppConstants.FONTS.DEFAULT_TEXT;
+
             const text = new fabric.Text(jQuery("#text").val(), {
                 fontFamily: selectedFont,
                 fontSize: initialFontSize,
+                fontWeight: AppConstants.FONTS.WEIGHT_TEXT,
                 fontStyle: "normal",
                 textAlign: jQuery('input[name="align"]:checked').val(),
                 fill: jQuery("#text-color").find(":selected").attr("value"),
