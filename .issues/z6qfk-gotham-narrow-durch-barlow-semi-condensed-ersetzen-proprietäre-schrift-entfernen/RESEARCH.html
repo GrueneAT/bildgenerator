@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="artifact-source-sha256" content="1edbfb1744b92f30aa0fea243ad174188e273e4d239085f11f26773ce885c9b5">
+<meta name="artifact-source-file" content="RESEARCH.md">
+<meta name="artifact-generated-at" content="2026-06-03">
+<meta name="design-system-version" content="ds-1">
+<title>Research: Gotham Narrow durch Barlow Semi Condensed ersetzen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://flomotlik.github.io/claude-code/design-system.css">
+</head>
+<body>
+<div class="page">
+
+<header class="row">
+  <div class="margin">
+    <p class="kicker"><span class="kicker-num">RE</span>Research</p>
+  </div>
+  <div class="body">
+    <h1 class="masthead-title">Gotham Narrow → Barlow Semi Condensed</h1>
+    <p class="masthead-sub">Issue: z6qfk · Generated 2026-06-03</p>
+  </div>
+</header>
+
+<hr class="rule">
+
+<section class="row" id="strategy">
+  <div class="margin">
+    <p class="kicker"><span class="kicker-num">01</span>Strategy</p>
+    <p class="margin-note">Read this first — the rest is detail.</p>
+  </div>
+  <div class="body">
+    <h2>Strategy summary</h2>
+    <p>Gotham Narrow was modeled as <strong>four separate font-family names</strong>;
+       Barlow Semi Condensed is <strong>one family with numeric weights</strong>. The code
+       picks fonts only by <code>fontFamily</code> string —
+       <span class="mark mark-green">so switching the family name alone renders Barlow 400, not the heavy 900/800 we want</span>.
+       The fix: set the family to <code>"Barlow Semi Condensed"</code> everywhere AND pass
+       an explicit <code>fontWeight</code> (and <code>fontStyle</code> for italic) to Fabric.js.</p>
+    <ul class="points">
+      <li class="point">
+        <p class="point-claim">One family, explicit weights.</p>
+        <p class="point-detail">Default text → 900 upright; default logo → 800.
+          Don't fake four families.</p>
+      </li>
+      <li class="point is-risk">
+        <p class="point-claim">Tests render the production build, not dev HTML.</p>
+        <p class="point-detail">Playwright runs <code>make serve-build</code> → <code>build/</code>.
+          The Google-Fonts <code>&lt;link&gt;</code> must survive <code>build.js</code>'s CSS-link rewrite,
+          so place it beside the design-system CDN link (outside the replaced span).</p>
+      </li>
+      <li class="point is-note">
+        <p class="point-claim">No font picker remains.</p>
+        <p class="point-detail">The <code>#font-style-select</code> dropdown was already removed;
+          text font is hardcoded at <code>event-handlers.js:141</code>. No UI option strings to change.</p>
+      </li>
+      <li class="point is-note">
+        <p class="point-claim">All affected baselines must be regenerated.</p>
+        <p class="point-detail">Barlow is narrower → line breaks/textbox sizes shift.
+          Run <code>npm run generate-references</code>; visual sign-off is an acceptance criterion.</p>
+      </li>
+    </ul>
+    <div class="stats">
+      <div class="stat"><div class="stat-num is-orange">4</div><div class="stat-label">Gotham .otf to delete</div></div>
+      <div class="stat"><div class="stat-num">~12</div><div class="stat-label">Code/CSS files to edit</div></div>
+      <div class="stat"><div class="stat-num is-red">76</div><div class="stat-label">Reference images to regen</div></div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section class="row" id="flow">
+  <div class="margin">
+    <p class="kicker"><span class="kicker-num">02</span>Flow</p>
+  </div>
+  <div class="body">
+    <h2>Task flow &amp; dependencies</h2>
+    <div class="flow">
+      <div class="flow-node is-foundation">
+        <span class="n">Step 1</span>
+        <span class="t">Embed Barlow via Google Fonts</span>
+        <span class="d">Add scoped &lt;link&gt; in index.html + impressum.html head; remove fonts.css/input.css @font-face; drop fonts.css from build-css.js order.</span>
+      </div>
+      <div class="flow-node is-key">
+        <span class="n">Step 2</span>
+        <span class="t">Repoint runtime font selection</span>
+        <span class="d">constants.js FONTS, event-handlers.js (fontWeight 900), handlers.js, wizard.js FontFaceObserver({weight}), tailwind.config.js.</span>
+      </div>
+      <div class="flow-node">
+        <span class="n">Step 3</span>
+        <span class="t">Update tests &amp; docs</span>
+        <span class="d">test-utils.js font.check strings, integration mock, repo CLAUDE.md/README; delete .otf files.</span>
+      </div>
+      <div class="flow-node is-key">
+        <span class="n">Step 4</span>
+        <span class="t">Regenerate baselines + sign-off</span>
+        <span class="d">npm run generate-references; npm run test:visual green; visual brand check of story/post/print.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section class="row" id="decisions">
+  <div class="margin">
+    <p class="kicker"><span class="kicker-num">03</span>Decisions</p>
+  </div>
+  <div class="body">
+    <h2>Key decisions &amp; options</h2>
+    <div class="decision">
+      <div class="decision-head">
+        <p class="decision-title">Font embedding source</p>
+        <span class="lozenge is-chosen">Locked</span>
+      </div>
+      <p class="decision-body">Scoped Google-Fonts <code>&lt;link&gt;</code> for only Barlow Semi Condensed
+        (ital,wght 0,400;600;700;800;900;1,400;1,900&amp;display=swap). Family name exactly
+        <code>"Barlow Semi Condensed"</code>.</p>
+      <p class="decision-body rejected">Link full <code>design-system.css</code> as the font source —
+        rejected: pulls layout/color tokens, widens scope.</p>
+    </div>
+    <div class="decision">
+      <div class="decision-head">
+        <p class="decision-title">One family + fontWeight vs four alias families</p>
+        <span class="lozenge is-chosen">Chosen</span>
+      </div>
+      <p class="decision-body">Single family <code>"Barlow Semi Condensed"</code>; select heaviness via
+        Fabric <code>fontWeight</code>. Matches the Google-Fonts model and the design system.</p>
+      <p class="decision-body rejected">Four self-hosted alias <code>@font-face</code> families mapping to Barlow weights —
+        re-introduces a CSS layer and complexity.</p>
+    </div>
+    <div class="decision">
+      <div class="decision-head">
+        <p class="decision-title">Weight mapping</p>
+        <span class="lozenge is-note">Recommended</span>
+      </div>
+      <p class="decision-body">Ultra (default text) → <strong>900 upright</strong>;
+        Bold (default logo) → <strong>800</strong> (not 700, to keep hierarchy vs 900 text);
+        Ultra Italic → 900 italic; Book → 400. Barlow is lighter/narrower than Gotham, so map up.</p>
+      <p class="decision-body">Open: visual sign-off decides if 900 reads too light vs Gotham Ultra —
+        there is no heavier step, so logo=800 is the hierarchy lever.</p>
+    </div>
+    <div class="decision">
+      <div class="decision-head">
+        <p class="decision-title">Google-Fonts &lt;link&gt; placement</p>
+        <span class="lozenge is-risk">Risk</span>
+      </div>
+      <p class="decision-body">Place beside the design-system CDN link (or before the FontAwesome link) so
+        <code>build.js</code>'s CSS-link replace regex does not delete it. Verify with
+        <code>grep googleapis build/index.html</code> after build.</p>
+    </div>
+    <div class="decision">
+      <div class="decision-head">
+        <p class="decision-title">CI network dependency on Google Fonts</p>
+        <span class="lozenge is-open">Open</span>
+      </div>
+      <p class="decision-body">Visual regression now depends on the CDN. If CI runs offline, baselines/diffs
+        break — and re-vendoring is forbidden by workspace rule. Flag as a plan risk.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section class="row" id="detail">
+  <div class="margin">
+    <p class="kicker"><span class="kicker-num">04</span>Detail</p>
+  </div>
+  <div class="body">
+    <h2>Full detail</h2>
+    <details class="detail">
+      <summary>Show full artifact source
+        <span class="summary-hint">click to expand</span></summary>
+      <div class="detail-body">
+        <pre><code id="artifact-source-target"></code></pre>
+      </div>
+    </details>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section class="row" id="provenance">
+  <div class="margin">
+    <p class="kicker"><span class="kicker-num">05</span>Provenance</p>
+  </div>
+  <div class="body">
+    <h2>Provenance</h2>
+    <p>Generated from the canonical <code>.md</code>. This HTML is never
+       hand-edited — if the <code>.md</code> changes, regenerate with
+       <code>/issue:view</code>.</p>
+    <footer class="footer">
+      <span>Source: <code>RESEARCH.md</code> · SHA-256 <code>1edbfb1744b92f30aa0fea243ad174188e273e4d239085f11f26773ce885c9b5</code></span>
+      <span>Generated 2026-06-03 · design system ds-1</span>
+    </footer>
+  </div>
+</section>
+
+</div>
+
+<script type="application/json" id="artifact-source">
+{"source": "# Research: Gotham Narrow durch Barlow Semi Condensed ersetzen\n\n**Researched:** 2026-06-03\n**Issue:** z6qfk\n**Confidence:** HIGH (codebase fully traced; Barlow weights verified against live Google Fonts CSS)\n\n<user_constraints>\n## User Constraints (from CONTEXT.md)\n\n### Locked Decisions\n1. **Schrifteinbindung \u2014 Google Fonts CDN (gezielt).** Barlow Semi Condensed wird **direkt von Google Fonts** geladen, per `@import`/`<link>`, ausschlie\u00dflich f\u00fcr diese Schrift:\n   ```\n   https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,900&display=swap\n   ```\n   **Nicht** gew\u00e4hlt: das komplette `design-system.css` von `grueneat.github.io` zu verlinken (das h\u00e4ngt bereits in `index.html`, bringt aber Layout-/Farb-Tokens und Vollkorn mit \u2192 au\u00dferhalb des Scope). Family-Name f\u00fcr Canvas/Fabric.js/FontFaceObserver: exakt **`\"Barlow Semi Condensed\"`**. Webfonts tainten das Canvas nicht. Kein Vendoring \u2014 die vier Gotham-`.otf` in `resources/fonts/` werden entfernt.\n2. **Gewicht-Mapping \u2014 im Research zu entscheiden** (siehe `## Architecture Patterns` unten; konkrete Empfehlung gegeben).\n3. **Scope \u2014 Schrift + Visual-Regression-Baselines.** Im Scope: Schriftaustausch + Neuaufnahme aller betroffenen Visual-Regression-Referenzbilder. Farben, Logos, Layout-Tokens und sonstige DS-Aspekte bleiben **au\u00dferhalb**.\n\n### Claude's Discretion\n- Exaktes Gewicht-Mapping inkl. Italic-Handhabung.\n- Genaue Einbindungsstelle des Google-Fonts-`@import`.\n\n### Deferred Ideas (OUT OF SCOPE)\n- Verlinken des kompletten `design-system.css` als Font-Quelle.\n- Farben, Logos, Layout-Tokens, sonstige DS-Migration.\n</user_constraints>\n\n## Summary\n\nDer Austausch ist **gut umrissen und mechanisch geradlinig**, aber mit einer wichtigen strukturellen Pointe: Gotham wurde als **vier separate `@font-face`-Family-Namen** modelliert (`\"Gotham Narrow Ultra\"`, `\"\u2026 Ultra Italic\"`, `\"\u2026 Book\"`, `\"\u2026 Bold\"`), Barlow Semi Condensed ist dagegen **eine Family mit numerischen Gewichten**. Der Code selektiert Schrift heute ausschlie\u00dflich \u00fcber `fontFamily`-Stringliterale (Fabric.js bekommt z. B. `fontFamily: \"Gotham Narrow Ultra\"`) \u2014 es wird **nirgends** `fontWeight`/`fontStyle` zur Schriftauswahl gesetzt (`fontStyle` ist \u00fcberall hart `\"normal\"`). Der saubere, risikoarmste Weg ist deshalb: **Family-Name \u00fcberall auf `\"Barlow Semi Condensed\"` setzen UND zus\u00e4tzlich `fontWeight` (und f\u00fcr Italic `fontStyle`) explizit setzen**, weil ein einzelner Family-Name ohne Gewicht sonst Barlow 400 rendert statt der gew\u00fcnschten 900/700.\n\nDie Font-Ladekette ist klar: `@font-face` heute in **zwei** CSS-Dateien (`resources/css/fonts.css` als runtime-Quelle, `resources/css/input.css` als Tailwind-Source-Duplikat), `<link>` auf `fonts.css` in `index.html` (Dev) **und** in `impressum.html`, B\u00fcndelung \u00fcber `scripts/build-css.js` (`fonts.css` zwischen FontAwesome und Tailwind). Visual-Regression l\u00e4uft gegen den **Production-Build** (`make serve-build` \u2192 `build/`), nicht gegen die Dev-`index.html` \u2014 der Google-Fonts-`<link>` muss daher so eingebaut werden, dass `scripts/build.js` ihn in `build/index.html` \u00fcbernimmt. Sicherster Mechanismus: den Google-Fonts-`<link>` in den `<head>` von `index.html` (und `impressum.html`) setzen, der von der CSS-Bundle-Replace-Regex **nicht** angefasst wird, und `fonts.css` leeren/entfernen.\n\n`grep -ri gotham` muss am Ende leer sein (au\u00dfer Changelog/.development-Historie). Es gibt **keinen** Font-Picker mehr im UI (das `#font-style-select`-Dropdown wurde bereits im `corporate-identity-update`-Issue entfernt), also keine UI-Optionsstrings zu \u00e4ndern \u2014 Text ist hart auf eine Schrift verdrahtet (`event-handlers.js:141`).\n\n**Primary recommendation:** Eine Family `\"Barlow Semi Condensed\"` via Google-Fonts-`<link>` im `<head>` von `index.html` + `impressum.html`; `fonts.css`/`input.css`-`@font-face` entfernen; alle JS-Stringliterale auf `\"Barlow Semi Condensed\"` umstellen **und** das fehlende Gewicht \u00fcber neue `FONTS.WEIGHTS`-Konstanten als `fontWeight` (900 Text / 800 Logo) bzw. `fontStyle` (Italic-Fall) explizit an Fabric.js \u00fcbergeben; alle 76 Referenzbilder mit `npm run generate-references` neu aufnehmen und optisch abnehmen.\n\n## Codebase Analysis\n\n### Relevant Code\n\n| File | Purpose | Relevance |\n|------|---------|-----------|\n| `resources/css/fonts.css` | 4 `@font-face` Gotham \u2192 runtime-Quelle, via `<link>` in index.html/impressum.html und geb\u00fcndelt | **ENTFERNEN/LEEREN** |\n| `resources/css/input.css:7-19` | Tailwind-Source: `@font-face` `'Gotham Narrow'` (italic!) + `'Gotham Narrow Bold'` in `@layer base` | **`@font-face`-Block entfernen** |\n| `resources/css/output.css` | Tailwind-Build-Output (generiert aus input.css) | Wird neu gebaut; ggf. Gotham-Reste pr\u00fcfen |\n| `tailwind.config.js:20-23` | `fontFamily.gotham` / `gotham-bold` | **umstellen auf Barlow** (oder entfernen \u2014 siehe Decisions: vermutlich Tot-Code) |\n| `resources/js/constants.js:82-91` | `FONTS.DEFAULT_LOGO/DEFAULT_TEXT/PRELOAD_FONTS` | **Kern der \u00c4nderung** |\n| `resources/js/handlers.js:1-19` | `loadFont()` mit `customFonts = ['Gotham Narrow']` + FontFaceObserver | **umstellen** |\n| `resources/js/wizard.js:21-36` | `preloadFonts()` \u2014 4\u00d7 `FontFaceObserver('Gotham Narrow \u2026')` | **umstellen** |\n| `resources/js/event-handlers.js:141` | `const selectedFont = \"Gotham Narrow Ultra\"` \u2014 Default beim Text-Erstellen | **umstellen + fontWeight setzen** |\n| `index.html:29` | `<link ... href=\"resources/css/fonts.css\">` (Dev); `index.html:25` DS-CDN bereits da | **Google-Fonts-`<link>` erg\u00e4nzen, fonts.css-`<link>` entfernen** |\n| `impressum.html:21` | `<link ... href=\"resources/css/fonts.css\">` | **gleiche Behandlung** |\n| `scripts/build-css.js:14-19,42-43` | CSS-Bundle-Reihenfolge inkl. `fonts.css`; URL-Rewrite `../fonts/` | **`fonts.css` aus `CSS_FILES_ORDER` entfernen** (sonst nur Warnung) |\n| `scripts/build.js:77-80,114-117` | Production-HTML: Regex ersetzt FontAwesome\u2192style.css-Block durch DS-CDN+`app.min.css`; l\u00e4sst andere `<head>`-`<link>` intakt | **Einbaustelle des GF-`<link>` muss diese Regex \u00fcberleben** |\n| `visual-regression/tests/test-utils.js:267-285` | `document.fonts.check('16px \"Gotham Narrow \u2026\"')` Smoke-Check | **Font-Strings umstellen** |\n| `tests/integration/logo-processing-integration.test.js:107` | Mock `FONTS: { DEFAULT_LOGO: 'Gotham' }` | **Mock-Wert umstellen** |\n| `resources/fonts/*.otf` (4 Dateien) | Vendorisierte Gotham-OTFs | **L\u00d6SCHEN** |\n| `CLAUDE.md:114,130` (Repo) | \u201eDefault text font: Gotham Narrow Ultra\" / \u201eTypography: Gotham Narrow font family\" | **Text aktualisieren** |\n| `README.md:29-30` | Gotham-Erw\u00e4hnungen | **aktualisieren** (UI-sichtbar? nein, Doku) |\n| `TestsToWrite.md:45-46` | Gotham-Erw\u00e4hnungen | aktualisieren (reine Doku/TODO, optional) |\n\n### Interfaces\n\n<interfaces>\n// === resources/js/constants.js:82-91 \u2014 AppConstants.FONTS (the single source of truth) ===\nFONTS: {\n    DEFAULT_LOGO: \"Gotham Narrow Bold\",   // used by logo text overlay\n    DEFAULT_TEXT: \"Gotham Narrow Ultra\",  // used as canvas text default (also hardcoded in event-handlers.js:141)\n    PRELOAD_FONTS: [\n        'Gotham Narrow Ultra Italic',\n        'Gotham Narrow Ultra',\n        'Gotham Narrow Book',\n        'Gotham Narrow Bold'\n    ]\n}\n// NOTE: there is NO weight/style field today \u2014 selection is purely by family name.\n\n// === resources/js/handlers.js:1-19 \u2014 loadFont (only path that re-applies a font to active text) ===\nfunction loadFont(font) {\n    const customFonts = ['Gotham Narrow'];   // NB: 'Gotham Narrow' is NOT one of the 4 declared families \u2014 effectively dead branch\n    const text = canvas.getActiveObject();\n    if (!text) return;\n    if (customFonts.includes(font)) {\n        const fontObserver = new FontFaceObserver(font);\n        fontObserver.load().then(function () {\n            text.set(\"fontFamily\", \"\");\n            text.set(\"fontFamily\", font);\n            canvas.renderAll();\n        });\n    } else {\n        text.set(\"fontFamily\", font);   // current real path for any string\n        canvas.renderAll();\n    }\n}\n\n// === resources/js/wizard.js:21-36 \u2014 preloadFonts (called on initializeWizard) ===\nfunction preloadFonts() {\n    const fonts = [\n        new FontFaceObserver('Gotham Narrow Ultra Italic'),\n        new FontFaceObserver('Gotham Narrow Ultra'),\n        new FontFaceObserver('Gotham Narrow Book'),\n        new FontFaceObserver('Gotham Narrow Bold')\n    ];\n    fonts.forEach(font => { font.load().then(...).catch(...); });\n}\n// FontFaceObserver('Family').load() resolves once the browser has loaded a face for that family.\n// With Barlow as ONE family + multiple weights, observe with explicit weight:\n//   new FontFaceObserver('Barlow Semi Condensed', { weight: 900 }).load()\n//   new FontFaceObserver('Barlow Semi Condensed', { weight: 800 }).load()\n//   new FontFaceObserver('Barlow Semi Condensed', { weight: 900, style: 'italic' }).load()\n//   new FontFaceObserver('Barlow Semi Condensed', { weight: 400 }).load()\n\n// === resources/js/event-handlers.js:131-160 \u2014 setupTextHandler (fabric.Text creation) ===\nconst selectedFont = \"Gotham Narrow Ultra\";\nconst text = new fabric.Text(jQuery(\"#text\").val(), {\n    fontFamily: selectedFont,\n    fontSize: initialFontSize,\n    fontStyle: \"normal\",       // <-- ALWAYS \"normal\"; no fontWeight is ever set\n    textAlign: ...,\n    fill: ...,\n    lineHeight: parseFloat(jQuery(\"#line-height\").val()) || 1.0,\n    ...\n});\n// To keep Ultra's heaviness with Barlow, add:  fontWeight: 900\n\n// === Fabric.js text weight/style selection (verified against fabric.min.js usage) ===\n// fabric.Text / fabric.IText honor fontFamily + fontWeight + fontStyle independently.\n// The canvas font string fabric builds is: `${fontStyle} ${fontWeight} ${fontSize}px ${fontFamily}`.\n// => With a single family, fontWeight is the ONLY way to pick 900 vs 800 vs 400.\n\n// === scripts/build-css.js:14-19 \u2014 CSS bundle order (fonts.css currently included) ===\nconst CSS_FILES_ORDER = [\n    'vendors/fontawesome/css/all.css',\n    'resources/css/fonts.css',   // <-- remove this entry when fonts.css is deleted\n    'resources/css/output.css',\n    'resources/css/style.css'\n];\n\n// === scripts/build.js:77-80 \u2014 production HTML CSS-link rewrite (DO NOT break) ===\n// Regex collapses the run from <link ... fontawesome/all.css> ... <link ... style.css?v=>\n// into: DS-CDN <link> + <link app.min.css>. A Google-Fonts <link> placed ABOVE the\n// fontawesome <link> (e.g. right after the DS-CDN <link> at index.html:25, or before line 23)\n// survives the rewrite; one placed INSIDE that run gets deleted.\n\n// === visual-regression/tests/test-utils.js:267-285 \u2014 font readiness gate ===\nconst fonts = [\n    '16px \"Gotham Narrow Ultra Italic\"',\n    '16px \"Gotham Narrow Book\"',\n    '16px \"Gotham Narrow Bold\"'\n];\nconst results = fonts.map(font => document.fonts.check(font));\n// document.fonts.check needs an exact family+size string; for Barlow use e.g.\n//   '900 16px \"Barlow Semi Condensed\"', '400 16px \"Barlow Semi Condensed\"',\n//   'italic 900 16px \"Barlow Semi Condensed\"', '800 16px \"Barlow Semi Condensed\"'\n\n// === Verified live Google Fonts CSS (the locked import URL) ===\n// family-name: 'Barlow Semi Condensed'\n// normal weights present: 400, 600, 700, 800, 900\n// italic weights present: 400, 900\n</interfaces>\n\n### Reusable Components\n- `FontFaceObserver` (vendored, already bundled) supports a 2nd argument `{ weight, style }` \u2014 reuse it to await specific Barlow weights instead of distinct families.\n- `AppConstants.FONTS` is the single config surface; widen it (add `WEIGHTS`/`STYLES` or per-role objects) rather than scattering numeric literals.\n- `document.fonts.ready` + `document.fonts.check(...)` already gate the visual tests \u2014 keep the gate, just change the strings.\n\n### Recommended Implementation Steps\n- **Step 1 \u2014 Embed Barlow via Google Fonts.** Add the scoped Google-Fonts `<link>` to the `<head>` of `index.html` (and `impressum.html`) beside the DS-CDN link; remove the `@font-face` blocks from `resources/css/fonts.css` and `resources/css/input.css`; drop the `resources/css/fonts.css` entry from `CSS_FILES_ORDER` in `scripts/build-css.js`; remove the `fonts.css` `<link>` from both HTML files.\n- **Step 2 \u2014 Repoint runtime font selection.** Update `constants.js` `FONTS` (family + new weight constants), `event-handlers.js:141` (family `\"Barlow Semi Condensed\"` + `fontWeight: 900`), `handlers.js` `customFonts`, `wizard.js` `preloadFonts` to `FontFaceObserver('Barlow Semi Condensed', {weight,...})`, and `tailwind.config.js` `fontFamily`.\n- **Step 3 \u2014 Update tests and docs and delete the OTFs.** Change the `document.fonts.check` strings in `visual-regression/tests/test-utils.js`, the `DEFAULT_LOGO` mock in `tests/integration/logo-processing-integration.test.js`, the repo `CLAUDE.md`/`README.md`; delete the four `resources/fonts/*.otf`.\n- **Step 4 \u2014 Regenerate baselines and sign-off.** Run `npm run generate-references`, then `npm run test:visual` until green, and do the visual brand sign-off on story/post/print samples.\n\n### Potential Conflicts\n- **`fontStyle: \"normal\"` hardcoded** in `event-handlers.js:146` while the OLD default was *Ultra* (upright). The OLD Tailwind `input.css` `@font-face` for `'Gotham Narrow'` was declared `font-style: italic` \u2014 but that family is not used by the canvas default, so the canvas default already rendered upright Ultra. With Barlow, keep upright (`fontStyle: \"normal\"`, `fontWeight: 900`). No italic in the default path.\n- **`design-system.css` is already linked** (`index.html:25`) and itself `@import`s Barlow Semi Condensed via Google Fonts. Adding a second, scoped Google-Fonts `<link>` is intentional per the locked decision (don't *rely* on the DS file) and is harmless (browser dedupes). Do NOT remove the DS-CDN `<link>` \u2014 `tailwind.config.js` colors depend on its `--gat-*` tokens.\n- **`tailwind.config.js` `font-gotham*`** utilities appear to be dead code (audit note `e5han/.../audit.md:136`: no direct `font-gotham` usage found in HTML). Safe to repoint to Barlow or drop; confirm with a grep for `font-gotham` in `index.html`/JS before deleting.\n\n## Standard Stack\n| Library | Version | Purpose | Why Standard | Confidence |\n|---------|---------|---------|--------------|------------|\n| Barlow Semi Condensed (Google Fonts) | live CDN | Brand font, replaces Gotham | DS-mandated (`--gat-font-headline/-copy`), SIL OFL, free | HIGH (live CSS verified) |\n| FontFaceObserver (vendored) | existing | Await webfont before canvas render | already in repo, supports `{weight,style}` | HIGH |\n| Fabric.js (vendored) | existing | Canvas text; honors fontFamily+fontWeight+fontStyle | already in repo | HIGH |\n\n### Alternatives Considered\n| Instead of | Could Use | Tradeoff |\n|------------|-----------|----------|\n| Scoped Google-Fonts `<link>` | Rely on `design-system.css` `@import` | Rejected by locked decision; couples font load to full DS file |\n| One family + fontWeight | 4 self-hosted `@font-face` aliases mapping to Barlow weights | Re-introduces complexity & a CSS layer; numeric weight is cleaner and matches DS |\n\n## Don't Hand-Roll\n| Problem | Don't Build | Use Instead | Why |\n|---------|-------------|-------------|-----|\n| Await font before canvas paint | Custom timeout/polling | `FontFaceObserver(family,{weight,style}).load()` (already used) | Reliable, in repo |\n| Weight selection for one family | 4 fake family names | Fabric `fontWeight` numeric | Matches Google Fonts model + DS |\n| Baseline image regen | Manual screenshot capture | `npm run generate-references` (`GENERATE_REFERENCE=true`) | Built-in mechanism (`test-utils.js:160-162`) |\n\n## Architecture Patterns\n\n### Recommended Approach \u2014 Weight Mapping (resolves Decision 2)\n\nBarlow Semi Condensed is **lighter and narrower** than Gotham Narrow at equal nominal weight, and Gotham *Ultra* is an extreme display black. To preserve the punchy default headline look, map **up**, not 1:1:\n\n| Gotham (alt) | Rolle | Barlow SC (neu) | Begr\u00fcndung |\n|---|---|---|---|\n| Gotham Narrow Ultra | **Default-Text** (`DEFAULT_TEXT`) | **900 (Black)**, upright | Schwerste verf\u00fcgbare Barlow-St\u00e4rke; n\u00e4hste Entsprechung zu Ultra. Verf\u00fcgbar (verifiziert). |\n| Gotham Narrow Ultra Italic | (PRELOAD; kein Default-Pfad) | **900 italic** | Einzige schwere Italic in der locked Import-URL (`1,900`). |\n| Gotham Narrow Bold | **Default-Logo** (`DEFAULT_LOGO`) | **800 (ExtraBold)** | Bold\u2192700 wirkt neben Barlow-900-Text zu nah/leicht; 800 erh\u00e4lt klare Hierarchie. 800 ist in der Import-URL vorhanden. |\n| Gotham Narrow Book | (PRELOAD) | **400 (Regular)** | Direkte Buch-/Flie\u00dftext-Entsprechung. |\n\n**Empfehlung:** Default-Text **900 upright**, Default-Logo **800**. Wenn die optische Abnahme zeigt, dass 900 f\u00fcr den Default-Text *zu leicht* gegen Gotham Ultra wirkt, gibt es keine schwerere Stufe \u2014 dann ist die Hierarchie \u00fcber Logo=800 (statt 700) der Hebel, nicht eine h\u00f6here Text-Stufe.\n\n**Condensed-Risiko:** Barlow Semi Condensed ist schmaler als Gotham Narrow. Bei gleichem `fontSize` werden Zeilen **k\u00fcrzer/schmaler** \u2192 in den Templates k\u00f6nnen sich **Zeilenumbr\u00fcche und Textbox-H\u00f6hen verschieben** (Logo-Text nutzt `LOGO.TEXT_SCALE_*`, `MAX_TEXT_LENGTH`, `scaleElementToFit`). Das ist **erwartet** und wird durch die Baseline-Neuaufnahme abgedeckt; bei der optischen Abnahme gezielt auf zweizeiligen Logo-Text (`logo-text-two-line*`) und langen Text (`long-text-input`) achten.\n\n### Anti-Patterns to Avoid\n- **Nur `fontFamily` umstellen, ohne `fontWeight` zu setzen** \u2192 Barlow rendert 400 statt 900; Default-Text wirkt d\u00fcnn. Immer `fontWeight` mitgeben.\n- **Google-Fonts-`<link>` nur in `index.html`** \u2192 fehlt im Production-Build, wenn er in die ersetzte CSS-Link-Region f\u00e4llt \u2192 Visual-Regression (l\u00e4uft gegen `build/`) rendert ohne Barlow. Platzierung au\u00dferhalb der Replace-Regex (Decisions).\n- **`fonts.css` leeren, aber Eintrag in `CSS_FILES_ORDER` belassen** \u2192 nur eine Build-Warnung, kein harter Fehler; trotzdem den Eintrag entfernen.\n- **Doppelten DS-CDN-`<link>` entfernen** \u2192 bricht `--gat-*`-Farben in Tailwind.\n\n## Common Pitfalls\n\n### Production-Build vs. Dev-HTML divergiert\n**What goes wrong:** Font l\u00e4dt in `make dev`, aber Visual-Regression (gegen `build/index.html` via `make serve-build`) rendert Fallback-Schrift.\n**Why:** `scripts/build.js:77-80` ersetzt den `<link>`-Block von FontAwesome bis `style.css`. Ein dort platzierter GF-`<link>` verschwindet.\n**How to avoid:** GF-`<link>` direkt nach dem DS-CDN-`<link>` (`index.html:25`) oder vor dem FontAwesome-`<link>` (Zeile 23) einf\u00fcgen \u2014 beide liegen am Rand/au\u00dferhalb der Replace-Spanne; nach `npm run build` `build/index.html` pr\u00fcfen (`grep googleapis build/index.html`).\n**Warning signs:** `document.fonts.check('900 16px \"Barlow Semi Condensed\"')` \u2192 `false` in test-utils Warnung.\n\n### FontFaceObserver wartet auf falsche Identit\u00e4t\n**What goes wrong:** `new FontFaceObserver('Barlow Semi Condensed')` ohne `{weight}` resolved evtl. schon bei 400, w\u00e4hrend 900 noch l\u00e4dt \u2192 erster Canvas-Render zu d\u00fcnn.\n**How to avoid:** Pro ben\u00f6tigtem Gewicht ein Observer mit `{weight}` (und Italic mit `{style:'italic'}`).\n**Warning signs:** FOUT auf Canvas beim ersten Text-Hinzuf\u00fcgen.\n\n### `grep -ri gotham` nicht leer\n**What goes wrong:** Akzeptanzkriterium verfehlt.\n**How to avoid:** Alle in der Tabelle gelisteten Stellen abr\u00e4umen; `.development/` und `.issues/`-Historie sind erlaubte Ausnahmen (Changelog/Archiv) \u2014 Repo-`CLAUDE.md`, `README.md`, `TestsToWrite.md`, `.planning/codebase/STRUCTURE.md` sind aktive Doku und sollten aktualisiert werden.\n\n### Italic-Pfad existiert nicht im Default\n**What goes wrong:** \u00dcber-Engineering f\u00fcr Italic, obwohl der Default-Text upright ist und es kein UI-Dropdown mehr gibt.\n**How to avoid:** Italic nur in PRELOAD/Observer abdecken (`1,900` ist verf\u00fcgbar); kein Default-Pfad setzt Italic. `event-handlers.js` bleibt `fontStyle: \"normal\"`.\n\n## Environment Availability\n| Dependency | Required By | Available | Notes |\n|------------|------------|-----------|-------|\n| Internet (Google Fonts CDN) | Font load (dev+prod+tests) | Assumed | Workspace-CLAUDE.md: kein Offline-Ziel, Internet darf vorausgesetzt werden. Playwright-CI muss `fonts.gstatic.com` erreichen. |\n| Node + Playwright + Chromium | Visual regression | Per repo setup | `npm run generate-references` baut + rendert |\n| `document.fonts` API | test-utils gate | Chromium \u2713 | bereits genutzt |\n\n**Risiko CI-Netzwerk:** Visual-Regression h\u00e4ngt jetzt an Google Fonts (vorher lokale OTF). Wenn CI ohne Netz l\u00e4uft, w\u00fcrden Barlow-Faces fehlen \u2192 Fallback \u2192 Diff. Bei Baseline-Regen UND CI-Lauf muss Netz verf\u00fcgbar sein. Falls CI offline ist, ist das ein zu meldender Plan-Risikopunkt (kein Workaround durch Re-Vendoring \u2014 verst\u00f6\u00dft gegen Workspace-Regel).\n\n## Project Constraints (from CLAUDE.md)\n\n**Workspace `/workspace/CLAUDE.md`:**\n- **Kein Vendoring von Drittabh\u00e4ngigkeiten** \u2014 Barlow per CDN, keine neuen `.otf`. Die vier Gotham-`.otf` m\u00fcssen weg. (Kern dieses Issues.)\n- **Keine Werkzeug-Attribution** in Commits/Code/Kommentaren \u2014 kein \u201eclaude\", kein \u201eGenerated with\", kein `Co-Authored-By`.\n\n**Repo `CLAUDE.md` (bildgenerator):**\n- NEVER inline styles; ALWAYS Tailwind; Custom-CSS nur wenn n\u00f6tig.\n- Visual-Regression: Canvas/Elemente **nie** direkt manipulieren \u2014 immer wie ein User \u00fcber UI-Features (`#text` f\u00fcllen, `#add-text` klicken). Die bestehenden Specs tun das bereits.\n- **ALWAYS pixelmatch** beim Vergleich (bereits in `test-utils.js`; Threshold 0.1, Toleranz <0.5% Diff).\n- Neue Visual-Test-Dateien m\u00fcssen in `playwright.config.js` registriert werden (hier nicht relevant \u2014 keine neuen Specs, nur Baselines).\n- Repo-`CLAUDE.md:114,130` selbst nennt Gotham \u2192 muss aktualisiert werden (Akzeptanzkriterium).\n\n## Visual-Regression Impact (Decision 3)\n\n- **Mechanik:** `test-utils.js` `compareWithReference()` l\u00e4dt das Canvas-Bild herunter und vergleicht via `pixelmatch` gegen `visual-regression/reference-images/<name>-reference.png` (76 PNGs). Mit `GENERATE_REFERENCE=true` werden die Referenzen \u00fcberschrieben (`test-utils.js:160-162`).\n- **Regen-Befehl:** `npm run generate-references` (= `npm run build && GENERATE_REFERENCE=true playwright test visual-regression/tests/`). Danach `npm run test:visual` zum Gr\u00fcn-Pr\u00fcfen.\n- **Tests laufen gegen den Production-Build** (`webServer: \"make serve-build\"`) \u2192 GF-`<link>` muss in `build/index.html` landen (siehe Pitfalls).\n- **Betroffene Specs (rendern Text):** `text-system.spec.js` (alle text-* Baselines), `layouts.spec.js`, `positioning.spec.js`, `background-images.spec.js`, `error-handling.spec.js`, plus Logo-Text-Baselines (`logo-text-*`) und QR-Text (`qr-text`, `qr-minimal-text`). In der Praxis: **praktisch alle 76 Referenzbilder mit Text/Logo neu** \u2014 pauschal alle regenerieren ist am sichersten, da auch Default-Logo-Text die Schrift nutzt.\n- **e2e** (`e2e/*.spec.js`) nutzt ebenfalls Text-Flows, aber ohne pixelgenaue Referenzbilder (Funktionspr\u00fcfung) \u2014 nach Umstellung gr\u00fcn halten.\n\n## Sources\n### HIGH confidence\n- Codebase analysis (alle oben zitierten `file:line`), `grep -rin gotham`, `scripts/build*.js`, `playwright.config.js`, `package.json`, `Makefile`.\n- Live Google Fonts CSS f\u00fcr die locked Import-URL (Family-Name + vorhandene Gewichte 400/600/700/800/900 + Italic 400/900 verifiziert).\n### MEDIUM confidence\n- Barlow ist \u201eleichter/schmaler\" als Gotham Narrow bei gleicher Nominalst\u00e4rke \u2192 Mapping nach oben (Designurteil, gest\u00fctzt auf bekannte Metriken beider Schriften; finale Best\u00e4tigung durch optische Abnahme).\n### LOW confidence (needs validation)\n- `tailwind.config.js` `font-gotham*` ist Tot-Code (Audit-Notiz aus Archiv; vor L\u00f6schen per Grep best\u00e4tigen).\n- CI-Netzwerkzugriff auf Google Fonts (umgebungsabh\u00e4ngig; im Plan als Risiko f\u00fchren).\n\n## Metadata\n**Confidence breakdown:** Codebase HIGH; Font availability HIGH; Weight mapping MEDIUM (Designurteil, optische Abnahme entscheidet); CI-Netz LOW.\n**Research date:** 2026-06-03\n**Sub-agents used:** none (single-researcher; standard depth, fully traceable in-repo).\n**Note:** `.issues/MAP.md:45` (\"fonts.css \u2026 Gotham\") und `.planning/codebase/STRUCTURE.md` sind nach Umstellung stale \u2014 optionale Doku-Pflege.\n"}
+</script>
+
+<script>
+(function () {
+  "use strict";
+  var dataEl = document.getElementById("artifact-source");
+  var target = document.getElementById("artifact-source-target");
+  if (dataEl && target) {
+    try {
+      target.textContent = JSON.parse(dataEl.textContent).source || "";
+    } catch (e) {
+      target.textContent = dataEl.textContent;
+    }
+  }
+  document.querySelectorAll('a[href^="#"]').forEach(function (a) {
+    a.addEventListener("click", function (ev) {
+      var el = document.getElementById(a.getAttribute("href").slice(1));
+      if (el) { ev.preventDefault(); el.scrollIntoView({ behavior: "smooth" }); }
+    });
+  });
+})();
+</script>
+</body>
+</html>
