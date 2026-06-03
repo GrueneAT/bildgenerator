@@ -13,7 +13,6 @@ const VENDOR_CSS_FILES = [
 // Define the CSS files to bundle in order
 const CSS_FILES_ORDER = [
     ...VENDOR_CSS_FILES,          // Vendor CSS files first
-    'resources/css/fonts.css',     // Custom fonts
     'resources/css/output.css',    // Tailwind CSS (needs to be built first)
     'resources/css/style.css'      // Custom styles last
 ];
@@ -39,9 +38,7 @@ async function buildCSS() {
                 let content = fs.readFileSync(fullPath, 'utf8');
                 
                 // Fix font URLs for bundled CSS
-                if (filePath === 'resources/css/fonts.css') {
-                    content = content.replace(/url\("\.\.\/fonts\//g, 'url("resources/fonts/');
-                } else if (filePath === 'vendors/fontawesome/css/all.css') {
+                if (filePath === 'vendors/fontawesome/css/all.css') {
                     // Fix FontAwesome webfont URLs for bundled CSS
                     content = content.replace(/url\("\.\.\/webfonts\//g, 'url("vendors/fontawesome/webfonts/');
                     content = content.replace(/url\('\.\.\/webfonts\//g, 'url(\'vendors/fontawesome/webfonts/');
