@@ -104,7 +104,7 @@ global.AppConstants = {
         WIDTH_SCALE: 0.95
     },
     FONTS: {
-        DEFAULT_LOGO: 'Gotham'
+        DEFAULT_LOGO: 'Barlow Semi Condensed'
     },
     COLORS: {
         WHITE: '#FFFFFF'

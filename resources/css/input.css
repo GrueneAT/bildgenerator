@@ -2,23 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  /* Custom font faces */
-  @font-face {
-    font-family: 'Gotham Narrow';
-    src: url('../fonts/GothamNarrow-UltraItalic.otf') format('opentype');
-    font-weight: normal;
-    font-style: italic;
-  }
-
-  @font-face {
-    font-family: 'Gotham Narrow Bold';
-    src: url('../fonts/GothamNarrow-Bold.otf') format('opentype');
-    font-weight: bold;
-    font-style: normal;
-  }
-}
-
 @layer components {
   /* Button components */
   .btn-primary {

@@ -111,7 +111,7 @@ The application supports multiple image formats defined in `TemplateConstants.TE
 - Dynamic logo sizing based on canvas dimensions (formula: `(contentRect.width + contentRect.height) / 10`)
 - Percentage-based logo positioning for consistent placement across templates
 - Border control (0 = full-bleed, 10-20 = green border in pixels)
-- Default text font: Gotham Narrow Ultra (non-italic)
+- Default text font: Barlow Semi Condensed (weight 900, upright)
 - Text color options: Gelb (Yellow), Weiß (White)
 - Line-height options: Klein (0.8), Mittel (0.9), Groß (1.1)
 
@@ -127,7 +127,7 @@ Logos are organized in a hierarchical structure:
 ### Styling
 
 - **Custom Theme**: GRÜNE brand colors (`gruene-primary`, `gruene-secondary`, `gruene-dark`)
-- **Typography**: Gotham Narrow font family
+- **Typography**: Barlow Semi Condensed (Grüne-AT house font, loaded via Google Fonts)
 - **Responsive Design**: Tailwind CSS utility classes
 
 ## File Organization
