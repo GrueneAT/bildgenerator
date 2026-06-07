@@ -13,6 +13,16 @@ const path = require('path');
 const ROOT = path.join(__dirname, '../..');
 const EXAMPLES_DIR = path.join(ROOT, 'resources/images/examples');
 
+// The six fully-composed example sharepics shown in the modal gallery.
+const EXPECTED_EXAMPLES = [
+  'radboerse-feed.png',
+  'openair-kino-story.png',
+  'klima-stammtisch-feed.png',
+  'klima-demo-event.png',
+  'zitat-kandidatin-feed.png',
+  'infostand-natur-story.png',
+];
+
 function read(file) {
   return fs.readFileSync(path.join(ROOT, file), 'utf8');
 }
@@ -31,14 +41,17 @@ describe('Font-examples gallery', () => {
   const indexHtml = read('index.html');
   const schriftenHtml = read('schriften.html');
 
-  it('ships at least six example thumbnails on disk', () => {
-    const files = fs.readdirSync(EXAMPLES_DIR).filter((f) => f.endsWith('.png'));
-    expect(files.length).toBeGreaterThanOrEqual(6);
+  it('ships exactly the six composed example sharepics on disk', () => {
+    const files = fs
+      .readdirSync(EXAMPLES_DIR)
+      .filter((f) => f.endsWith('.png'))
+      .sort();
+    expect(files).toEqual([...EXPECTED_EXAMPLES].sort());
   });
 
-  it('every image referenced in the modal exists on disk', () => {
+  it('the modal references exactly the six expected examples', () => {
     const refs = exampleRefs(indexHtml);
-    expect(refs.size).toBeGreaterThanOrEqual(6);
+    expect([...refs].sort()).toEqual([...EXPECTED_EXAMPLES].sort());
     for (const file of refs) {
       expect(fs.existsSync(path.join(EXAMPLES_DIR, file))).toBe(true);
     }

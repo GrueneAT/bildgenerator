@@ -62,9 +62,9 @@ test.describe('Font examples modal & picker width', () => {
     expect(await page.evaluate(() => document.getElementById('fontExamplesModal').open)).toBe(true);
     expect(page.url()).toBe(urlBefore);
 
-    // The gallery shows the richer example set.
+    // The gallery shows the six fully-composed example sharepics.
     const imgCount = await page.locator('#font-examples-gallery img').count();
-    expect(imgCount).toBe(9);
+    expect(imgCount).toBe(6);
   });
 
   test('modal closes via the close button and via Escape', async ({ page }) => {

@@ -87,6 +87,14 @@ function replaceCanvas() {
 
   canvas.renderAll();
 
+  // Keep the globally exposed reference pointing at the live canvas. Without
+  // this, window.canvas only ever tracked the first canvas built during setup;
+  // every later template switch replaced the internal canvas but left the
+  // global stale, so tooling and tests reading window.canvas saw a disposed,
+  // empty instance after any non-default template was selected.
+  window.canvas = canvas;
+  window.contentRect = contentRect;
+
   // Update dimensions display if the function exists (from wizard.js)
   if (typeof updateCanvasDimensions === "function") {
     setTimeout(() => {
