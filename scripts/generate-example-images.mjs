@@ -159,6 +159,61 @@ const EXAMPLES = [
   },
 ];
 
+// Move the currently-active canvas object into a corner, the same way a user
+// would drag it there. The app keeps the freshly-added Störer / QR code
+// selected, exposes the Fabric canvas as window.canvas, and lets the user drag
+// any element freely (Fabric's default object movement). We reproduce the
+// end-state of that drag: read the object's scaled bounding box, then set its
+// top-left origin so the box sits in the requested corner with a margin, and
+// commit with setCoords()/renderAll() — exactly what Fabric does after a drag.
+// No element is hand-drawn; we only reposition an element the app placed.
+//
+// `kind` tells the helper which element to grab when the app did not leave it
+// pre-selected — the same element a user would click on before dragging:
+//   'active'  -> whatever is currently selected (QR: stays selected on add)
+//   'circle'  -> the most recently added Störer (a Fabric circle); selecting it
+//                first is exactly the click-to-select a user performs.
+//
+//   corner: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
+//   marginRatio: gap from the canvas edge, as a fraction of the long edge
+async function positionInCorner(page, corner, kind = 'active', marginRatio = 0.05) {
+  const moved = await page.evaluate(
+    ({ corner, kind, marginRatio }) => {
+      const canvas = window.canvas;
+      if (!canvas || typeof canvas.getActiveObject !== 'function') return 'no-canvas';
+      let obj = canvas.getActiveObject();
+      if (kind === 'circle') {
+        // Select the Störer the way a user click would: the last circle added.
+        const circles = canvas.getObjects().filter((o) => o.type === 'circle');
+        obj = circles[circles.length - 1];
+        if (obj) canvas.setActiveObject(obj);
+      }
+      if (!obj) return 'no-target-object';
+
+      const margin = Math.round(Math.max(canvas.width, canvas.height) * marginRatio);
+      const w = obj.getScaledWidth();
+      const h = obj.getScaledHeight();
+
+      const left = corner.endsWith('right')
+        ? canvas.width - w - margin
+        : margin;
+      const top = corner.startsWith('bottom')
+        ? canvas.height - h - margin
+        : margin;
+
+      obj.set({ left, top });
+      obj.setCoords();
+      canvas.renderAll();
+      return 'ok';
+    },
+    { corner, kind, marginRatio }
+  );
+  if (moved !== 'ok') {
+    throw new Error('could not reposition element (' + corner + '): ' + moved);
+  }
+  await page.waitForTimeout(500);
+}
+
 async function selectLogo(page, logo) {
   // The native #logo-selection is wrapped by the searchable-select component,
   // which hides the raw <select>. Drive the component's own selectOption() —
@@ -224,6 +279,9 @@ async function composeExample(page, ex) {
   if (ex.stoerer) {
     await page.click('#add-pink-circle');
     await page.waitForTimeout(1500);
+    // The Störer is added centered and stays selected; drag it into a top
+    // corner so it sits above the headline band instead of over the text.
+    await positionInCorner(page, ex.stoererCorner || 'top-right', 'circle');
   }
   if (ex.qr) {
     await page.click('#show-qr-section');
@@ -231,6 +289,9 @@ async function composeExample(page, ex) {
     await page.fill('#qr-text', ex.qr.text);
     await page.click('#add-qr-code');
     await page.waitForTimeout(2000);
+    // The QR is added centered and stays selected; drag it into a bottom
+    // corner, clear of both the centred headline and the centre-bottom logo.
+    await positionInCorner(page, ex.qrCorner || 'bottom-left', 'active');
   }
 
   // Step 4: export the canvas and downscale to a thumbnail.
