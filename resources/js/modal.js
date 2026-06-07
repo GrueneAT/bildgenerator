@@ -54,6 +54,41 @@ jQuery(function() {
     }
 });
 
+// Font-examples modal: shows the example gallery in-app so the user never
+// leaves their in-progress canvas. Same native <dialog> mechanism as the
+// video modal; schriften.html stays as a deep-linkable standalone fallback.
+jQuery(function() {
+    const dialog = document.getElementById('fontExamplesModal');
+    if (!dialog) return;
+
+    function openFontExamples() {
+        if (typeof dialog.showModal === 'function') {
+            dialog.showModal();
+        } else {
+            dialog.setAttribute('open', '');
+        }
+    }
+
+    function closeFontExamples() {
+        if (dialog.open) {
+            dialog.close();
+        } else {
+            dialog.removeAttribute('open');
+        }
+    }
+
+    jQuery('#font-examples-btn').on('click', openFontExamples);
+    jQuery('#close-font-examples').on('click', closeFontExamples);
+
+    // Close when clicking the backdrop (the dialog element itself, outside the
+    // content box).
+    dialog.addEventListener('click', function(e) {
+        if (e.target === dialog) {
+            closeFontExamples();
+        }
+    });
+});
+
 // Button group functionality
 jQuery(function() {
     jQuery('.btn-group label').on('click', function() {

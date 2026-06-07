@@ -152,7 +152,152 @@
         </div>
       </div>
     </dialog>
-    
+
+    <!-- Schriften-Beispiele Modal (gat-modal = native <dialog>) -->
+    <dialog
+      id="fontExamplesModal"
+      class="gat-modal gat-modal--wide gat-modal--blur"
+      aria-labelledby="fontExamplesTitle"
+    >
+      <div class="gat-modal__head">
+        <h3 class="gat-modal__title" id="fontExamplesTitle">
+          Welche Schrift wofür
+        </h3>
+        <button
+          type="button"
+          class="gat-modal__close"
+          id="close-font-examples"
+          aria-label="Schließen"
+        >
+          <span class="sr-only">Schließen</span>
+          <i class="fas fa-times" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="gat-modal__body">
+        <p class="text-sm text-gray-700 mb-2">
+          <strong>Standardschrift</strong> für Headlines und Fließtext —
+          passt für fast alle Sujets.
+          <strong>Betonte Serifenschrift</strong> nur für Zitate und einzelne
+          Akzente, bewusst und sparsam.
+        </p>
+        <div
+          class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4"
+          id="font-examples-gallery"
+        >
+          <figure class="m-0">
+            <img
+              src="resources/images/examples/klima-story.png"
+              alt="Beispiel Story Klimaschutz in der Standardschrift"
+              loading="lazy"
+              class="w-full h-40 sm:h-48 object-contain rounded-md border border-gray-200 bg-gray-50"
+            />
+            <figcaption class="mt-1 text-xs text-gray-600">
+              Story · Klima · Standardschrift
+            </figcaption>
+          </figure>
+          <figure class="m-0">
+            <img
+              src="resources/images/examples/soziales-feed.png"
+              alt="Beispiel Feed-Post leistbares Wohnen in der Standardschrift"
+              loading="lazy"
+              class="w-full h-40 sm:h-48 object-contain rounded-md border border-gray-200 bg-gray-50"
+            />
+            <figcaption class="mt-1 text-xs text-gray-600">
+              Feed-Post · Soziales · Standardschrift
+            </figcaption>
+          </figure>
+          <figure class="m-0">
+            <img
+              src="resources/images/examples/verkehr-feed.png"
+              alt="Beispiel Feed-Post Radverkehr in der Standardschrift"
+              loading="lazy"
+              class="w-full h-40 sm:h-48 object-contain rounded-md border border-gray-200 bg-gray-50"
+            />
+            <figcaption class="mt-1 text-xs text-gray-600">
+              Feed-Post · Verkehr · Standardschrift
+            </figcaption>
+          </figure>
+          <figure class="m-0">
+            <img
+              src="resources/images/examples/demo-event.png"
+              alt="Beispiel Event-Header Klima-Demo in der Standardschrift"
+              loading="lazy"
+              class="w-full h-40 sm:h-48 object-contain rounded-md border border-gray-200 bg-gray-50"
+            />
+            <figcaption class="mt-1 text-xs text-gray-600">
+              Event · Demo · Standardschrift
+            </figcaption>
+          </figure>
+          <figure class="m-0">
+            <img
+              src="resources/images/examples/stammtisch-story.png"
+              alt="Beispiel Story Grüner Stammtisch in der Standardschrift"
+              loading="lazy"
+              class="w-full h-40 sm:h-48 object-contain rounded-md border border-gray-200 bg-gray-50"
+            />
+            <figcaption class="mt-1 text-xs text-gray-600">
+              Story · Stammtisch · Standardschrift
+            </figcaption>
+          </figure>
+          <figure class="m-0">
+            <img
+              src="resources/images/examples/infostand-feed.png"
+              alt="Beispiel Feed-Post Infostand in der Standardschrift"
+              loading="lazy"
+              class="w-full h-40 sm:h-48 object-contain rounded-md border border-gray-200 bg-gray-50"
+            />
+            <figcaption class="mt-1 text-xs text-gray-600">
+              Feed-Post · Infostand · Standardschrift
+            </figcaption>
+          </figure>
+          <figure class="m-0">
+            <img
+              src="resources/images/examples/vortrag-event.png"
+              alt="Beispiel Event-Header Vortrag und Diskussion in der Standardschrift"
+              loading="lazy"
+              class="w-full h-40 sm:h-48 object-contain rounded-md border border-gray-200 bg-gray-50"
+            />
+            <figcaption class="mt-1 text-xs text-gray-600">
+              Event · Vortrag · Standardschrift
+            </figcaption>
+          </figure>
+          <figure class="m-0">
+            <img
+              src="resources/images/examples/zitat-accent-feed.png"
+              alt="Beispiel Feed-Post Zitat in der betonten Serifenschrift"
+              loading="lazy"
+              class="w-full h-40 sm:h-48 object-contain rounded-md border border-gray-200 bg-gray-50"
+            />
+            <figcaption class="mt-1 text-xs text-gray-600">
+              Feed-Post · Zitat · Serifenschrift
+            </figcaption>
+          </figure>
+          <figure class="m-0">
+            <img
+              src="resources/images/examples/akzent-accent-story.png"
+              alt="Beispiel Story Akzent in der betonten Serifenschrift"
+              loading="lazy"
+              class="w-full h-40 sm:h-48 object-contain rounded-md border border-gray-200 bg-gray-50"
+            />
+            <figcaption class="mt-1 text-xs text-gray-600">
+              Story · Akzent · Serifenschrift
+            </figcaption>
+          </figure>
+        </div>
+        <p class="text-sm text-gray-600 mt-4">
+          Ausführliche Erklärung auf der
+          <a
+            href="schriften.html"
+            target="_blank"
+            rel="noopener"
+            class="text-gruene-primary hover:underline"
+            >Schriften-Seite</a
+          >.
+        </p>
+      </div>
+    </dialog>
+
+
     <!-- Mobile Navigation Tabs -->
     <div class="md:hidden px-4 sm:px-6 lg:px-8 pb-4">
       <div class="flex gap-2">
@@ -823,36 +968,36 @@
                             <option value="1.1">Groß</option>
                           </select>
                         </div>
-                        <div>
-                          <label
-                            for="font-style-select"
-                            class="block text-sm font-medium text-gray-700 mb-2"
-                            >Schriftart:</label
+                      </div>
+                      <div>
+                        <label
+                          for="font-style-select"
+                          class="block text-sm font-medium text-gray-700 mb-2"
+                          >Schriftart:</label
+                        >
+                        <select
+                          class="gat-select text-method w-full"
+                          name="font-style-select"
+                          id="font-style-select"
+                        >
+                          <option value="standard">
+                            Standardschrift — Headlines &amp; Fließtext
+                          </option>
+                          <option value="accent">
+                            Betonte Serifenschrift — für Zitate &amp; Akzente
+                          </option>
+                        </select>
+                        <p class="text-sm text-gray-600 mt-2">
+                          Standardschrift für Überschriften und Fließtext,
+                          betonte Serifenschrift für Zitate und Akzente.
+                          <button
+                            type="button"
+                            id="font-examples-btn"
+                            class="text-gruene-primary hover:underline font-medium"
                           >
-                          <select
-                            class="gat-select text-method w-full"
-                            name="font-style-select"
-                            id="font-style-select"
-                          >
-                            <option value="standard">
-                              Standardschrift — Headlines &amp; Fließtext
-                            </option>
-                            <option value="accent">
-                              Betonte Serifenschrift — für Zitate &amp; Akzente
-                            </option>
-                          </select>
-                          <p class="text-sm text-gray-600 mt-2">
-                            Standardschrift für Überschriften und Fließtext,
-                            betonte Serifenschrift für Zitate und Akzente.
-                            <a
-                              href="schriften.html"
-                              target="_blank"
-                              rel="noopener"
-                              class="text-gruene-primary hover:underline"
-                              >Beispiele ansehen</a
-                            >.
-                          </p>
-                        </div>
+                            Beispiele ansehen
+                          </button>
+                        </p>
                       </div>
                       <div
                         class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4"
