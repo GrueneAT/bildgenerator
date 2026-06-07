@@ -193,6 +193,59 @@ const EXAMPLES = [
     caption: 'Story · Infostand · Standardschrift',
     alt: 'Beispiel-Sharepic Story Infostand am Markt mit Logo, Foto-Hintergrund, Schlagzeile und wöchentlichen Termin-Details',
   },
+
+  // ---- No-background examples -------------------------------------------
+  // These intentionally skip the photo upload (noBackground: true) so the
+  // canvas keeps the default solid GRÜNE green. They show the generator works
+  // great as a pure text/element layout on the brand canvas, no photo needed.
+  {
+    // Aus dem Gemeinderat — Feed-Post on the plain green canvas. Logo + headline
+    // + a few short result lines (✓ glyphs) + the session date. Text-only.
+    file: 'gemeinderat-feed.png',
+    template: 'feed_post_45',
+    logo: 'WIEN',
+    noBackground: true,
+    blocks: [
+      { text: 'AUS DEM\nGEMEINDERAT', fontOption: 'standard', color: YELLOW, widthRatio: 0.86, band: 0.22, lineHeight: '0.8' },
+      { text: '✓ Mehr Tempo 30 beschlossen\n✓ Radweg Hauptstraße kommt\n✓ Budget für Kinderbetreuung erhöht', fontOption: 'standard', color: WHITE, widthRatio: 0.84, band: 0.52, align: 'left', lineHeight: '1.1' },
+      { text: 'Sitzung vom 14. Mai', fontOption: 'standard', color: YELLOW, widthRatio: 0.5, band: 0.74 },
+    ],
+    occasion: 'Aus dem Gemeinderat',
+    caption: 'Feed-Post · Aus dem Gemeinderat · ohne Hintergrundbild',
+    alt: 'Beispiel-Sharepic Feed-Post Aus dem Gemeinderat auf einfarbig grünem Hintergrund ohne Foto, mit Logo, Schlagzeile, drei Ergebniszeilen mit Häkchen und der Sitzungsdatum-Zeile',
+  },
+  {
+    // Veranstaltungsankündigung — Story on the plain green canvas. Logo +
+    // headline + date/time/place + a QR labelled "Anmeldung". Text + QR only.
+    file: 'workshop-story.png',
+    template: 'story',
+    logo: 'STEIERMARK',
+    noBackground: true,
+    blocks: [
+      { text: 'KLIMA-\nWORKSHOP', fontOption: 'standard', color: YELLOW, widthRatio: 0.84, band: 0.30, lineHeight: '0.8' },
+      { text: 'Mi 18. Juni · 18 Uhr\nVolkshaus, Saal 2', fontOption: 'standard', color: WHITE, widthRatio: 0.8, band: 0.50, lineHeight: '1.1' },
+    ],
+    qr: { text: 'https://gruene.at/workshop', label: 'Anmeldung', corner: 'bottom-right' },
+    occasion: 'Veranstaltungsankündigung',
+    caption: 'Story · Veranstaltung · ohne Hintergrundbild',
+    alt: 'Beispiel-Sharepic Story Klima-Workshop auf einfarbig grünem Hintergrund ohne Foto, mit Logo, Schlagzeile, Datum-Zeit-Ort-Zeile und QR-Code mit Beschriftung Anmeldung unten rechts',
+  },
+  {
+    // Wahlaufruf — Feed-Post on the plain green canvas. Logo + headline + the
+    // Wahlkreuz + a short line. Yellow/white on green, no photo.
+    file: 'wahlaufruf-feed.png',
+    template: 'feed_post_45',
+    logo: 'TIROL',
+    noBackground: true,
+    blocks: [
+      { text: 'AM 5. OKTOBER\nGRÜN WÄHLEN', fontOption: 'standard', color: YELLOW, widthRatio: 0.86, band: 0.30, lineHeight: '0.8' },
+      { text: 'Deine Stimme für\neine grüne Gemeinde', fontOption: 'standard', color: WHITE, widthRatio: 0.74, band: 0.54, lineHeight: '1.1' },
+    ],
+    wahlkreuz: { corner: 'bottom-right', widthRatio: 0.22 },
+    occasion: 'Wahlaufruf',
+    caption: 'Feed-Post · Wahlaufruf · ohne Hintergrundbild',
+    alt: 'Beispiel-Sharepic Feed-Post Wahlaufruf auf einfarbig grünem Hintergrund ohne Foto, mit Logo, Schlagzeile Am 5. Oktober GRÜN wählen, gelbem Wahlkreuz und kurzer Aufruf-Zeile',
+  },
 ];
 
 // Move the currently-active canvas object into a corner, the same way a user
@@ -535,13 +588,19 @@ async function composeExample(page, ex) {
   await page.click('#step-1-next');
   await page.waitForTimeout(1000);
 
-  // Step 2: upload the AI photo background via the file input.
-  const bgPath = path.resolve(BG_DIR, ex.background);
-  if (!fs.existsSync(bgPath)) {
-    throw new Error('missing background: ' + bgPath);
+  // Step 2: background. Most examples upload an AI photo; the no-background
+  // examples deliberately skip the upload and keep the default solid GRÜNE
+  // green canvas — exactly what a user does when they want a plain-green
+  // sharepic. In both cases we simply advance the wizard past the (optional)
+  // background step.
+  if (!ex.noBackground) {
+    const bgPath = path.resolve(BG_DIR, ex.background);
+    if (!fs.existsSync(bgPath)) {
+      throw new Error('missing background: ' + bgPath);
+    }
+    await page.setInputFiles('#meme-input', bgPath);
+    await page.waitForTimeout(2500);
   }
-  await page.setInputFiles('#meme-input', bgPath);
-  await page.waitForTimeout(2500);
   await page.click('#step-2-next');
   await page.waitForTimeout(1000);
 

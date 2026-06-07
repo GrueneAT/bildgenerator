@@ -13,7 +13,9 @@ const path = require('path');
 const ROOT = path.join(__dirname, '../..');
 const EXAMPLES_DIR = path.join(ROOT, 'resources/images/examples');
 
-// The six fully-composed example sharepics shown in the modal gallery.
+// The fully-composed example sharepics shown in the modal gallery: six with an
+// AI photo background plus three that deliberately use NO background image (the
+// plain solid GRÜNE green canvas), showing the generator works text-only too.
 const EXPECTED_EXAMPLES = [
   'radboerse-feed.png',
   'openair-kino-story.png',
@@ -21,6 +23,10 @@ const EXPECTED_EXAMPLES = [
   'klima-demo-event.png',
   'zitat-kandidatin-feed.png',
   'infostand-natur-story.png',
+  // No-background examples (solid green canvas, no photo upload).
+  'gemeinderat-feed.png',
+  'workshop-story.png',
+  'wahlaufruf-feed.png',
 ];
 
 function read(file) {
@@ -41,7 +47,7 @@ describe('Font-examples gallery', () => {
   const indexHtml = read('index.html');
   const schriftenHtml = read('schriften.html');
 
-  it('ships exactly the six composed example sharepics on disk', () => {
+  it('ships exactly the expected composed example sharepics on disk', () => {
     const files = fs
       .readdirSync(EXAMPLES_DIR)
       .filter((f) => f.endsWith('.png'))
@@ -49,7 +55,7 @@ describe('Font-examples gallery', () => {
     expect(files).toEqual([...EXPECTED_EXAMPLES].sort());
   });
 
-  it('the modal references exactly the six expected examples', () => {
+  it('the modal references exactly the expected examples', () => {
     const refs = exampleRefs(indexHtml);
     expect([...refs].sort()).toEqual([...EXPECTED_EXAMPLES].sort());
     for (const file of refs) {
