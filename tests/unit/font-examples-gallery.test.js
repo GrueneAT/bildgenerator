@@ -91,6 +91,31 @@ describe('Font-examples gallery', () => {
     expect(hintArea).not.toMatch(/href="schriften\.html"/);
   });
 
+  it('exposes a prominent, always-visible header entry into the same modal', () => {
+    // A header button (desktop + mobile) opens the SAME #fontExamplesModal —
+    // not a duplicate — so users can reach the gallery from anywhere.
+    expect(indexHtml).toContain('id="header-examples-btn"');
+    expect(indexHtml).toContain('id="header-examples-btn-mobile"');
+    // The header button must live in the header, before the wizard content.
+    const headerStart = indexHtml.indexOf('class="header');
+    const contentStart = indexHtml.indexOf('id="font-style-select"');
+    const headerBtn = indexHtml.indexOf('id="header-examples-btn"');
+    expect(headerBtn).toBeGreaterThan(headerStart);
+    expect(headerBtn).toBeLessThan(contentStart);
+  });
+
+  it('includes no-background examples on the plain green canvas', () => {
+    const noBg = ['gemeinderat-feed.png', 'workshop-story.png', 'wahlaufruf-feed.png'];
+    const modalRefs = exampleRefs(indexHtml);
+    for (const file of noBg) {
+      expect(modalRefs.has(file)).toBe(true);
+      expect(fs.existsSync(path.join(EXAMPLES_DIR, file))).toBe(true);
+    }
+    // Their captions must flag the "ohne Hintergrundbild" occasion.
+    expect(indexHtml).toContain('ohne Hintergrundbild');
+    expect(schriftenHtml).toContain('ohne Hintergrundbild');
+  });
+
   it('never names the underlying fonts by brand in the picker labels', () => {
     const selectStart = indexHtml.indexOf('id="font-style-select"');
     const selectBlock = indexHtml.slice(selectStart, selectStart + 600);
