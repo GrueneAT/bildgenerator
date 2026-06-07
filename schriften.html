@@ -35,6 +35,29 @@
     color: var(--gat-color-text-muted, inherit);
     font-size: var(--gat-text-small, .9rem);
   }
+  /* Responsive Thumbnail-Galerie der Beispiele. Das DS hat keine Grid-Galerie
+     fuer Bilder — diese seitenlokale Regel haelt die Thumbnails klein und
+     gleichmaessig. */
+  .schriften-gallery {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--gat-space-3);
+    margin-top: var(--gat-space-3);
+  }
+  @media (min-width: 640px) {
+    .schriften-gallery { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  .schriften-gallery figure { margin: 0; }
+  .schriften-gallery img {
+    display: block; width: 100%; height: auto;
+    border-radius: var(--gat-web-radius-card, 6px);
+    border: 1px solid var(--gat-web-hairline, rgba(0,0,0,.12));
+  }
+  .schriften-gallery figcaption {
+    margin-top: var(--gat-space-2);
+    color: var(--gat-color-text-muted, inherit);
+    font-size: var(--gat-text-small, .9rem);
+  }
 </style>
 </head>
 <body>
@@ -101,7 +124,7 @@
       </div>
 
       <figure class="schriften-figure">
-        <img src="resources/images/examples/standard-headline.png"
+        <img src="resources/images/examples/klima-story.png"
              alt="Beispiel: Schlagzeile in der Standardschrift" loading="lazy">
         <figcaption>Schlagzeile in der Standardschrift — plakativ und klar.</figcaption>
       </figure>
@@ -147,7 +170,7 @@
       </div>
 
       <figure class="schriften-figure">
-        <img src="resources/images/examples/accent-quote.png"
+        <img src="resources/images/examples/zitat-accent-feed.png"
              alt="Beispiel: Zitat in der betonten Serifenschrift" loading="lazy">
         <figcaption>Zitat in der betonten Serifenschrift — wärmer und persönlicher.</figcaption>
       </figure>
@@ -159,6 +182,67 @@
           Wirkung — dort bleibt die Standardschrift die bessere Wahl.
         </p>
       </aside>
+    </div>
+  </section>
+
+  <!-- ============ BEISPIEL-GALERIE ============ -->
+  <section class="gat-section" id="galerie">
+    <div class="gat-container">
+      <div class="gat-section-head">
+        <h2 class="gat-headline">Beispiele aus der Praxis</h2>
+        <p class="gat-subline">
+          Verschiedene Formate und Themen — die meisten in der Standardschrift,
+          zwei mit der betonten Serifenschrift als Akzent.
+        </p>
+      </div>
+
+      <div class="schriften-gallery">
+        <figure>
+          <img src="resources/images/examples/klima-story.png"
+               alt="Story Klimaschutz in der Standardschrift" loading="lazy">
+          <figcaption>Story · Klima · Standardschrift</figcaption>
+        </figure>
+        <figure>
+          <img src="resources/images/examples/soziales-feed.png"
+               alt="Feed-Post leistbares Wohnen in der Standardschrift" loading="lazy">
+          <figcaption>Feed-Post · Soziales · Standardschrift</figcaption>
+        </figure>
+        <figure>
+          <img src="resources/images/examples/verkehr-feed.png"
+               alt="Feed-Post Radverkehr in der Standardschrift" loading="lazy">
+          <figcaption>Feed-Post · Verkehr · Standardschrift</figcaption>
+        </figure>
+        <figure>
+          <img src="resources/images/examples/demo-event.png"
+               alt="Event-Header Klima-Demo in der Standardschrift" loading="lazy">
+          <figcaption>Event · Demo · Standardschrift</figcaption>
+        </figure>
+        <figure>
+          <img src="resources/images/examples/stammtisch-story.png"
+               alt="Story Grüner Stammtisch in der Standardschrift" loading="lazy">
+          <figcaption>Story · Stammtisch · Standardschrift</figcaption>
+        </figure>
+        <figure>
+          <img src="resources/images/examples/infostand-feed.png"
+               alt="Feed-Post Infostand in der Standardschrift" loading="lazy">
+          <figcaption>Feed-Post · Infostand · Standardschrift</figcaption>
+        </figure>
+        <figure>
+          <img src="resources/images/examples/vortrag-event.png"
+               alt="Event-Header Vortrag und Diskussion in der Standardschrift" loading="lazy">
+          <figcaption>Event · Vortrag · Standardschrift</figcaption>
+        </figure>
+        <figure>
+          <img src="resources/images/examples/zitat-accent-feed.png"
+               alt="Feed-Post Zitat in der betonten Serifenschrift" loading="lazy">
+          <figcaption>Feed-Post · Zitat · Serifenschrift</figcaption>
+        </figure>
+        <figure>
+          <img src="resources/images/examples/akzent-accent-story.png"
+               alt="Story Akzent in der betonten Serifenschrift" loading="lazy">
+          <figcaption>Story · Akzent · Serifenschrift</figcaption>
+        </figure>
+      </div>
     </div>
   </section>
 
