@@ -86,11 +86,22 @@ const AppConstants = {
         WEIGHT_TEXT: 900,    // default canvas text (Black)
         WEIGHT_LOGO: 800,    // logo overlay text (ExtraBold)
         WEIGHT_BOOK: 400,    // body / book equivalent (Regular)
+        // User-selectable text fonts, labelled DESCRIPTIVELY (type + use),
+        // never by brand name. Option ids match #font-style-select values.
+        OPTIONS: [
+            { id: 'standard', label: 'Standardschrift — Headlines & Fließtext', family: 'Barlow Semi Condensed', weight: 900, style: 'normal' },
+            { id: 'accent',   label: 'Betonte Serifenschrift — für Zitate & Akzente', family: 'Vollkorn', weight: 900, style: 'normal' }
+        ],
+        // Each entry carries its own family so the preload observer binds to
+        // the correct font. Mixing families under a single observer family
+        // would leave the other font unloaded (serif fallback on first use).
         PRELOAD_FONTS: [
-            { weight: 900, style: 'italic' },  // italic accent
-            { weight: 900 },                   // default text
-            { weight: 400 },                   // book / body
-            { weight: 800 }                    // default logo
+            { family: 'Barlow Semi Condensed', weight: 900, style: 'italic' },  // italic accent
+            { family: 'Barlow Semi Condensed', weight: 900 },                   // default text
+            { family: 'Barlow Semi Condensed', weight: 400 },                   // book / body
+            { family: 'Barlow Semi Condensed', weight: 800 },                   // default logo
+            { family: 'Vollkorn', weight: 900 },                               // accent serif
+            { family: 'Vollkorn', weight: 400 }                                // accent serif (book)
         ]
     },
 
