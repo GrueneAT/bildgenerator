@@ -10,157 +10,174 @@
 <link rel="icon" type="image/png" sizes="32x32" href="resources/favicon/favicon-32x32.png">
 <link rel="icon" type="image/svg+xml" href="https://grueneat.github.io/design-system/assets/gruene-logo.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="resources/favicon/apple-touch-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://flomotlik.github.io/claude-code/design-system.css">
+<!-- Grüne AT Design System (gehostet). Lädt Barlow Semi Condensed + Vollkorn
+     selbst und liefert die gat-Komponenten + --gat-*-Tokens. -->
+<link rel="stylesheet" href="https://grueneat.github.io/design-system/design-system.css">
 <style>
-  /* The design system has no image component; this keeps the example
-     screenshots responsive and framed like the paper. Scoped to figures
-     on this page only. */
-  figure { margin: 1.5rem 0 0; }
-  figure img {
-    display: block;
-    width: 100%;
-    height: auto;
-    border-radius: 3px;
-    border: 1px solid var(--rule-hair);
+  /* design-system.css setzt bewusst KEINE Tag-Defaults — das body-Grundlayout
+     muss die konsumierende Seite selbst aus den --gat-*-Tokens setzen. */
+  body {
+    margin: 0;
+    background: var(--gat-color-surface);
+    color: var(--gat-color-text);
+    font-family: var(--gat-font-copy);
   }
-  figure figcaption { margin-top: .5rem; }
+  /* Das DS hat keine Bild-Komponente — diese kleine, auf diese Seite
+     beschränkte Regel hält die Beispiel-Screenshots responsiv und gerahmt. */
+  .schriften-figure { margin: var(--gat-space-3) 0 0; }
+  .schriften-figure img {
+    display: block; width: 100%; height: auto;
+    border-radius: var(--gat-web-radius-card, 6px);
+    border: 1px solid var(--gat-web-hairline, rgba(0,0,0,.12));
+  }
+  .schriften-figure figcaption {
+    margin-top: var(--gat-space-2);
+    color: var(--gat-color-text-muted, inherit);
+    font-size: var(--gat-text-small, .9rem);
+  }
 </style>
 </head>
 <body>
-<div class="page">
 
-  <!-- ============ MASTHEAD ============ -->
-  <header class="row">
-    <div class="margin">
-      <p class="kicker"><span class="kicker-num">00</span>Schriften</p>
-      <p class="margin-note">Zwei Schriften, zwei Aufgaben. Im Zweifel die
-        Standardschrift.</p>
-    </div>
-    <div class="body">
-      <h1 class="masthead-title">Welche Schrift wofür</h1>
-      <p class="masthead-sub">Der Bildgenerator bietet im Textschritt zwei
-        Schriften an. Diese Seite zeigt, wann welche passt.</p>
-      <p class="lead" style="margin-top:1.5rem;">
-        Beide Schriften kommen aus dem Grünen Schriftsystem.
-        <span class="mark mark-blue">Die Standardschrift trägt fast alles</span> —
-        Überschriften wie Fließtext. Die betonte Serifenschrift ist die
-        Ausnahme für Zitate und einzelne Akzente.
-      </p>
+  <header class="gat-header">
+    <div class="gat-header__inner">
+      <a class="gat-header__brand" href="index.html">
+        <img class="gat-header__logo"
+             src="https://grueneat.github.io/design-system/assets/gruene-logo.svg"
+             alt="Die Grünen">
+        <span class="gat-header__wordmark">Grüner Bildgenerator</span>
+      </a>
     </div>
   </header>
 
-  <hr class="rule">
+  <!-- ============ INTRO ============ -->
+  <section class="gat-section" id="start">
+    <div class="gat-container">
+      <h1 class="gat-headline">Welche Schrift wofür</h1>
+      <p class="gat-subline">
+        Der Bildgenerator bietet im Textschritt zwei Schriften an — diese Seite
+        zeigt, wann welche passt.
+      </p>
+      <p class="gat-fliesstext">
+        Beide Schriften kommen aus dem Grünen Schriftsystem. <strong>Die
+        Standardschrift trägt fast alles</strong> — Überschriften wie Fließtext.
+        Die <em class="gat-emphasis">betonte Serifenschrift</em> ist die
+        Ausnahme für Zitate und einzelne Akzente. Im Zweifel: die
+        Standardschrift.
+      </p>
+    </div>
+  </section>
 
   <!-- ============ STANDARDSCHRIFT ============ -->
-  <section class="row">
-    <div class="margin">
-      <p class="kicker"><span class="kicker-num">01</span>Standardschrift</p>
-      <p class="margin-note is-affirmed">Die Voreinstellung — passt für die
-        allermeisten Sujets.</p>
-    </div>
-    <div class="body">
-      <h2>Standardschrift — Headlines &amp; Fließtext</h2>
-      <p>Die kräftige, schmal laufende Standardschrift (technisch:
+  <section class="gat-section" id="standardschrift">
+    <div class="gat-container">
+      <div class="gat-section-head">
+        <h2 class="gat-headline">Standardschrift — Headlines &amp; Fließtext</h2>
+        <p class="gat-subline">Die Voreinstellung — passt für die allermeisten Sujets.</p>
+      </div>
+
+      <p class="gat-fliesstext">
+        Die kräftige, schmal laufende Standardschrift (technisch:
         Barlow&nbsp;Semi&nbsp;Condensed) ist die Arbeitsschrift des
         Bildgenerators. Sie ist gut lesbar, wirkt klar und plakativ und
-        funktioniert von der großen Schlagzeile bis zum kurzen Fließtext.</p>
+        funktioniert von der großen Schlagzeile bis zum kurzen Fließtext.
+      </p>
 
-      <ul class="points">
-        <li class="point">
-          <p class="point-claim">Für Schlagzeilen und Kernbotschaften.</p>
-          <p class="point-detail">Der hohe Schriftschnitt füllt die Fläche und
-            bleibt auch klein noch lesbar.</p>
-        </li>
-        <li class="point is-note">
-          <p class="point-claim">Für längeren Text und Aufzählungen.</p>
-          <p class="point-detail">Ruhiges, gleichmäßiges Schriftbild — der
-            Inhalt steht im Vordergrund, nicht die Schrift.</p>
-        </li>
-      </ul>
+      <div class="gat-grid">
+        <article class="gat-card gat-card--primary">
+          <h3 class="gat-card__title">Für Schlagzeilen &amp; Kernbotschaften</h3>
+          <p class="gat-card__body">
+            Der hohe Schriftschnitt füllt die Fläche und bleibt auch klein noch
+            lesbar.
+          </p>
+        </article>
+        <article class="gat-card">
+          <h3 class="gat-card__title">Für längeren Text &amp; Aufzählungen</h3>
+          <p class="gat-card__body">
+            Ruhiges, gleichmäßiges Schriftbild — der Inhalt steht im
+            Vordergrund, nicht die Schrift.
+          </p>
+        </article>
+      </div>
 
-      <figure>
+      <figure class="schriften-figure">
         <img src="resources/images/examples/standard-headline.png"
-             alt="Beispiel: Schlagzeile in der Standardschrift"
-             loading="lazy">
-        <figcaption class="meta-line">Schlagzeile in der Standardschrift —
-          plakativ und klar.</figcaption>
+             alt="Beispiel: Schlagzeile in der Standardschrift" loading="lazy">
+        <figcaption>Schlagzeile in der Standardschrift — plakativ und klar.</figcaption>
       </figure>
 
-      <div class="callout is-affirmed">
-        <p class="callout-label">Faustregel</p>
-        <p>Wenn du unsicher bist, nimm die Standardschrift. Sie ist die
-          Voreinstellung und passt für nahezu jedes Sujet.</p>
-      </div>
+      <aside class="gat-callout gat-callout--info">
+        <p class="gat-fliesstext" style="margin:0;">
+          <strong>Faustregel:</strong> Wenn du unsicher bist, nimm die
+          Standardschrift. Sie ist die Voreinstellung und passt für nahezu jedes
+          Sujet.
+        </p>
+      </aside>
     </div>
   </section>
-
-  <hr class="rule">
 
   <!-- ============ BETONTE SERIFENSCHRIFT ============ -->
-  <section class="row">
-    <div class="margin">
-      <p class="kicker"><span class="kicker-num">02</span>Serifenschrift</p>
-      <p class="margin-note">Der Akzent — sparsam einsetzen, sonst verliert er
-        seine Wirkung.</p>
-    </div>
-    <div class="body">
-      <h2>Betonte Serifenschrift — für Zitate &amp; Akzente</h2>
-      <p>Die betonte Serifenschrift (technisch: Vollkorn) bringt einen
-        wärmeren, persönlicheren Ton. Sie eignet sich für Zitate und einzelne
-        hervorgehobene Wörter — nicht für ganze Textblöcke.</p>
+  <section class="gat-section" id="serifenschrift">
+    <div class="gat-container">
+      <div class="gat-section-head">
+        <h2 class="gat-headline">Betonte Serifenschrift — für Zitate &amp; Akzente</h2>
+        <p class="gat-subline">Der Akzent — sparsam einsetzen, sonst verliert er seine Wirkung.</p>
+      </div>
 
-      <ul class="points">
-        <li class="point">
-          <p class="point-claim">Für Zitate und persönliche Aussagen.</p>
-          <p class="point-detail">Die Serifen geben dem Satz eine ruhige,
-            menschliche Note.</p>
-        </li>
-        <li class="point is-note">
-          <p class="point-claim">Für einzelne Akzente.</p>
-          <p class="point-detail">Ein hervorgehobenes Wort oder eine kurze
-            Aussage — als bewusster Kontrast zur Standardschrift.</p>
-        </li>
-      </ul>
+      <p class="gat-fliesstext">
+        Die <em class="gat-emphasis">betonte Serifenschrift</em> (technisch:
+        Vollkorn) bringt einen wärmeren, persönlicheren Ton. Sie eignet sich für
+        Zitate und einzelne hervorgehobene Wörter — nicht für ganze Textblöcke.
+      </p>
 
-      <figure>
+      <div class="gat-grid">
+        <article class="gat-card">
+          <h3 class="gat-card__title">Für Zitate &amp; persönliche Aussagen</h3>
+          <p class="gat-card__body">
+            Die Serifen geben dem Satz eine ruhige, menschliche Note.
+          </p>
+        </article>
+        <article class="gat-card">
+          <h3 class="gat-card__title">Für einzelne Akzente</h3>
+          <p class="gat-card__body">
+            Ein hervorgehobenes Wort oder eine kurze Aussage — als bewusster
+            Kontrast zur Standardschrift.
+          </p>
+        </article>
+      </div>
+
+      <figure class="schriften-figure">
         <img src="resources/images/examples/accent-quote.png"
-             alt="Beispiel: Zitat in der betonten Serifenschrift"
-             loading="lazy">
-        <figcaption class="meta-line">Zitat in der betonten Serifenschrift —
-          wärmer und persönlicher.</figcaption>
+             alt="Beispiel: Zitat in der betonten Serifenschrift" loading="lazy">
+        <figcaption>Zitat in der betonten Serifenschrift — wärmer und persönlicher.</figcaption>
       </figure>
 
-      <div class="callout is-note">
-        <p class="callout-label">Sparsam einsetzen</p>
-        <p>Die Serifenschrift wirkt als Akzent. Auf ganzen Flächen oder in
-          langem Fließtext verliert sie diese Wirkung — dort bleibt die
-          Standardschrift die bessere Wahl.</p>
+      <aside class="gat-callout gat-callout--warn">
+        <p class="gat-fliesstext" style="margin:0;">
+          <strong>Sparsam einsetzen:</strong> Die Serifenschrift wirkt als
+          Akzent. Auf ganzen Flächen oder in langem Fließtext verliert sie diese
+          Wirkung — dort bleibt die Standardschrift die bessere Wahl.
+        </p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ============ KURZ ENTSCHEIDEN ============ -->
+  <section class="gat-section" id="kurz">
+    <div class="gat-container">
+      <div class="gat-section-head">
+        <h2 class="gat-headline">Kurz entschieden</h2>
       </div>
+      <p class="gat-fliesstext">
+        <strong>Standardschrift</strong> für Headlines, Fließtext und fast alles.
+        <em class="gat-emphasis">Betonte Serifenschrift</em> nur für Zitate und
+        einzelne Akzente — bewusst und sparsam.
+      </p>
+      <p class="gat-fliesstext">
+        <a class="gat-btn gat-btn--primary" href="index.html">Zum Bildgenerator</a>
+      </p>
     </div>
   </section>
 
-  <hr class="rule">
-
-  <!-- ============ ZURÜCK ============ -->
-  <section class="row">
-    <div class="margin">
-      <p class="kicker"><span class="kicker-num">03</span>Weiter</p>
-    </div>
-    <div class="body">
-      <p class="lead">Die Schrift wählst du im Bildgenerator direkt im
-        Textschritt aus.</p>
-      <p style="margin-top:1rem;"><a href="index.html">← Zurück zum
-        Bildgenerator</a></p>
-    </div>
-  </section>
-
-  <footer class="footer">
-    <span>Grüner Bildgenerator · Schriftverwendung</span>
-    <span><a href="index.html">Zur App</a></span>
-  </footer>
-
-</div>
 </body>
 </html>
