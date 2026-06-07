@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Provenance: SHA-256 of the source .md this page was generated from. -->
+<meta name="artifact-source-sha256" content="8b9b7132ef91d0af1b1febabe802e5c0e5c4a90fa17b83e9ea94fe8e5b26aa7e">
+<meta name="artifact-source-file" content="RESEARCH.md">
+<meta name="artifact-generated-at" content="2026-06-07">
+<meta name="design-system-version" content="ds-1">
+<title>Research: Bildgenerator — Logo-Hinweis, Vollkorn, Beispiel-Seite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://flomotlik.github.io/claude-code/design-system.css">
+</head>
+<body>
+<div class="page">
+
+<header class="row">
+  <div class="margin">
+    <p class="kicker"><span class="kicker-num">00</span>Research</p>
+  </div>
+  <div class="body">
+    <h1 class="masthead-title">Bildgenerator: Logo-Hinweis, Vollkorn-Schrift, Beispiel-Seite</h1>
+    <p class="masthead-sub">Issue: ptupd &middot; Generated 2026-06-07</p>
+  </div>
+</header>
+
+<hr class="rule">
+
+<section class="row" id="strategy">
+  <div class="margin">
+    <p class="kicker"><span class="kicker-num">01</span>Strategy</p>
+    <p class="margin-note">Three low-coupling changes on top of merged z6qfk.</p>
+  </div>
+  <div class="body">
+    <h2>Strategy summary</h2>
+    <p>The Barlow font infrastructure from z6qfk is already in place. This issue mostly
+       <span class="mark mark-green">adds a second font to existing machinery and re-introduces a tiny picker</span>
+       that was previously removed. The text font is hardcoded today at
+       <code>event-handlers.js:141</code>; there is no picker in the DOM.</p>
+    <ul class="points">
+      <li class="point">
+        <p class="point-claim">Feature 1 (logo hint) is pure markup.</p>
+        <p class="point-detail">A Tailwind hint in the Step-1 logo block
+          (<code>index.html:636-652</code>). No JS. The <code>value=""</code> option is the
+          &bdquo;kein Logo&ldquo; path; users then use &bdquo;Bild hinzuf&uuml;gen&ldquo;
+          (<code>index.html:910-913</code>).</p>
+      </li>
+      <li class="point is-note">
+        <p class="point-claim">Feature 2 (Vollkorn + descriptive picker) is the core work.</p>
+        <p class="point-detail">Add a 2-option select to the Step-3 text section, an
+          <code>OPTIONS</code> map to <code>constants.js</code>, read it in
+          <code>#add-text</code>, re-render via the existing <code>loadFont()</code>, add a
+          Vollkorn Google-Fonts <code>&lt;link&gt;</code>, and extend the
+          FontFaceObserver preload.</p>
+      </li>
+      <li class="point is-risk">
+        <p class="point-claim">Vollkorn is a serif &mdash; must preload or it falls back.</p>
+        <p class="point-detail">The single riskiest spot is <code>preloadFonts()</code>
+          (<code>wizard.js:22</code>), which binds every preload entry to the single Barlow
+          family. It must carry a family per entry for Vollkorn to preload at all.</p>
+      </li>
+      <li class="point">
+        <p class="point-claim">Feature 3 (examples page) is a new root static page.</p>
+        <p class="point-detail">Mirror <code>impressum.html</code>; <code>createStaticPage()</code>
+          (<code>build.js:107</code>) already copies it to <code>build/</code>. Style it with
+          the hosted flomotlik design system; link it from the picker hint.</p>
+      </li>
+    </ul>
+    <div class="stats">
+      <div class="stat"><div class="stat-num is-green">3</div><div class="stat-label">Features</div></div>
+      <div class="stat"><div class="stat-num">2</div><div class="stat-label">Font options</div></div>
+      <div class="stat"><div class="stat-num is-orange">400&nbsp;/&nbsp;900</div><div class="stat-label">Vollkorn weights</div></div>
+    </div>
+    <p><strong>Primary recommendation:</strong> Put the picker in the Step-3
+       &bdquo;Text hinzuf&uuml;gen&ldquo; section (between the color/line-height grid at
+       ~line 820 and <code>#add-text</code> at line 887), driven by a new
+       <code>AppConstants.FONTS.OPTIONS</code> array. Default option = Barlow. Mirror
+       z6qfk's wiring for Vollkorn; weights 400+900 upright (no italic), matching the
+       design-system import.</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section class="row" id="flow">
+  <div class="margin">
+    <p class="kicker"><span class="kicker-num">02</span>Flow</p>
+  </div>
+  <div class="body">
+    <h2>Task flow &amp; dependencies</h2>
+    <div class="flow">
+      <div class="flow-node is-foundation">
+        <span class="n">Step 1</span>
+        <span class="t">constants.js: FONTS.OPTIONS + Vollkorn preload</span>
+        <span class="d">Add descriptive option map; fix preload to carry family per entry.</span>
+      </div>
+      <div class="flow-node">
+        <span class="n">Step 2</span>
+        <span class="t">index.html / impressum.html: picker + hints + Vollkorn link</span>
+        <span class="d">Step-1 logo hint, Step-3 picker, head Google-Fonts link.</span>
+      </div>
+      <div class="flow-node is-key">
+        <span class="n">Step 3</span>
+        <span class="t">event-handlers.js: read picker + change handler</span>
+        <span class="d">Un-hardcode line 141; re-render active text via loadFont().</span>
+      </div>
+      <div class="flow-node">
+        <span class="n">Step 4</span>
+        <span class="t">schriften.html + build.js wiring</span>
+        <span class="d">New examples page; createStaticPage in build().</span>
+      </div>
+      <div class="flow-node">
+        <span class="n">Step 5</span>
+        <span class="t">Tests + regenerate baselines</span>
+        <span class="d">Medium-tests spec, register in playwright.config.js, generate-references.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section class="row" id="decisions">
+  <div class="margin">
+    <p class="kicker"><span class="kicker-num">03</span>Decisions</p>
+  </div>
+  <div class="body">
+    <h2>Key decisions &amp; options</h2>
+
+    <div class="decision">
+      <div class="decision-head">
+        <p class="decision-title">Where the font picker lives</p>
+        <span class="lozenge is-chosen">Chosen</span>
+      </div>
+      <p class="decision-body">Step-3 &bdquo;Text hinzuf&uuml;gen&ldquo; section, before
+         <code>#add-text</code> (index.html ~line 887), using the existing
+         <code>gat-select text-method w-full</code> classes.</p>
+      <p class="decision-body rejected">Advanced options panel (Step 4) &mdash; further from
+         the text input it controls; worse discoverability.</p>
+    </div>
+
+    <div class="decision">
+      <div class="decision-head">
+        <p class="decision-title">Vollkorn weights / italic</p>
+        <span class="lozenge is-chosen">400 + 900 upright</span>
+      </div>
+      <p class="decision-body">Match the design-system import
+         <code>Vollkorn:ital,wght@0,400;0,900</code>. No italic is actually loaded there.</p>
+      <p class="decision-body rejected">Requesting italic (<code>1,...</code>) &mdash; the DS
+         doesn't load it; Fabric would fall back or load an unused descriptor.</p>
+    </div>
+
+    <div class="decision">
+      <div class="decision-head">
+        <p class="decision-title">Final accent canvas weight (400 vs 900)</p>
+        <span class="lozenge is-open">Open</span>
+      </div>
+      <p class="decision-body">Both are loaded. Recommend 900 for visual parity with the heavy
+         default; planner pins one in <code>OPTIONS</code>.</p>
+    </div>
+
+    <div class="decision">
+      <div class="decision-head">
+        <p class="decision-title">preloadFonts() second family</p>
+        <span class="lozenge is-risk">Watch</span>
+      </div>
+      <p class="decision-body">Carry a <code>family</code> per <code>PRELOAD_FONTS</code> entry
+         (or add a second loop). Naively appending Vollkorn entries binds them to Barlow
+         (wizard.js:22) &mdash; Vollkorn never preloads.</p>
+    </div>
+
+    <div class="decision">
+      <div class="decision-head">
+        <p class="decision-title">Example image generation</p>
+        <span class="lozenge is-open">Open</span>
+      </div>
+      <p class="decision-body">Commit pre-rendered app-output PNGs under
+         <code>resources/images/</code> (deterministic, simplest).</p>
+      <p class="decision-body rejected">Generate via the visual-regression harness on every
+         build &mdash; more moving parts for a static help page.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section class="row" id="detail">
+  <div class="margin">
+    <p class="kicker"><span class="kicker-num">04</span>Detail</p>
+  </div>
+  <div class="body">
+    <h2>Full detail</h2>
+    <details class="detail">
+      <summary>Show full artifact source
+        <span class="summary-hint">click to expand</span></summary>
+      <div class="detail-body">
+        <pre><code id="artifact-source-target"></code></pre>
+      </div>
+    </details>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section class="row" id="provenance">
+  <div class="margin">
+    <p class="kicker"><span class="kicker-num">05</span>Provenance</p>
+  </div>
+  <div class="body">
+    <h2>Provenance</h2>
+    <p>Generated from the canonical <code>.md</code>. This HTML is never hand-edited &mdash;
+       if the <code>.md</code> changes, regenerate with <code>/issue:view</code>.</p>
+    <footer class="footer">
+      <span>Source: <code>RESEARCH.md</code> &middot; SHA-256 <code>8b9b7132ef91d0af1b1febabe802e5c0e5c4a90fa17b83e9ea94fe8e5b26aa7e</code></span>
+      <span>Generated 2026-06-07 &middot; design system ds-1</span>
+    </footer>
+  </div>
+</section>
+
+</div>
+
+<script type="application/json" id="artifact-source">
+{"source": "# Research: Bildgenerator \u2014 Eigenes Logo erkl\u00e4ren, Vollkorn als Schrift-Option, Beispiel-Seite\n\n**Researched:** 2026-06-07\n**Issue:** ptupd\n**Confidence:** HIGH (all findings verified against real code at cited file:line; design-system Vollkorn weights verified against the hosted CSS source)\n\n<user_constraints>\n## User Constraints (from CONTEXT.md)\n\n### Locked Decisions\n- **Entscheidung 1 \u2014 Eigenes Logo:** Kurzer, gut sichtbarer Hinweis im Wizard-Schritt der Logo-Auswahl: Gruppen mit eigenem Logo w\u00e4hlen **\u201ekein Logo\"** und f\u00fcgen es \u00fcber **\u201eBild hinzuf\u00fcgen\"** selbst ein. Reiner UI-/Texthinweis, keine neue Logik (der Weg funktioniert schon heute). Platzierung an der richtigen Stelle der Logo-Auswahl, Tailwind, kein Inline-Style.\n- **Entscheidung 2 \u2014 Vollkorn mit BESCHREIBENDER Beschriftung:** Auswahl wird **nicht mit Markennamen** beschriftet. Zwei Optionen, beschreibend benannt (Vorschlag): **\u201eStandardschrift \u2014 Headlines & Flie\u00dftext\"** \u2192 Barlow Semi Condensed (Default); **\u201eBetonte Serifenschrift \u2014 f\u00fcr Zitate & Akzente\"** \u2192 Vollkorn. Kurzer Hinweis an der Auswahl, wann welche Schrift sinnvoll ist, mit Verweis auf die Beispiel-Seite. Technische Einbindung wie Barlow: Google Fonts CDN (Vollkorn SIL OFL, **kein Vendoring**), Canvas/Fabric.js mit `fontFamily`/`fontWeight`/`fontStyle` + FontFaceObserver. **Default bleibt Barlow.**\n- **Entscheidung 3 \u2014 Beispiel-Seite:** Eigene Hilfe-/Beispiel-Seite \u201eWelche Schrift wof\u00fcr\" mit Beispielbildern, im flomotlik/Gr\u00fcne-Design-System-HTML-Stil (gehostetes Stylesheet). Verlinkt von der Schrift-Auswahl. Beispielbilder: generierte Bildgenerator-Outputs.\n- **Entscheidung 4 \u2014 Konsistenz & Tests:** Beschreibende Labels gelten f\u00fcr **beide** Schriften. Visual-Regression/Unit-Tests f\u00fcr neue Auswahl-UI + Vollkorn-Rendering erg\u00e4nzen; Suite gr\u00fcn. Repo-Regeln: kein Inline-Style, Tests treiben die UI wie ein:e Nutzer:in, pixelmatch. **Kein Werkzeug-Attribut in Commits/Code.**\n\n### Claude's Discretion\n- Ort/Form der Schrift-Auswahl-UI (Wizard-Text-Schritt vs. erweiterte Optionen) \u2014 Research empfiehlt unten konkret.\n- Finale Wortlaute der beschreibenden Labels & des Erkl\u00e4rhinweises.\n- Welche konkreten Beispielbilder die Beispiel-Seite zeigt und wie sie erzeugt werden.\n\n### Deferred Ideas (OUT OF SCOPE)\n- Keine genannt. Keine neue Logo-Logik (nur Text). Keine \u00c4nderung am Default (bleibt Barlow).\n</user_constraints>\n\n## Summary\n\nThree independent, low-coupling changes on top of the merged z6qfk Barlow work. The font infrastructure (Google Fonts `<link>`, FontFaceObserver preload, centralized `AppConstants.FONTS`) is already in place; this issue mostly **adds a second font** to that existing machinery and **re-introduces a tiny picker** that was previously removed.\n\n**Feature 1 (logo hint)** is pure markup: a Tailwind-styled hint added to the Step-1 logo-selection block in `index.html` (around lines 636\u2013652). No JS. The `value=\"\"` option labelled \"Logo ausw\u00e4hlen...\" IS the \"kein Logo\" path; the toggle `#logo-toggle` also disables the logo. The hint just tells users to leave the logo off and use \"Bild hinzuf\u00fcgen\" (Step 3, `index.html:910-913`).\n\n**Feature 2 (Vollkorn + descriptive picker)** is the core work. Today the text font is hardcoded at `event-handlers.js:141` (`const selectedFont = AppConstants.FONTS.DEFAULT_TEXT`). There is NO picker in the DOM. The change: add a 2-option `<select>` in the Step-3 text section, add a `FONT_OPTIONS` map to `constants.js` (descriptive label \u2192 family/weight/style), read it in the `#add-text` handler, add a `change` handler that re-renders the active text object via the existing `loadFont()` pattern (`handlers.js:1-19`), add the Vollkorn Google-Fonts `<link>` to `index.html` + `impressum.html`, and extend `PRELOAD_FONTS`/FontFaceObserver to cover the second family. Vollkorn is a serif \u2192 must wait on FontFaceObserver before canvas render or it falls back.\n\n**Feature 3 (examples page)** is a new static HTML page at repo root (mirroring `impressum.html`, which `scripts/build.js:createStaticPage` already copies to `build/`), styled with the hosted flomotlik design system, linked from the picker hint. Example images are generated bildgenerator PNGs \u2014 easiest via the visual-regression Playwright harness (which already drives the real app like a user) or hand-exported and committed under `resources/`.\n\n**Primary recommendation:** Put the picker in the Step-3 \"Text hinzuf\u00fcgen\" section (`index.html`, between the color/line-height grid at ~line 820 and the `#add-text` button at line 887), driven by a new `AppConstants.FONTS.OPTIONS` array. Default option = Barlow. Mirror z6qfk's font wiring exactly for Vollkorn. Vollkorn weights: **400 + 900 upright** (match the design-system import `Vollkorn:ital,wght@0,400;0,900` \u2014 no italic is actually loaded there).\n\n## Codebase Analysis\n\n### Relevant Code\n| File | Purpose | Relevance |\n|------|---------|-----------|\n| `resources/js/constants.js:82-95` | `AppConstants.FONTS` block (FAMILY, DEFAULT_TEXT, DEFAULT_LOGO, WEIGHT_TEXT=900, WEIGHT_LOGO=800, WEIGHT_BOOK=400, PRELOAD_FONTS) | Add `OPTIONS` map + Vollkorn preload entries here |\n| `resources/js/event-handlers.js:131-176` | `setupTextHandler()` \u2014 `#add-text` click; line 141 hardcodes `selectedFont` | Read picker value instead of hardcoding |\n| `resources/js/event-handlers.js:20-75` | `setupCanvasObjectHandlers()` \u2014 text-color/line-height/etc. change handlers | Add a `#font-style-select` change handler here (or in handlers.js) |\n| `resources/js/handlers.js:1-19` | `loadFont(font)` \u2014 FontFaceObserver-gated `fontFamily` swap on active text object | Existing re-render pattern; extend `customFonts` array to include Vollkorn |\n| `resources/js/wizard.js:21-33` | `preloadFonts()` \u2014 builds FontFaceObserver per `PRELOAD_FONTS` entry, all on `FONTS.FAMILY` (single family) | Must extend to preload a SECOND family (Vollkorn) |\n| `resources/js/main.js:203-217` | Logo overlay text creation (`DEFAULT_LOGO`, `WEIGHT_LOGO`) | Do NOT touch \u2014 logo font stays Barlow |\n| `index.html:22-25` | Barlow Google-Fonts preconnect + stylesheet `<link>` | Add Vollkorn `<link>` adjacent |\n| `index.html:636-652` | Step-1 logo-selection `<select>` (`#logo-selection`, `value=\"\"` = kein Logo) | Feature 1 hint goes here |\n| `index.html:653-663` | `#logo-toggle` checkbox (\"Logo am unteren Rand hinzuf\u00fcgen\") | Context for the hint wording |\n| `index.html:772-890` | Step-3 `#text-section` (textarea, color, line-height, shadow, align, `#add-text`) | Feature 2 picker goes here (~before line 887) |\n| `index.html:908-913` | \"Bild hinzuf\u00fcgen\" (`#add-image` label) in Step-3 elements section | The path the hint refers to |\n| `impressum.html:18-21` | Barlow Google-Fonts `<link>` in static page head | Mirror Vollkorn `<link>` here too |\n| `scripts/build.js:63-123` | `createProductionHTML()` + `createStaticPage()` | Confirms Google-Fonts `<link>` survives build untouched; pattern for new examples page |\n\n### Interfaces\n<interfaces>\n// From resources/js/constants.js:82-95 \u2014 current FONTS block (single family)\nAppConstants.FONTS = {\n    FAMILY: \"Barlow Semi Condensed\",\n    DEFAULT_LOGO: \"Barlow Semi Condensed\",\n    DEFAULT_TEXT: \"Barlow Semi Condensed\",\n    WEIGHT_TEXT: 900,    // default canvas text (Black)\n    WEIGHT_LOGO: 800,    // logo overlay text (ExtraBold)\n    WEIGHT_BOOK: 400,    // body / book equivalent (Regular)\n    PRELOAD_FONTS: [     // each entry becomes `new FontFaceObserver(FAMILY, entry)`\n        { weight: 900, style: 'italic' },\n        { weight: 900 },\n        { weight: 400 },\n        { weight: 800 }\n    ]\n}\n// NOTE: PRELOAD_FONTS entries today implicitly all belong to FONTS.FAMILY\n// (see wizard.js:22). To preload a second family, either add a family field\n// per entry or add a parallel preload list.\n\n// From resources/js/event-handlers.js:131-176 \u2014 the ONLY text-creation site for user text\nEventHandlerUtils.setupTextHandler()  // binds '#add-text' click\n//   line 141:  const selectedFont = AppConstants.FONTS.DEFAULT_TEXT;   // <-- hardcoded\n//   line 143:  new fabric.Text(value, { fontFamily: selectedFont,\n//                  fontSize: canvas.width/2,\n//                  fontWeight: AppConstants.FONTS.WEIGHT_TEXT,   // line 146 (always 900)\n//                  fontStyle: \"normal\",                          // line 147\n//                  ... })\n\n// From resources/js/handlers.js:1-19 \u2014 existing FontFaceObserver-gated re-render\nfunction loadFont(font)  // operates on canvas.getActiveObject()\n//   customFonts = ['Barlow Semi Condensed']  // line 3 \u2014 extend with 'Vollkorn'\n//   if (customFonts.includes(font)) { new FontFaceObserver(font).load().then(() => {\n//        text.set(\"fontFamily\",\"\"); text.set(\"fontFamily\", font); canvas.renderAll(); }) }\n//   NOTE: this fn currently has NO caller wired to a picker (picker was removed).\n\n// From resources/js/wizard.js:21-33 \u2014 font preload\nfunction preloadFonts()\n//   const fonts = AppConstants.FONTS.PRELOAD_FONTS.map(\n//       d => new FontFaceObserver(AppConstants.FONTS.FAMILY, d));   // single family\n//   fonts.forEach(f => f.load().then(...).catch(...));\n\n// From resources/js/event-handlers.js:20-72 \u2014 canvas object change handlers (model to follow)\n//   '#text-color' { change }, '#line-height' { change }, 'input[name=\"align\"]' { change }\n//   each reads canvas.getActiveObject(), checks type===\"text\", calls setValue(prop, val).\n\n// setValue(prop, value) \u2014 global helper used by all the above to mutate active text +\n//   renderAll (defined in resources/js/ helpers; used at event-handlers.js:24,42,49,etc.)\n\n// FontFaceObserver \u2014 bundled vendor (vendors.min.js). Constructor:\n//   new FontFaceObserver(family, { weight, style }).load() -> Promise\n</interfaces>\n\n### Design-System Vollkorn provisioning (verified)\nThe Gr\u00fcne-AT design system (`/workspace/design-system/design-system/design-system.css:2`) imports:\n```\n@import \"https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,900&family=Vollkorn:ital,wght@0,400;0,900&display=swap\";\n```\n- **Vollkorn weights actually loaded: 400 and 900, UPRIGHT only** (`0,400;0,900`). Despite the `ital` axis being declared, NO italic Vollkorn cut is requested in the DS. The token is `--gat-font-emphasis: \"Vollkorn\", serif`.\n- **Recommendation:** Add a standalone Vollkorn `<link>` to the bildgenerator HTML matching the DS exactly: `family=Vollkorn:ital,wght@0,400;0,900`. Use **weight 900** for the canvas accent text to match Barlow's heavy default visual weight (both pickers' default weight stays consistent at the heavy cut), or 400 if a lighter accent is preferred \u2014 pick one in the plan and pin it in `OPTIONS`. Do NOT request italic unless the plan explicitly wants it (DS doesn't load it; requesting `1,...` would add an unloaded descriptor and Fabric would fall back).\n- The bildgenerator already links `design-system.css` (`index.html:29`), so Vollkorn is *technically* already pulled in by the DS `@import` at runtime. **However**, relying on that alone is fragile (the DS `@import` is for DS CSS, not guaranteed for canvas use, and `display=swap` + FontFaceObserver expectations differ). Mirror z6qfk's explicit, self-contained `<link>` so the canvas font is provisioned by the app itself, not a transitive DS import.\n\n### Reusable Components\n- `loadFont()` (handlers.js) \u2014 ready-made FontFaceObserver-gated re-render for the active text object; the planner should wire the picker's `change` event to it (after extending `customFonts` to include `'Vollkorn'`).\n- `setValue(prop, value)` global helper \u2014 used by all existing text-property change handlers; could be used for simple props but `loadFont` is the correct one for `fontFamily` because of the FontFaceObserver gate.\n- `createStaticPage(filename)` (build.js:107) \u2014 already generic; supports any new root-level static HTML page (currently only `impressum.html`). Add the examples page filename to the `build()` sequence (build.js:33).\n- `compareWithReference()` + `setupTestEnvironment()` + `setupBasicTemplate()` (visual-regression/tests/test-utils.js) \u2014 drive the real app for new visual tests.\n\n### Potential Conflicts\n- `preloadFonts()` (wizard.js:22) maps every `PRELOAD_FONTS` entry onto the SINGLE `FONTS.FAMILY`. Naively adding Vollkorn entries to `PRELOAD_FONTS` would create `FontFaceObserver(\"Barlow Semi Condensed\", {weight:400})` for a Vollkorn entry \u2014 WRONG. The planner must change the preload to carry a family per entry (e.g. `{ family, weight, style }`) or add a second preload loop. This is the single most error-prone spot.\n- The picker `<select>` must NOT carry inline styles \u2014 use the existing `gat-select text-method w-full` classes (see `index.html:794-798` for the color select pattern).\n- Removing/renaming the previously-removed `#font-style-select` id: grep confirms NO current `#font-style-select` references remain in JS/HTML, so reusing that id is safe and won't clash.\n\n### Code Patterns in Use\n- Centralized constants in `AppConstants` (constants.js), exposed via `window.AppConstants`.\n- jQuery event binding via `EventHandlerUtils.bindHandler(selector, event, fn)` and `bindHandlers(map)`.\n- All canvas text mutations go through `setValue(...)` or direct `text.set(...)` + `canvas.renderAll()`.\n- Tailwind utility classes only; custom CSS only in `resources/css/style.css` (CLAUDE.md rule).\n- Static pages: plain HTML at repo root, copied to `build/` by `createStaticPage`, design-system + app CSS swapped in at build.\n\n## Standard Stack\n| Library | Version | Purpose | Why Standard | Confidence |\n|---------|---------|---------|--------------|------------|\n| Google Fonts CDN | n/a | Serve Barlow Semi Condensed + Vollkorn (SIL OFL) | Already used for Barlow (z6qfk); CLAUDE.md mandates CDN, no vendoring | HIGH |\n| FontFaceObserver | bundled in `vendors.min.js` | Gate canvas render until web font ready | Already used (`wizard.js`, `handlers.js`) | HIGH |\n| Fabric.js | bundled | Canvas text objects (`fontFamily`/`fontWeight`/`fontStyle`) | Core canvas lib | HIGH |\n| flomotlik design system | `https://flomotlik.github.io/claude-code/design-system.css` | Style the examples page (Feature 3) | Hosted, per workspace memory + RESEARCH.html convention | HIGH |\n| Gr\u00fcne-AT design system | `https://grueneat.github.io/design-system/design-system.css` | App-facing brand CSS (already linked) | Already in `index.html:29` | HIGH |\n\n## Don't Hand-Roll\n| Problem | Don't Build | Use Instead | Why |\n|---------|-------------|-------------|-----|\n| Wait for web font before canvas render | Custom `document.fonts.ready` polling | `FontFaceObserver` (already bundled, already used) | z6qfk established this; consistent handling |\n| Re-render active text on font change | New mutation code | Existing `loadFont()` (handlers.js:1-19) | Already FontFaceObserver-gated and correct |\n| Ship the examples page into `build/` | New copy logic | `createStaticPage()` (build.js:107) | Generic; already copies impressum.html |\n| Style the examples page | Bespoke CSS | Hosted flomotlik `design-system.css` + component classes | Workspace convention; no vendoring |\n| Provision Vollkorn | Self-host font files in repo | Google Fonts `<link>` | SIL OFL but CLAUDE.md forbids vendoring; mirror Barlow |\n\n## Architecture Patterns\n### Recommended Approach\nThe recommended approach maps to the five flow steps in RESEARCH.html:\n\n- **Step 1 \u2014 `constants.js`:** add `FONTS.OPTIONS` (array of `{ id, label, family, weight, style }`), e.g.\n   `[{ id:'standard', label:'Standardschrift \u2014 Headlines & Flie\u00dftext', family:'Barlow Semi Condensed', weight:900, style:'normal' }, { id:'accent', label:'Betonte Serifenschrift \u2014 f\u00fcr Zitate & Akzente', family:'Vollkorn', weight:900, style:'normal' }]`. Keep `DEFAULT_TEXT` = Barlow. Change `PRELOAD_FONTS` to carry a `family` per entry (or add Vollkorn preload entries with explicit family) and add Vollkorn 400/900.\n- **Step 2 \u2014 `index.html` / `impressum.html`:** (a) Step-1 logo block: add the Tailwind hint paragraph; (b) Step-3 text section: add the `<select id=\"font-style-select\" class=\"gat-select text-method w-full\">` with two `<option>`s (descriptive labels), a short hint paragraph, and a link to the examples page; (c) head: add Vollkorn `<link>` next to Barlow's (lines 22-25). Mirror in `impressum.html` head.\n- **Step 3 \u2014 `event-handlers.js`:** replace hardcoded `selectedFont`/`fontWeight`/`fontStyle` (lines 141,146,147) with values read from the selected `OPTIONS` entry (via `#font-style-select`). Add a `#font-style-select` `change` handler (in `setupCanvasObjectHandlers`) that, for the active text object, applies the option's family/weight/style through `loadFont()` (extend `customFonts` to include `'Vollkorn'`) + sets weight/style. Also extend `wizard.js` `preloadFonts()` to preload BOTH families (Barlow + Vollkorn) per their weights/styles.\n- **Step 4 \u2014 examples page + build:** new `schriften.html` (or similar) at repo root; add to `build.js` `build()` via `createStaticPage('schriften.html')`. Link it from the picker hint.\n- **Step 5 \u2014 Tests + baselines:** new visual-regression spec for Vollkorn canvas text + picker; register it in `playwright.config.js` (medium-tests). Optional Jest unit test for the `OPTIONS` lookup. Regenerate references (`npm run generate-references`) \u2014 Vollkorn changes pixels so new/updated baselines are expected.\n\n### Anti-Patterns to Avoid\n- **Mapping Vollkorn weights onto `FONTS.FAMILY` in `preloadFonts()`** \u2014 produces wrong FontFaceObserver descriptors; Vollkorn won't be preloaded. (See Potential Conflicts.)\n- **Brand-name labels** (\"Vollkorn\"/\"Barlow\") in the UI \u2014 explicitly forbidden by CONTEXT.md; use descriptive labels.\n- **Requesting Vollkorn italic** (`1,400`/`1,900`) when the DS only loads upright \u2014 Fabric would fall back / load an extra unused descriptor. Only request italic if the plan deliberately adds it.\n- **Inline styles** anywhere \u2014 CLAUDE.md hard rule; Tailwind/`gat-*` classes only. (Note: the existing chevron `style=\"transform: rotate(-90deg)\"` at index.html:769/905 is legacy; do not add new inline styles.)\n- **Manipulating the canvas directly in visual tests** \u2014 CLAUDE.md: drive the UI like a user (select the picker option, click `#add-text`).\n- **Vendoring Vollkorn font files** \u2014 forbidden; CDN only.\n- **Tool attribution in commits/code/comments** \u2014 forbidden workspace-wide.\n\n## Common Pitfalls\n### Serif fallback on canvas (Vollkorn not loaded at render time)\n**What goes wrong:** First `#add-text` with Vollkorn renders in a fallback serif because the web font isn't ready.\n**Why it happens:** Google Fonts `display=swap` + canvas snapshots the glyphs at draw time; Fabric doesn't auto-re-render when the font finishes loading.\n**How to avoid:** Preload Vollkorn (400+900) in `preloadFonts()`; on picker change use `loadFont()`'s FontFaceObserver gate (extend `customFonts` to include `'Vollkorn'`) which clears+resets `fontFamily` then `renderAll()`.\n**Warning signs:** Flaky visual-regression diffs on Vollkorn text; first-add looks like Times, subsequent adds correct.\n\n### preloadFonts family mismatch\n**What goes wrong:** Vollkorn never preloads because all `PRELOAD_FONTS` entries are bound to Barlow.\n**Why:** `wizard.js:22` hardcodes `FONTS.FAMILY` as the observer family.\n**How to avoid:** Carry `family` per preload entry or add a separate Vollkorn preload loop.\n**Warning signs:** Console shows only Barlow \"Font loaded\" logs; Vollkorn first-render fallback.\n\n### Build drops the examples page\n**What goes wrong:** New page exists in source but not in `build/` \u2192 404 on GitHub Pages.\n**Why:** `createStaticPage` is called explicitly per filename (build.js:33); new pages aren't auto-discovered.\n**How to avoid:** Add `await createStaticPage('schriften.html')` to `build()`. Verify it lands in `build/`.\n\n### Descriptive labels too long for the select\n**What goes wrong:** Long labels overflow/wrap the `gat-select`.\n**How to avoid:** Keep labels to the proposed length (\"Standardschrift \u2014 Headlines & Flie\u00dftext\"); put the longer \"when to use which\" guidance in the adjacent hint paragraph, not the `<option>`.\n\n### Visual baselines must be regenerated\n**What goes wrong:** Existing text-system baselines may shift if any default font path changes; new Vollkorn test has no baseline.\n**How to avoid:** `npm run generate-references` (z6qfk did this), review the diff, commit updated/new reference PNGs. Default stays Barlow so existing Barlow baselines should be stable \u2014 verify.\n\n## Environment Availability\n| Dependency | Required By | Available | Notes |\n|------------|------------|-----------|-------|\n| Node.js + npm | build, jest, playwright | Yes (repo uses it) | `npm run build`, `npm test`, `npm run test:visual` |\n| Playwright (Chromium) | visual regression | Per repo devDeps | `npm run test:visual`, `npm run generate-references` |\n| Internet (Google Fonts, design-system CDN) | font + DS CSS at runtime | Required | CLAUDE.md: no offline target; apps may assume connectivity |\n| Jest + jsdom | unit/integration | Per repo devDeps (`jest@29`, `jest-environment-jsdom`) | `tests/**/*.test.js` |\n\n## Tests + Build (concrete)\n- **Unit/integration (Jest):** `jest.config.js` \u2192 `testMatch: tests/**/*.test.js`, env jsdom, setup `tests/setup.js`. Existing: `tests/unit/{validation,canvas-utils-snap,logo-toggle}.test.js`, `tests/integration/*`. A `tests/unit/font-options.test.js` could assert the `OPTIONS` lookup returns correct family/weight/style for each id. Run: `npm test`.\n- **Visual regression (Playwright):** specs in `visual-regression/tests/`, util in `test-utils.js` (`setupTestEnvironment`, `setupBasicTemplate`, `compareWithReference` using pixelmatch + pngjs). References in `visual-regression/reference-images/`. **Every new spec MUST be registered in `playwright.config.js`** project `testMatch` arrays (fast/medium/complex) or it's silently skipped in CI \u2014 put a font-picker spec in **medium-tests** (text-system is there). Drive it like a user: `selectOption('#font-style-select', 'accent')` \u2192 `fill('#text', ...)` \u2192 `click('#add-text')` \u2192 `compareWithReference(page, 'text-vollkorn')`.\n- **Generate baselines:** `npm run generate-references` (= `npm run build && GENERATE_REFERENCE=true playwright test visual-regression/tests/`). `GENERATE_REFERENCE_MODE` is read from `process.env.GENERATE_REFERENCE` in test-utils.js:11.\n- **Build:** `npm run build` (`scripts/build.js`) \u2192 builds Tailwind prod CSS (`build-css-prod`), bundles CSS/JS, writes `build/index.html` + `build/impressum.html` (+ new page), copies `resources/`. Google-Fonts `<link>`s in source HTML pass through to `build/` **untouched** (build.js regex only replaces the FontAwesome\u2192style.css CSS block and the JS bundles \u2014 see build.js:77-89, 114-117). So adding the Vollkorn `<link>` to source HTML is sufficient.\n\n## Feature 1 \u2014 exact placement (logo hint)\n- Logo selection lives in **Step 1**, `index.html:636-652`. The `value=\"\"` option \"Logo ausw\u00e4hlen...\" (line 648) is effectively \"kein Logo\"; `#logo-toggle` (line 653-663) also removes the logo entirely.\n- The \"Bild hinzuf\u00fcgen\" path the hint references is in **Step 3**, `index.html:910-913` (`#add-image`).\n- **Recommendation:** add a Tailwind hint `<p>`/callout directly under the logo `<select>` (after line 652, before the toggle div at 653) \u2014 e.g. a `text-sm text-gray-600` paragraph or a `gat-callout` (the DS provides callout classes; `gat-callout` is used elsewhere per git history). Wording per the issue: \u201eEigenes Logo? W\u00e4hle \u201aLogo ausw\u00e4hlen\u2026' (kein Logo) und f\u00fcge dein Logo sp\u00e4ter \u00fcber \u201aBild hinzuf\u00fcgen' selbst ein.\" No JS.\n\n## Feature 3 \u2014 examples page (concrete)\n- **Pattern:** copy `impressum.html` structure (root-level static page, same head: favicon, Barlow+Vollkorn Google-Fonts `<link>`, FontAwesome, Gr\u00fcne-AT DS, output.css, style.css). For the design-system-report look, ALSO link the hosted flomotlik system `https://flomotlik.github.io/claude-code/design-system.css` (Feature 3 is explicitly \"HTML-Report-Stil\"). Note both DS stylesheets can coexist, but verify no class collisions; simplest is to make `schriften.html` a clean report page using ONLY the flomotlik DS classes for the examples content.\n- **Deploy:** add `await createStaticPage('schriften.html')` to `build.js` `build()` (after the impressum call, line 33). `.nojekyll` + GitHub Pages already deploy `build/`.\n- **Link from app:** add an anchor in the picker hint (Step 3) to `schriften.html` (relative link, like `impressum.html` at index.html:1184).\n- **Example images:** two viable routes \u2014 (a) **commit pre-rendered PNGs** under `resources/images/` (e.g. `resources/images/examples/headline-barlow.png`, `quote-vollkorn.png`) referenced by the page; generate them by running the app and exporting, or via the Playwright harness; (b) generate them in a visual-regression test and copy the outputs. Route (a) is simplest and deterministic for a help page. These are app-generated outputs (not third-party assets), so committing them does NOT violate no-vendoring.\n\n## Project Constraints (from CLAUDE.md)\n- **No vendoring** of third-party deps (workspace `/workspace/CLAUDE.md`) \u2014 Vollkorn via Google Fonts CDN; design-system CSS via CDN; no font files in repo.\n- **No tool attribution** in commits/code/comments (workspace + repo memory).\n- **Never inline styles; Tailwind only**; custom CSS only in `resources/css/style.css` when absolutely necessary (repo CLAUDE.md).\n- **Visual tests must drive the UI as a user** \u2014 never manipulate canvas/elements directly (repo CLAUDE.md).\n- **Always use pixelmatch** for visual comparisons (repo CLAUDE.md) \u2014 already the convention in test-utils.js.\n- **Documentation files go in repo root** (repo CLAUDE.md) \u2014 the examples page and any docs at root.\n- **New visual test files MUST be registered in `playwright.config.js`** or they're skipped in CI (repo CLAUDE.md).\n- **New vendor JS/CSS must be added to build bundler arrays** \u2014 N/A here (no new vendor libs; FontFaceObserver already bundled).\n\n## Sources\n### HIGH confidence\n- Codebase: `constants.js`, `event-handlers.js`, `handlers.js`, `wizard.js`, `main.js`, `index.html`, `impressum.html`, `scripts/build.js`, `visual-regression/tests/*`, `playwright.config.js`, `jest.config.js`, `package.json` (all read directly, cited file:line).\n- `/workspace/design-system/design-system/design-system.css:2` \u2014 verified Vollkorn import = `Vollkorn:ital,wght@0,400;0,900` (400+900 upright, no italic), token `--gat-font-emphasis: \"Vollkorn\", serif`.\n- Git history: z6qfk commits (`b3d9ab6` \"load Barlow Semi Condensed from Google Fonts\", `fbc75aa` research, `86daa9b` plan, `1051e7b` \"regenerate baselines for Barlow\") confirm the established font-wiring + baseline-regeneration pattern.\n- Workspace/repo CLAUDE.md + MEMORY.md for constraints.\n\n### MEDIUM confidence\n- Exact final Vollkorn canvas weight (400 vs 900) for the accent option \u2014 design system loads both; planner should pick one and pin it in `OPTIONS`. Recommend 900 for visual parity with the heavy default unless a lighter quote look is wanted.\n\n### LOW confidence (needs validation)\n- Whether existing Barlow text-system baselines stay pixel-stable after adding the picker (default unchanged, so expected stable) \u2014 confirm by running `npm run test:visual` before regenerating.\n\n## Metadata\n**Confidence breakdown:**\n- Codebase wiring: HIGH (read every cited line).\n- Vollkorn provisioning: HIGH (DS import verified; mirrors Barlow).\n- Picker placement: HIGH (Step-3 text section structure read in full).\n- Examples page: HIGH for mechanism (createStaticPage), MEDIUM for image-generation route (two valid options, planner picks).\n- Test impact: HIGH for structure, LOW for exact baseline deltas.\n\n**Research date:** 2026-06-07\n**Sub-agents used:** none (direct investigation; full tool access)\n**Raw research files:** n/a (single-pass direct research)\n"}
+</script>
+
+<script>
+(function () {
+  "use strict";
+  var dataEl = document.getElementById("artifact-source");
+  var target = document.getElementById("artifact-source-target");
+  if (dataEl && target) {
+    try {
+      target.textContent = JSON.parse(dataEl.textContent).source || "";
+    } catch (e) {
+      target.textContent = dataEl.textContent;
+    }
+  }
+  document.querySelectorAll('a[href^="#"]').forEach(function (a) {
+    a.addEventListener("click", function (ev) {
+      var el = document.getElementById(a.getAttribute("href").slice(1));
+      if (el) { ev.preventDefault(); el.scrollIntoView({ behavior: "smooth" }); }
+    });
+  });
+})();
+</script>
+</body>
+</html>

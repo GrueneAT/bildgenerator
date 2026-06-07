@@ -20,7 +20,7 @@ function initializeWizard() {
 // Preload custom fonts
 function preloadFonts() {
     const fonts = AppConstants.FONTS.PRELOAD_FONTS.map(
-        d => new FontFaceObserver(AppConstants.FONTS.FAMILY, d)
+        ({ family, ...desc }) => new FontFaceObserver(family, desc)
     );
 
     fonts.forEach(font => {

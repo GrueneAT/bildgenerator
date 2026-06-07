@@ -68,6 +68,21 @@ const EventHandlerUtils = {
                         setValue("lineHeight", lineHeight);
                     }
                 }
+            },
+            '#font-style-select': {
+                'change': function() {
+                    const activeObject = canvas.getActiveObject();
+                    if (activeObject && activeObject.get('type') === "text") {
+                        const optId = jQuery(this).val();
+                        const opt = AppConstants.FONTS.OPTIONS.find(o => o.id === optId)
+                            || AppConstants.FONTS.OPTIONS[0];
+                        // Set weight/style before the family swap so the
+                        // FontFaceObserver-gated re-render uses them.
+                        activeObject.set("fontWeight", opt.weight);
+                        activeObject.set("fontStyle", opt.style);
+                        loadFont(opt.family);
+                    }
+                }
             }
         };
 
@@ -138,13 +153,16 @@ const EventHandlerUtils = {
             }
 
             const initialFontSize = canvas.width / 2;
-            const selectedFont = AppConstants.FONTS.DEFAULT_TEXT;
+            const optId = jQuery('#font-style-select').val();
+            const opt = AppConstants.FONTS.OPTIONS.find(o => o.id === optId)
+                || AppConstants.FONTS.OPTIONS[0];
+            const selectedFont = opt.family;
 
             const text = new fabric.Text(jQuery("#text").val(), {
                 fontFamily: selectedFont,
                 fontSize: initialFontSize,
-                fontWeight: AppConstants.FONTS.WEIGHT_TEXT,
-                fontStyle: "normal",
+                fontWeight: opt.weight,
+                fontStyle: opt.style,
                 textAlign: jQuery('input[name="align"]:checked').val(),
                 fill: jQuery("#text-color").find(":selected").attr("value"),
                 stroke: "#000000",

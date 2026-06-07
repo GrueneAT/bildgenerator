@@ -31,6 +31,7 @@ async function build() {
         console.log('📄 Creating production HTML...');
         await createProductionHTML();
         await createStaticPage('impressum.html');
+        await createStaticPage('schriften.html');
         console.log('✅ Production HTML created\n');
         
         // Step 5: Copy assets
