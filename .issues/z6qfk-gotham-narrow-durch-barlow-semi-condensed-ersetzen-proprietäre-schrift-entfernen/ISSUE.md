@@ -2,6 +2,7 @@
 id: z6qfk
 title: Gotham Narrow durch Barlow Semi Condensed ersetzen (proprietäre Schrift entfernen)
 status: in_progress
+ship_state: pr_open
 priority: high
 labels:
 - design-system
