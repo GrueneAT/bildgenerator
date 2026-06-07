@@ -222,56 +222,37 @@ const CanvasUtils = {
     },
 
     // Picture movement constraints
+    //
+    // The background is cover-scaled (see positionBackgroundImage), so it always
+    // covers the content rect on both axes and overflows on the longer one. As
+    // the user pans the image we clamp it so the content rect stays fully
+    // covered — the image edge can never move inside the rect (which would
+    // expose the green background). We clamp against the ACTUAL scaled size
+    // rather than re-deriving a single-axis fit, so the logic is correct for
+    // any aspect ratio.
     enablePictureMove(canvasInstance) {
         canvasInstance.on("object:moving", function (options) {
             if (options.target === contentImage) {
-                const imageRelatedHeight = options.target.height * (contentRect.width / contentImage.width);
-                const imageRelatedWidth = options.target.width * (contentRect.height / contentImage.height);
+                const scaledWidth = options.target.getScaledWidth();
+                const scaledHeight = options.target.getScaledHeight();
 
-                const maxTop = contentImage.top - contentRect.top - contentRect.height;
-                const maxLeft = contentImage.left - contentRect.left - contentRect.width;
+                // Allowed range for the image's top-left so the rect stays
+                // covered: max edge flush at rect start, min edge flush at end.
+                const maxLeft = contentRect.left;
+                const minLeft = contentRect.left + contentRect.width - scaledWidth;
+                const maxTop = contentRect.top;
+                const minTop = contentRect.top + contentRect.height - scaledHeight;
 
-                // Snap to top if dragged beyond and image is larger than height
-                if (
-                    options.target.top > contentRect.top &&
-                    imageRelatedHeight > contentRect.height
-                ) {
-                    options.target
-                        .set({ top: contentRect.top })
-                        .setCoords();
-                }
+                let left = options.target.left;
+                let top = options.target.top;
 
-                // Snap to left if dragged beyond and image is wider than width
-                if (
-                    options.target.left > contentRect.left &&
-                    imageRelatedWidth > contentRect.width
-                ) {
-                    options.target
-                        .set({ left: contentRect.left })
-                        .setCoords();
-                }
+                if (left > maxLeft) left = maxLeft;
+                if (left < minLeft) left = minLeft;
+                if (top > maxTop) top = maxTop;
+                if (top < minTop) top = minTop;
 
-                // Snap to max boundaries
-                if (
-                    imageRelatedHeight > contentRect.height &&
-                    imageRelatedHeight < maxTop * -1
-                ) {
-                    options.target
-                        .set({
-                            top: contentRect.height - imageRelatedHeight + contentRect.top,
-                        })
-                        .setCoords();
-                }
-
-                if (
-                    imageRelatedWidth > contentRect.width &&
-                    imageRelatedWidth < maxLeft * -1
-                ) {
-                    options.target
-                        .set({
-                            left: contentRect.width - imageRelatedWidth + contentRect.left,
-                        })
-                        .setCoords();
+                if (left !== options.target.left || top !== options.target.top) {
+                    options.target.set({ left, top }).setCoords();
                 }
             }
         });
@@ -284,8 +265,6 @@ const CanvasUtils = {
             canvas.remove(contentImage);
             
             contentImage.selectable = true;
-            contentImage.top = contentRect.top;
-            contentImage.left = contentRect.left;
             this.disableScalingControls(contentImage);
 
             const clipRect = new fabric.Rect({
@@ -296,27 +275,38 @@ const CanvasUtils = {
                 absolutePositioned: true,
             });
 
-            if (contentRect.width > contentRect.height) {
-                contentImage.scaleToWidth(contentRect.width);
-                contentImage.lockMovementX = true;
-                contentImage.lockMovementY = false;
-            } else if (
-                contentRect.width < contentRect.height ||
-                contentImage.width > contentImage.height
-            ) {
-                contentImage.scaleToHeight(contentRect.height);
-                contentImage.lockMovementY = true;
-                contentImage.lockMovementX = false;
-            } else {
-                contentImage.scaleToWidth(contentRect.width);
-                contentImage.lockMovementX = true;
-                contentImage.lockMovementY = false;
-            }
-            
+            // Cover-scale: pick the larger of the two fit ratios so the image
+            // always fully covers the content rect on BOTH axes. The clipPath
+            // crops whatever overflows. This guarantees no background gap
+            // (green border) for any image/canvas aspect-ratio combination.
+            const coverScale = Math.max(
+                contentRect.width / contentImage.width,
+                contentRect.height / contentImage.height
+            );
+            contentImage.scale(coverScale);
+
+            // Lock the axis that fits exactly; leave the overflowing axis free
+            // so the user can still pan the image to reframe it. When the
+            // image covers exactly (same aspect) both axes lock.
+            const scaledWidth = contentImage.getScaledWidth();
+            const scaledHeight = contentImage.getScaledHeight();
+            const widthOverflow = scaledWidth - contentRect.width;
+            const heightOverflow = scaledHeight - contentRect.height;
+            const EPS = 0.5; // sub-pixel tolerance
+            contentImage.lockMovementX = widthOverflow <= EPS;
+            contentImage.lockMovementY = heightOverflow <= EPS;
+
             contentImage.clipPath = clipRect;
             canvas.add(contentImage);
             canvas.sendToBack(contentImage);
-            canvas.centerObjectH(contentImage);
+            // Center the image over the CONTENT RECT (not the whole canvas, so
+            // bordered templates stay correct) on both axes. Splitting the
+            // overflow evenly keeps the rect fully covered with no gap.
+            contentImage.set({
+                left: contentRect.left + (contentRect.width - scaledWidth) / 2,
+                top: contentRect.top + (contentRect.height - scaledHeight) / 2,
+            });
+            contentImage.setCoords();
         }
     },
 
