@@ -62,9 +62,47 @@ test.describe('Font examples modal & picker width', () => {
     expect(await page.evaluate(() => document.getElementById('fontExamplesModal').open)).toBe(true);
     expect(page.url()).toBe(urlBefore);
 
-    // The gallery shows the six fully-composed example sharepics.
+    // The gallery shows every fully-composed example sharepic (six with a
+    // photo background plus three on the plain green canvas).
     const imgCount = await page.locator('#font-examples-gallery img').count();
-    expect(imgCount).toBe(6);
+    expect(imgCount).toBe(9);
+  });
+
+  test('prominent header button opens the same in-app modal', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    // The header entry is reachable from the very first step — no need to walk
+    // the wizard. Just load the app and click it.
+    await page.goto('/');
+    await page.waitForFunction(() => document.fonts.ready.then(() => true), { timeout: 30000 });
+    await page.waitForTimeout(1000);
+
+    const modal = page.locator('#fontExamplesModal');
+    await expect(modal).toBeHidden();
+
+    const urlBefore = page.url();
+    await page.click('#header-examples-btn');
+    await page.waitForTimeout(300);
+
+    // Same dialog, opened without navigating away.
+    await expect(modal).toBeVisible();
+    expect(await page.evaluate(() => document.getElementById('fontExamplesModal').open)).toBe(true);
+    expect(page.url()).toBe(urlBefore);
+    const imgCount = await page.locator('#font-examples-gallery img').count();
+    expect(imgCount).toBe(9);
+  });
+
+  test('prominent header button works on mobile', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/');
+    await page.waitForFunction(() => document.fonts.ready.then(() => true), { timeout: 30000 });
+    await page.waitForTimeout(1000);
+
+    const modal = page.locator('#fontExamplesModal');
+    await expect(modal).toBeHidden();
+    // On mobile the icon-only button is the visible entry point.
+    await page.click('#header-examples-btn-mobile');
+    await page.waitForTimeout(300);
+    await expect(modal).toBeVisible();
   });
 
   test('modal closes via the close button and via Escape', async ({ page }) => {

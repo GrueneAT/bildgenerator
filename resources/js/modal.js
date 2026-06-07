@@ -77,7 +77,13 @@ jQuery(function() {
         }
     }
 
-    jQuery('#font-examples-btn').on('click', openFontExamples);
+    // Every entry point opens the SAME dialog: the picker hint under the font
+    // select plus the prominent, always-visible header buttons (desktop +
+    // mobile). One handler, no duplicated modal.
+    jQuery('#font-examples-btn, #header-examples-btn, #header-examples-btn-mobile').on(
+        'click',
+        openFontExamples
+    );
     jQuery('#close-font-examples').on('click', closeFontExamples);
 
     // Close when clicking the backdrop (the dialog element itself, outside the
