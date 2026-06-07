@@ -3,6 +3,7 @@ id: ptupd
 title: 'Bildgenerator: Eigenes Logo per Bild-Upload erklären, Vollkorn als Schrift-Option,
   Beispiel-Seite zur Schriftverwendung'
 status: done
+ship_state: pr_open
 priority: medium
 labels:
 - design-system
