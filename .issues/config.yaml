@@ -1,20 +1,22 @@
-# Issue system configuration
-# Generated: 2026-04-03
-
 research_model: opus
 plan_model: opus
 execute_model: sonnet
-
 source:
   type: github
   repo: GrueneAT/bildgenerator
-
-branches:
-  template: "feature/{source_id}-{slug}"
-
+  sync_on_create: true
+local_id:
+  scheme: hash
+  length: 5
+naming:
+  branch: feature/{slug}
 commits:
   format: conventional
-
+  prefix: true
 repos:
-  - path: .
-    name: bildgenerator
+- name: bildgenerator
+  path: .
+worktree_dir: .worktrees
+staleness_days: 7
+github:
+  repo: GrueneAT/bildgenerator

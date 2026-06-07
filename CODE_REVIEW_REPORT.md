@@ -61,8 +61,8 @@ function calculateLogoTop(logoHeight, template) {
 #### 2. **Inconsistent Font Configuration**
 **Location:** Multiple files
 
-- `resources/js/constants.js:77`: `DEFAULT_TEXT: "Gotham Narrow Ultra"`
-- `resources/js/event-handlers.js:150`: Default fallback still "Gotham Narrow Ultra"
+- `resources/js/constants.js:77`: `DEFAULT_TEXT: "Barlow Semi Condensed"`
+- `resources/js/event-handlers.js:150`: Default fallback still "Barlow Semi Condensed"
 - `index.html:774-776`: Dropdown shows "Überschrift" for Ultra variant
 
 **Issue:** Font naming inconsistency between configuration and UI

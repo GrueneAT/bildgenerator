@@ -204,6 +204,7 @@ function addLogo() {
           top: textTopPosition,
           fontFamily: AppConstants.FONTS.DEFAULT_LOGO,
           fontSize: Math.floor(image.getScaledWidth() / 10),
+          fontWeight: AppConstants.FONTS.WEIGHT_LOGO,
           fontStyle: "normal",
           textAlign: "right",
           fill: AppConstants.COLORS.LOGO_TEXT,
