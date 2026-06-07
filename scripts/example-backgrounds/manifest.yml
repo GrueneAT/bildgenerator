@@ -1,0 +1,91 @@
+# AI photo backgrounds for the example-sharepics gallery.
+#
+# Generated once with the codex image tool, NOT at build time:
+#
+#   python3 /workspace/vorlagen/tools/codex_image_gen.py \
+#       scripts/example-backgrounds/manifest.yml
+#
+# The tool resolves each `output:` relative to manifest.parent.parent, i.e.
+# the scripts/ directory — so files land under
+# scripts/resources/images/examples/backgrounds/ and must then be moved to
+# resources/images/examples/backgrounds/ (one command, see below). Every JPG
+# gets the mandatory "Symbolfoto — KI-generiert" disclosure band stamped on
+# automatically.
+#
+#   mv scripts/resources/images/examples/backgrounds/*.jpg \
+#      resources/images/examples/backgrounds/ && rm -rf scripts/resources
+#
+# These photos are the BACKGROUND inputs uploaded into the generator by
+# scripts/generate-example-images.mjs; the headline / logo / Störer / QR are
+# composed on top inside the real app.
+#
+# Sizes follow each target format's aspect: vertical 1024x1536 for Story and
+# Feed-Post 4:5 (the canvas cover-crops to fit), landscape 1536x1024 for the
+# Event-Header.
+images:
+  - id: radboerse-feed-bg
+    output: resources/images/examples/backgrounds/radboerse-feed-bg.jpg
+    size: 1024x1536
+    prompt: |
+      Documentary-style photo of a sunny town square in a small Austrian town
+      on a bright spring morning. A friendly second-hand bicycle market: rows
+      of used bikes lined up on cobblestones, a few people of mixed ages
+      browsing and chatting, warm natural sunlight, soft shadows, historic
+      pastel-coloured townhouses in the background. Relaxed community
+      atmosphere. Vertical composition with open sky at the top for headline
+      space. Natural colours, realistic skin tones. No text overlays.
+      No watermarks.
+  - id: openair-kino-story-bg
+    output: resources/images/examples/backgrounds/openair-kino-story-bg.jpg
+    size: 1024x1536
+    prompt: |
+      Documentary-style photo of a warm summer evening open-air cinema in a
+      park. A large outdoor projection screen glows softly in the dusk, the
+      sky in warm orange and deep blue gradients, silhouettes of a relaxed
+      audience sitting on blankets and folding chairs, string lights between
+      trees. Cosy, hopeful late-evening mood, soft golden light. Vertical
+      composition with the glowing screen in the upper third and darker
+      foreground for text. Natural colours. No text overlays. No watermarks.
+  - id: klima-stammtisch-feed-bg
+    output: resources/images/examples/backgrounds/klima-stammtisch-feed-bg.jpg
+    size: 1024x1536
+    prompt: |
+      Documentary-style photo inside a cosy Austrian café in the evening.
+      A small group of people in their 30s and 40s sitting around a wooden
+      table, engaged in friendly conversation over coffee and tea, warm
+      ambient lamplight, plants and bookshelves softly out of focus in the
+      background. Approachable, community-meeting atmosphere. Vertical
+      composition with some calmer space at the top. Natural warm colours,
+      realistic skin tones. No text overlays. No watermarks.
+  - id: klima-demo-event-bg
+    output: resources/images/examples/backgrounds/klima-demo-event-bg.jpg
+    size: 1536x1024
+    prompt: |
+      Documentary-style photo of a peaceful, hopeful climate demonstration on
+      a public square in an Austrian city on a bright day. A diverse crowd of
+      people of all ages walking together, some holding blank handmade signs,
+      green trees and historic buildings in the background, soft natural
+      daylight, optimistic and friendly mood, no visible text on any sign.
+      Wide horizontal composition with open sky for a header headline.
+      Natural colours, realistic skin tones. No text overlays. No watermarks.
+  - id: kandidatin-portrait-feed-bg
+    output: resources/images/examples/backgrounds/kandidatin-portrait-feed-bg.jpg
+    size: 1024x1536
+    prompt: |
+      Documentary-style portrait photo of an Austrian woman in her 40s with
+      short brown hair, wearing a green blazer, friendly confident direct
+      gaze, standing in front of a softly blurred neutral light-grey
+      background. Soft even front light, natural skin tones, professional but
+      approachable. Vertical headshot with space beside and below her for a
+      quote. No text overlays. No watermarks.
+  - id: infostand-natur-story-bg
+    output: resources/images/examples/backgrounds/infostand-natur-story-bg.jpg
+    size: 1024x1536
+    prompt: |
+      Documentary-style photo of a friendly community information stand at an
+      outdoor weekly market on the edge of a green park, late morning. A
+      simple folding table with leaflets and a sun umbrella, lush green trees
+      and dappled sunlight in the background, a couple of volunteers talking
+      with a passer-by. Fresh, natural, inviting mood. Vertical composition
+      with leafy green space at the top for a headline. Natural greens and
+      warm light, realistic skin tones. No text overlays. No watermarks.
