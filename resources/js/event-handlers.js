@@ -162,6 +162,7 @@ const EventHandlerUtils = {
                 fontFamily: selectedFont,
                 fontSize: initialFontSize,
                 fontWeight: opt.weight,
+                charSpacing: AppConstants.FONTS.CHAR_SPACING,
                 fontStyle: opt.style,
                 textAlign: jQuery('input[name="align"]:checked').val(),
                 fill: jQuery("#text-color").find(":selected").attr("value"),
@@ -362,7 +363,7 @@ const EventHandlerUtils = {
 
     // Download handler
     setupDownloadHandler() {
-        this.bindHandler('#generate-meme', 'click', function() {
+        this.bindHandler('#generate-meme', 'click', async function() {
             const validation = ValidationUtils.validateDownload();
 
             if (!validation.isValid) {
@@ -377,7 +378,7 @@ const EventHandlerUtils = {
                 const quality = parseFloat(jQuery("#image-quality").find(":selected").attr("value"));
 
                 try {
-                    const exportResult = CanvasUtils.exportCanvas(format, quality, targetDPI);
+                    const exportResult = await CanvasUtils.exportCanvas(format, quality, targetDPI);
 
                     const link = document.createElement("a");
                     link.href = exportResult.dataURL;

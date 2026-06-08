@@ -85,26 +85,31 @@ const AppConstants = {
 
     // Font Configuration
     FONTS: {
-        FAMILY: "Barlow Semi Condensed",
-        DEFAULT_LOGO: "Barlow Semi Condensed",
-        DEFAULT_TEXT: "Barlow Semi Condensed",
+        FAMILY: "Raleway",
+        DEFAULT_LOGO: "Raleway",
+        DEFAULT_TEXT: "Raleway",
         WEIGHT_TEXT: 900,    // default canvas text (Black)
         WEIGHT_LOGO: 800,    // logo overlay text (ExtraBold)
         WEIGHT_BOOK: 400,    // body / book equivalent (Regular)
+        // Manual tracking for fabric.js text (charSpacing, 1/1000 em).
+        // -30 = -0.03 em = the "Raleway -3" decision (tightens letters
+        // and word spacing), matching the Scribus KERN -3 of the print
+        // templates.
+        CHAR_SPACING: -30,
         // User-selectable text fonts, labelled DESCRIPTIVELY (type + use),
         // never by brand name. Option ids match #font-style-select values.
         OPTIONS: [
-            { id: 'standard', label: 'Standardschrift — Headlines & Fließtext', family: 'Barlow Semi Condensed', weight: 900, style: 'normal' },
+            { id: 'standard', label: 'Standardschrift — Headlines & Fließtext', family: 'Raleway', weight: 900, style: 'normal' },
             { id: 'accent',   label: 'Betonte Serifenschrift — für Zitate & Akzente', family: 'Vollkorn', weight: 900, style: 'italic' }
         ],
         // Each entry carries its own family so the preload observer binds to
         // the correct font. Mixing families under a single observer family
         // would leave the other font unloaded (serif fallback on first use).
         PRELOAD_FONTS: [
-            { family: 'Barlow Semi Condensed', weight: 900, style: 'italic' },  // italic accent
-            { family: 'Barlow Semi Condensed', weight: 900 },                   // default text
-            { family: 'Barlow Semi Condensed', weight: 400 },                   // book / body
-            { family: 'Barlow Semi Condensed', weight: 800 },                   // default logo
+            { family: 'Raleway', weight: 900, style: 'italic' },  // italic accent
+            { family: 'Raleway', weight: 900 },                   // default text
+            { family: 'Raleway', weight: 400 },                   // book / body
+            { family: 'Raleway', weight: 800 },                   // default logo
             { family: 'Vollkorn', weight: 900, style: 'italic' },              // accent serif (Black Italic)
             { family: 'Vollkorn', weight: 400 }                                // accent serif (book)
         ]

@@ -3,6 +3,10 @@ import { cpus } from "os";
 
 export default defineConfig({
   testDir: ".",
+  // Exclude build/deps so discovery only sees real specs. (No ".worktrees"
+  // here: it would self-exclude when the suite runs from inside a worktree,
+  // and the dir never exists in CI anyway.)
+  testIgnore: ["**/.claude/**", "**/node_modules/**", "**/dist/**", "**/build/**"],
   testMatch: ["e2e/**/*.spec.js", "visual-regression/**/*.spec.js"],
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
@@ -75,7 +79,7 @@ export default defineConfig({
   webServer: {
     command: "make serve-build",
     url: "http://localhost:8000",
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
     stdout: "ignore",
     stderr: "pipe",
   },

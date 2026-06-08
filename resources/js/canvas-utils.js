@@ -355,9 +355,48 @@ const CanvasUtils = {
     },
 
     // Canvas export with DPI handling
-    exportCanvas(format, quality, targetDPI = 200) {
+    async exportCanvas(format, quality, targetDPI = 200) {
         const screenDPI = 72;
         const maxPixels = 250000000;
+
+        // Make the web fonts canvas-available BEFORE re-measuring/rendering.
+        // The 2D canvas only uses a loaded web font after an explicit
+        // document.fonts.load() for that exact weight/style — document.fonts.ready
+        // and .check() are NOT sufficient. Awaiting the load here makes the
+        // export deterministic regardless of how late the font finished loading
+        // relative to text being added (fixed fallback glyphs in headless
+        // reference runs and guarantees real downloads use Raleway too).
+        if (typeof document !== "undefined" && document.fonts && document.fonts.load) {
+            try {
+                const fontSpecs = (typeof AppConstants !== "undefined" &&
+                    AppConstants.FONTS && AppConstants.FONTS.PRELOAD_FONTS)
+                    ? AppConstants.FONTS.PRELOAD_FONTS.map(function (f) {
+                        const style = f.style && f.style !== "normal" ? f.style + " " : "";
+                        return style + (f.weight || 400) + ' 16px "' + f.family + '"';
+                    })
+                    : [];
+                await Promise.all(fontSpecs.map(function (spec) {
+                    return document.fonts.load(spec).catch(function () {});
+                }));
+            } catch (e) {
+                // Non-fatal: fall through to render with whatever is available.
+            }
+        }
+
+        // Re-measure text with the now-loaded fonts before exporting.
+        // Fabric caches a text object's char metrics at creation time; if a
+        // web font (Raleway) finished loading AFTER the text was added, the
+        // cached fallback metrics — and thus the exported PNG — stick unless we
+        // force a re-measure. This makes the export deterministic regardless of
+        // font-load timing (fixes fallback glyphs in headless reference runs).
+        canvas.getObjects().forEach(function (obj) {
+            if (obj && (obj.type === "text" || obj.type === "i-text" || obj.type === "textbox")) {
+                obj.dirty = true;
+                if (typeof obj.initDimensions === "function") obj.initDimensions();
+                if (typeof obj.setCoords === "function") obj.setCoords();
+            }
+        });
+        canvas.renderAll();
 
         const baseMultiplier = targetDPI / screenDPI;
         const finalWidth = canvas.width * baseMultiplier;
