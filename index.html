@@ -53,98 +53,87 @@
       }
     </script>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="header uppercase py-3">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3">
+      <div class="header py-3">
+        <div class="flex items-center justify-between gap-4">
+          <!-- Brand -->
+          <a href="index.html" class="flex items-center gap-3 shrink-0 no-underline">
             <img
               src="https://grueneat.github.io/design-system/assets/gruene-logo.svg"
               width="32"
-              alt="Die Gruenen"
+              alt="Die Grünen"
             />
-            <h1 class="text-gray-900 text-xl font-bold">
+            <h1 class="text-gray-900 text-lg sm:text-xl font-bold uppercase leading-none whitespace-nowrap">
               Grüner Bildgenerator
             </h1>
-          </div>
-          <!-- Navigation Tabs -->
-          <div class="hidden md:flex items-center gap-2">
-            <button 
-              id="tab-generator" 
-              class="nav-tab active px-4 py-2 text-sm font-medium rounded-lg bg-gruene-primary text-white"
+          </a>
+
+          <!-- Mode tabs (segmented control) -->
+          <div class="hidden md:flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+            <button
+              id="tab-generator"
+              class="nav-tab active inline-flex items-center gap-2 px-4 py-1.5 text-sm font-medium rounded-md bg-gruene-primary text-white"
             >
-              <i class="fas fa-image mr-2"></i>Bildgenerator
+              <i class="fas fa-image"></i>Bildgenerator
             </button>
-            <button 
-              id="tab-qrcode" 
-              class="nav-tab px-4 py-2 text-sm font-medium rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300"
+            <button
+              id="tab-qrcode"
+              class="nav-tab inline-flex items-center gap-2 px-4 py-1.5 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 transition-colors"
             >
-              <i class="fas fa-qrcode mr-2"></i>QR-Code
+              <i class="fas fa-qrcode"></i>QR-Code
             </button>
           </div>
-          <div class="flex items-center gap-2 text-sm">
-            <a
-              href="https://grueneat.github.io/werkzeuge/"
-              target="_blank"
-              rel="noopener"
-              class="hidden sm:inline-flex items-center gap-1.5 text-gray-700 hover:text-gruene-primary transition-colors"
-              title="Alle Werkzeuge der Grünen (externes Tool-Verzeichnis)"
-            >
-              <i class="fas fa-toolbox text-gray-500"></i>
-              <span class="font-medium">Werkzeuge</span>
-              <i class="fas fa-arrow-up-right-from-square text-xs text-gray-400" aria-hidden="true"></i>
-            </a>
-            <a
-              href="https://grueneat.github.io/werkzeuge/"
-              target="_blank"
-              rel="noopener"
-              class="sm:hidden inline-flex items-center text-gray-700 hover:text-gruene-primary"
-              title="Werkzeuge der Grünen"
-              aria-label="Werkzeuge der Grünen (externes Tool-Verzeichnis)"
-            >
-              <i class="fas fa-toolbox"></i>
-            </a>
-            <a
-              href="mailto:florian.motlik@gruene.at"
-              class="hidden sm:inline-flex items-center gap-1.5 text-gray-700 hover:text-gruene-primary transition-colors"
-              title="Bei Fragen oder Feedback an den Betreuer dieses Tools schreiben"
-            >
-              <i class="fas fa-envelope text-gray-500"></i>
-              <span class="font-medium">florian.motlik@gruene.at</span>
-            </a>
-            <a
-              href="mailto:florian.motlik@gruene.at"
-              class="sm:hidden inline-flex items-center text-gray-700 hover:text-gruene-primary"
-              title="florian.motlik@gruene.at"
-              aria-label="Support-E-Mail"
-            >
-              <i class="fas fa-envelope"></i>
-            </a>
+
+          <!-- Actions -->
+          <div class="flex items-center gap-2 shrink-0">
             <button
               type="button"
-              class="hidden sm:inline-flex items-center gap-1.5 btn-sm btn-secondary"
+              class="hidden sm:inline-flex items-center gap-2 btn-sm btn-secondary"
               id="header-examples-btn"
               title="Beispiel-Sharepics ansehen, die mit dem Generator gestaltet wurden"
-            >
-              <i class="fas fa-images"></i>
-              <span>Beispiele ansehen</span>
-            </button>
-            <button
-              type="button"
-              class="sm:hidden inline-flex items-center gap-1 btn-sm btn-secondary"
-              id="header-examples-btn-mobile"
-              title="Beispiele ansehen"
-              aria-label="Beispiel-Sharepics ansehen"
             >
               <i class="fas fa-images"></i>
               <span>Beispiele</span>
             </button>
             <button
               type="button"
-              class="btn-sm btn-primary"
+              class="inline-flex items-center gap-2 btn-sm btn-primary"
               id="video-modal-btn"
               data-video="https://www.youtube.com/embed/ukLWMNFAei0"
             >
-              <i class="fas fa-play"></i> Erklärvideo
+              <i class="fas fa-play"></i><span class="hidden sm:inline">Erklärvideo</span>
             </button>
+
+            <!-- Mobile-only examples (icon) -->
+            <button
+              type="button"
+              class="sm:hidden inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-600 hover:text-gruene-primary hover:bg-gray-100 transition-colors"
+              id="header-examples-btn-mobile"
+              title="Beispiele ansehen"
+              aria-label="Beispiel-Sharepics ansehen"
+            >
+              <i class="fas fa-images"></i>
+            </button>
+
+            <!-- Utility icons -->
+            <span class="hidden sm:block w-px h-6 bg-gray-200 mx-1" aria-hidden="true"></span>
+            <a
+              href="https://grueneat.github.io/werkzeuge/"
+              target="_blank"
+              rel="noopener"
+              class="hidden sm:inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-500 hover:text-gruene-primary hover:bg-gray-100 transition-colors"
+              title="Alle Werkzeuge der Grünen (externes Tool-Verzeichnis)"
+              aria-label="Werkzeuge der Grünen"
+            >
+              <i class="fas fa-toolbox"></i>
+            </a>
+            <a
+              href="mailto:florian.motlik@gruene.at"
+              class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-500 hover:text-gruene-primary hover:bg-gray-100 transition-colors"
+              title="Bei Fragen oder Feedback an den Betreuer dieses Tools schreiben"
+              aria-label="Kontakt / Feedback"
+            >
+              <i class="fas fa-envelope"></i>
+            </a>
           </div>
         </div>
       </div>
