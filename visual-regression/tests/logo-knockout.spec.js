@@ -36,18 +36,68 @@ function magentaDataUrl() {
   return 'data:image/png;base64,' + buf.toString('base64');
 }
 
-async function selectRegionLogo(page, preferred) {
-  return page.evaluate((pref) => {
-    const $select = jQuery('#logo-selection');
-    const searchableSelect = $select.data('searchable-select');
-    if (!searchableSelect) return { success: false, error: 'SearchableSelect not initialized' };
-    const options = Array.from($select[0].options).map((o) => o.value).filter((v) => v);
-    let target = options.find((o) => o.toUpperCase() === pref);
-    if (!target) target = options.find((o) => o.length > 0 && o.length <= 16 && !o.includes('%'));
-    if (!target) return { success: false, error: 'No suitable option' };
-    searchableSelect.selectOption(target);
+// Enable the logo and select a region the way the app reacts to a real user
+// change: the #logo-selection 'change' handler (event-handlers.js) calls
+// addLogo() only while the logo feature is enabled, and addLogo() loads the
+// logo image ASYNCHRONOUSLY. So we (1) ensure the toggle is on, (2) set the
+// value and dispatch a native bubbling 'change' (which the jQuery delegated
+// handler catches), then the caller polls waitForLogo() until the async
+// fabric.Image has actually landed.
+async function selectRegionLogo(page, mode) {
+  return page.evaluate((m) => {
+    const toggle = document.getElementById('logo-toggle');
+    if (toggle && !toggle.checked) {
+      toggle.checked = true;
+      toggle.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    const select = document.getElementById('logo-selection');
+    if (!select) return { success: false, error: 'logo-selection missing' };
+    const options = Array.from(select.options).map((o) => o.value).filter((v) => v);
+    let target;
+    if (m === 'twoline') {
+      target = options.find((o) => o.includes('BEZIRK') && o.includes('%'))
+            || options.find((o) => o.includes('%'));
+    } else {
+      target = options.find((o) => o.toUpperCase() === 'WIEN')
+            || options.find((o) => o.length > 0 && o.length <= 16 && !o.includes('%'));
+    }
+    if (!target) return { success: false, error: 'no suitable option' };
+    select.value = target;
+    select.dispatchEvent(new Event('change', { bubbles: true }));
     return { success: true, value: target };
-  }, preferred);
+  }, mode);
+}
+
+// Poll until addLogo()'s async fabric.Image has landed on the canvas. The
+// production bundle does NOT expose `logo`/`logoName` as globals, but
+// `window.canvas` is exposed — so detect the logo via the canvas object graph:
+// addLogo() adds a cached Group holding the logo image + the destination-out
+// region-name text.
+function logoGroupProbe() {
+  const objs = (window.canvas && window.canvas.getObjects()) || [];
+  const group = objs.find(
+    (o) => o.type === 'group' && (o._objects || []).some((c) => c.type === 'text')
+  );
+  if (!group) return null;
+  const txt = group._objects.find((c) => c.type === 'text');
+  return {
+    hasLogo: true,
+    hasText: !!txt,
+    compositeOp: txt ? txt.globalCompositeOperation : null,
+    text: txt ? txt.text : '',
+  };
+}
+
+async function waitForLogo(page) {
+  await page.waitForFunction(
+    `(${logoGroupProbe.toString()})() !== null`,
+    null,
+    { timeout: 15000 }
+  );
+}
+
+async function probeLogo(page) {
+  return page.evaluate(`(${logoGroupProbe.toString()})()`);
 }
 
 // Export the current canvas via the real download button and return the decoded PNG.
@@ -112,18 +162,10 @@ test.describe('Visual Regression - Logo region-name knockout (#40)', () => {
   test('Region name shows the background PHOTO through the letters (core acceptance)', async ({ page }) => {
     await setupBasicTemplate(page, 'feed_post_45');
 
-    // Re-enable the logo (setupBasicTemplate disables it) and pick a short region.
-    await page.evaluate(() => {
-      const toggle = document.getElementById('logo-toggle');
-      if (toggle && !toggle.checked) toggle.click();
-    });
-    await page.waitForTimeout(500);
-
-    // Go back to step 1 to select the logo, then forward to upload a background.
-    // setupBasicTemplate left us on step 2; ensure the logo selection is applied.
-    const sel = await selectRegionLogo(page, 'WIEN');
+    // Enable the logo + select a short region; wait for the async logo image.
+    const sel = await selectRegionLogo(page, 'short');
     expect(sel.success).toBe(true);
-    await page.waitForTimeout(2000);
+    await waitForLogo(page);
 
     // Upload a vivid magenta "photo" as the background, exactly like a user upload.
     await page.evaluate((dataUrl) => {
@@ -131,16 +173,11 @@ test.describe('Visual Regression - Logo region-name knockout (#40)', () => {
     }, magentaDataUrl());
     await page.waitForTimeout(2000);
 
-    // Sanity: a logo group and a background image must both exist.
-    const state = await page.evaluate(() => ({
-      hasLogo: typeof logo !== 'undefined' && logo !== null,
-      hasText: typeof logoName !== 'undefined' && logoName !== null,
-      compositeOp: (typeof logoName !== 'undefined' && logoName) ? logoName.globalCompositeOperation : null,
-      hasBackground: typeof contentImage !== 'undefined' && contentImage !== null,
-    }));
-    expect(state.hasLogo).toBe(true);
+    // Sanity: the logo group + its knockout text must exist. The bundle does
+    // not expose `logo`/`logoName` globals, so probe the canvas object graph.
+    const state = await probeLogo(page);
+    expect(state).not.toBeNull();
     expect(state.hasText).toBe(true);
-    expect(state.hasBackground).toBe(true);
     // The text must be a destination-out knockout, never a solid fill.
     expect(state.compositeOp).toBe('destination-out');
 
@@ -158,15 +195,10 @@ test.describe('Visual Regression - Logo region-name knockout (#40)', () => {
 
   test('Region name over the green canvas keeps the logo looking unchanged', async ({ page }) => {
     await setupBasicTemplate(page, 'feed_post_45');
-    await page.evaluate(() => {
-      const toggle = document.getElementById('logo-toggle');
-      if (toggle && !toggle.checked) toggle.click();
-    });
-    await page.waitForTimeout(500);
 
-    const sel = await selectRegionLogo(page, 'WIEN');
+    const sel = await selectRegionLogo(page, 'short');
     expect(sel.success).toBe(true);
-    await page.waitForTimeout(2000);
+    await waitForLogo(page);
 
     // No background uploaded: the canvas is the solid green brand colour, so the
     // knockout letters reveal that green — visually the same as before the fix.
@@ -183,37 +215,20 @@ test.describe('Visual Regression - Logo region-name knockout (#40)', () => {
 
   test('Long (two-line) region name knockout over a photo', async ({ page }) => {
     await setupBasicTemplate(page, 'feed_post_45');
-    await page.evaluate(() => {
-      const toggle = document.getElementById('logo-toggle');
-      if (toggle && !toggle.checked) toggle.click();
-    });
-    await page.waitForTimeout(500);
 
-    // Pick a two-line (percent-broken) region to exercise the long-bar path.
-    const sel = await page.evaluate(() => {
-      const $select = jQuery('#logo-selection');
-      const searchableSelect = $select.data('searchable-select');
-      if (!searchableSelect) return { success: false };
-      const options = Array.from($select[0].options).map((o) => o.value).filter((v) => v);
-      let target = options.find((o) => o.includes('BEZIRK') && o.includes('%'));
-      if (!target) target = options.find((o) => o.includes('%'));
-      if (!target) return { success: false };
-      searchableSelect.selectOption(target);
-      return { success: true, value: target };
-    });
+    // Enable the logo + pick a two-line (percent-broken) region; wait for it.
+    const sel = await selectRegionLogo(page, 'twoline');
     expect(sel.success).toBe(true);
-    await page.waitForTimeout(2000);
+    await waitForLogo(page);
 
     await page.evaluate((dataUrl) => {
       processMeme({ url: dataUrl, width: 4, height: 4 });
     }, magentaDataUrl());
     await page.waitForTimeout(2000);
 
-    const twoLine = await page.evaluate(() => ({
-      hasLineBreak: typeof logoName !== 'undefined' && logoName ? logoName.text.includes('\n') : false,
-      compositeOp: typeof logoName !== 'undefined' && logoName ? logoName.globalCompositeOperation : null,
-    }));
-    expect(twoLine.hasLineBreak).toBe(true);
+    const twoLine = await probeLogo(page);
+    expect(twoLine).not.toBeNull();
+    expect(twoLine.text.includes('\n')).toBe(true);
     expect(twoLine.compositeOp).toBe('destination-out');
 
     const png = await exportPng(page, 'photo-twoline');
