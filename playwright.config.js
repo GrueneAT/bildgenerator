@@ -50,6 +50,7 @@ export default defineConfig({
         "**/qr-codes.spec.js",
         "**/logo-toggle.spec.js",
         "**/logo-text-positioning.spec.js",
+        "**/logo-knockout.spec.js",
         "**/font-picker.spec.js"
       ],
       use: { ...devices["Desktop Chrome"] }

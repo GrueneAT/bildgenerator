@@ -72,6 +72,11 @@ const AppConstants = {
         BACKGROUND_SECONDARY: "#257639",
         PINK_CIRCLE: "#E6007E",
         LOGO_TEXT: "#257639",
+        // Region name on the logo bar is a transparent KNOCKOUT, not a fill.
+        // It is rendered with globalCompositeOperation 'destination-out', so the
+        // colour is immaterial (only the glyph alpha erases the white bar). Kept
+        // opaque white for a crisp erase. LOGO_TEXT is retained for reference/back-compat.
+        LOGO_KNOCKOUT: "#ffffff",
         TEXT_STROKE: "#000000",
         CORNER_COLOR: "yellow",
         BORDER_COLOR: "rgba(88,42,114)",

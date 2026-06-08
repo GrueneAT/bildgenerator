@@ -61,6 +61,13 @@ global.fabric = {
     Rect: jest.fn(function(options) {
         this.options = options;
         this.set = jest.fn();
+    }),
+    Group: jest.fn(function(objects, options) {
+        this.objects = objects;
+        this.options = options;
+        this.set = jest.fn();
+        this.getScaledWidth = () => 200;
+        this.getScaledHeight = () => 100;
     })
 };
 
@@ -330,10 +337,62 @@ describe('Logo Processing Integration Tests', () => {
             jQuery('#logo-selection').html(`
                 <option value="GRÜNE/DIE%ALTERNATIVE" selected>GRÜNE/DIE ALTERNATIVE</option>
             `);
-            
+
             addLogo();
-            
+
             expect(global.logoText).toBe('GRÜNE/DIE\nALTERNATIVE');
+        });
+    });
+
+    describe('addLogo function - region name knockout', () => {
+        test('region name text is rendered as a destination-out knockout, not a fill', () => {
+            jQuery('#logo-selection').html(`
+                <option value="WIEN" selected>WIEN</option>
+            `);
+
+            addLogo();
+
+            // The region name must use destination-out compositing so it cuts the
+            // letters out of the white bar instead of painting solid green over it.
+            expect(fabric.Text).toHaveBeenCalled();
+            const textOptions = fabric.Text.mock.calls[0][1];
+            expect(textOptions.globalCompositeOperation).toBe('destination-out');
+        });
+
+        test('logo image and knockout text are combined into a single fabric.Group', () => {
+            jQuery('#logo-selection').html(`
+                <option value="WIEN" selected>WIEN</option>
+            `);
+
+            addLogo();
+
+            // Grouping the white logo image with the destination-out text is what
+            // isolates the knockout to the bar: the group renders to its own cache,
+            // so the letters become transparent there and reveal whatever is behind
+            // the logo (green canvas or uploaded photo) rather than the white bar.
+            expect(fabric.Group).toHaveBeenCalledTimes(1);
+            const [groupObjects] = fabric.Group.mock.calls[0];
+            expect(Array.isArray(groupObjects)).toBe(true);
+            expect(groupObjects.length).toBe(2);
+            // The group must contain the knockout text instance.
+            const textInstance = fabric.Text.mock.instances[0];
+            expect(groupObjects).toContain(textInstance);
+            // logo global now references the cached group, logoName the inner text.
+            expect(global.logo).toBe(fabric.Group.mock.instances[0]);
+            expect(global.logoName).toBe(textInstance);
+        });
+
+        test('the cached group exposes the knockout via objectCaching', () => {
+            jQuery('#logo-selection').html(`
+                <option value="WIEN" selected>WIEN</option>
+            `);
+
+            addLogo();
+
+            const groupOptions = fabric.Group.mock.calls[0][1];
+            // Caching must be on so the destination-out child composites within the
+            // group cache (producing transparent holes) rather than against the canvas.
+            expect(groupOptions.objectCaching).toBe(true);
         });
     });
 });
