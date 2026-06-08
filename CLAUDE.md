@@ -113,7 +113,8 @@ The application supports multiple image formats defined in `TemplateConstants.TE
 - Border control (0 = full-bleed, 10-20 = green border in pixels)
 - Text font is user-selectable via a descriptive 2-option picker (labelled by
   type/use, not brand name): standard = Barlow Semi Condensed (weight 900,
-  upright; default), accent serif = Vollkorn (weight 900, upright). Both are
+  upright; default), accent serif = Vollkorn (weight 900, italic — "Black
+  Italic"). Both are
   loaded via the Google Fonts CDN. See `schriften.html` for the examples page
   explaining which font for what.
 - Text color options: Gelb (Yellow), Weiß (White)

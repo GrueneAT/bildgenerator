@@ -95,7 +95,7 @@ const AppConstants = {
         // never by brand name. Option ids match #font-style-select values.
         OPTIONS: [
             { id: 'standard', label: 'Standardschrift — Headlines & Fließtext', family: 'Barlow Semi Condensed', weight: 900, style: 'normal' },
-            { id: 'accent',   label: 'Betonte Serifenschrift — für Zitate & Akzente', family: 'Vollkorn', weight: 900, style: 'normal' }
+            { id: 'accent',   label: 'Betonte Serifenschrift — für Zitate & Akzente', family: 'Vollkorn', weight: 900, style: 'italic' }
         ],
         // Each entry carries its own family so the preload observer binds to
         // the correct font. Mixing families under a single observer family
@@ -105,7 +105,7 @@ const AppConstants = {
             { family: 'Barlow Semi Condensed', weight: 900 },                   // default text
             { family: 'Barlow Semi Condensed', weight: 400 },                   // book / body
             { family: 'Barlow Semi Condensed', weight: 800 },                   // default logo
-            { family: 'Vollkorn', weight: 900 },                               // accent serif
+            { family: 'Vollkorn', weight: 900, style: 'italic' },              // accent serif (Black Italic)
             { family: 'Vollkorn', weight: 400 }                                // accent serif (book)
         ]
     },

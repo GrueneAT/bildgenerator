@@ -36,11 +36,11 @@ describe('AppConstants.FONTS.OPTIONS', () => {
     expect(opt.style).toBe('normal');
   });
 
-  it('resolves the accent option to Vollkorn 900 upright (no italic)', () => {
+  it('resolves the accent option to Vollkorn 900 italic (Black Italic)', () => {
     const opt = lookup('accent');
     expect(opt.family).toBe('Vollkorn');
     expect(opt.weight).toBe(900);
-    expect(opt.style).toBe('normal');
+    expect(opt.style).toBe('italic');
   });
 
   it('keeps DEFAULT_TEXT in sync with the standard option family', () => {
