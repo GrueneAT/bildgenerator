@@ -135,8 +135,13 @@ build-dev:
 	npm run build:css
 	@echo "✅ Development build complete"
 
-# Serve production build
+# Serve production build.
+# Free port 8000 first so a leftover server from another run/worktree can't
+# keep serving a stale build (which would make tests pass/fail against old
+# code). fuser/lsof are best-effort; the bind below is the real guarantee.
 serve-build: build
+	-@fuser -k 8000/tcp 2>/dev/null || true
+	-@lsof -ti tcp:8000 2>/dev/null | xargs -r kill 2>/dev/null || true
 	cd build && python3 -m http.server 8000
 
 # Clean generated files

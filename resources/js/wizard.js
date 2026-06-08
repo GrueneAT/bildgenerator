@@ -17,18 +17,45 @@ function initializeWizard() {
     goToStep(1);
 }
 
-// Preload custom fonts
+// Preload custom fonts.
+//
+// Uses the native FontFaceSet API (document.fonts.load) rather than
+// FontFaceObserver: a font that FontFaceObserver has "loaded" (and that
+// document.fonts.check() reports as available) is still NOT usable by the 2D
+// canvas until it has been document.fonts.load()-ed for that exact
+// weight/style. Fabric then keeps rendering the fallback — which silently
+// poisoned the visual-regression baselines (fallback glyphs/metrics) in
+// headless runs. Loading each preload spec explicitly makes the web font
+// canvas-available; once all have settled we re-measure any text already on
+// the canvas so it switches from the fallback to the real font.
 function preloadFonts() {
-    const fonts = AppConstants.FONTS.PRELOAD_FONTS.map(
-        ({ family, ...desc }) => new FontFaceObserver(family, desc)
-    );
+    const specs = AppConstants.FONTS.PRELOAD_FONTS.map(function (f) {
+        const style = f.style && f.style !== 'normal' ? f.style + ' ' : '';
+        return style + (f.weight || 400) + ' 16px "' + f.family + '"';
+    });
 
-    fonts.forEach(font => {
-        font.load().then(function() {
-            console.log('Font loaded successfully:', font.family);
-        }).catch(function() {
-            console.log('Font failed to load:', font.family);
+    if (!(document.fonts && document.fonts.load)) {
+        return; // very old browser: nothing to force, CSS swap still applies
+    }
+
+    Promise.all(specs.map(function (spec) {
+        return document.fonts.load(spec).catch(function () {
+            console.log('Font failed to load:', spec);
         });
+    })).then(function () {
+        // The web fonts are now canvas-available. Re-measure any text already
+        // placed so it picks up the real font's metrics instead of the
+        // fallback it may have been created with.
+        if (typeof canvas !== 'undefined' && canvas && canvas.getObjects) {
+            canvas.getObjects().forEach(function (o) {
+                if (o && (o.type === 'text' || o.type === 'i-text' || o.type === 'textbox')) {
+                    o.dirty = true;
+                    if (typeof o.initDimensions === 'function') o.initDimensions();
+                    if (typeof o.setCoords === 'function') o.setCoords();
+                }
+            });
+            canvas.renderAll();
+        }
     });
 }
 
