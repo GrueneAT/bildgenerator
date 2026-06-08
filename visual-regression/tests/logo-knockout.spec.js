@@ -68,36 +68,24 @@ async function selectRegionLogo(page, mode) {
   }, mode);
 }
 
-// Poll until addLogo()'s async fabric.Image has landed on the canvas. The
+// Poll until addLogo()'s async logo image has landed on the canvas. The
 // production bundle does NOT expose `logo`/`logoName` as globals, but
-// `window.canvas` is exposed — so detect the logo via the canvas object graph:
-// addLogo() adds a cached Group holding the logo image + the destination-out
-// region-name text.
-function logoGroupProbe() {
+// `window.canvas` is exposed. The region-name knockout is BAKED into a single
+// flattened logo image (real transparent letter-holes) — there is no live
+// destination-out object — so detect the logo as the non-selectable image
+// (the uploaded background image is selectable; the logo is not).
+function logoProbe() {
   const objs = (window.canvas && window.canvas.getObjects()) || [];
-  const group = objs.find(
-    (o) => o.type === 'group' && (o._objects || []).some((c) => c.type === 'text')
-  );
-  if (!group) return null;
-  const txt = group._objects.find((c) => c.type === 'text');
-  return {
-    hasLogo: true,
-    hasText: !!txt,
-    compositeOp: txt ? txt.globalCompositeOperation : null,
-    text: txt ? txt.text : '',
-  };
+  const img = objs.find((o) => o.type === 'image' && o.selectable === false);
+  return img ? { hasLogo: true } : null;
 }
 
 async function waitForLogo(page) {
   await page.waitForFunction(
-    `(${logoGroupProbe.toString()})() !== null`,
+    `(${logoProbe.toString()})() !== null`,
     null,
     { timeout: 15000 }
   );
-}
-
-async function probeLogo(page) {
-  return page.evaluate(`(${logoGroupProbe.toString()})()`);
 }
 
 // Export the current canvas via the real download button and return the decoded PNG.
@@ -135,22 +123,24 @@ function classifyBarBand(png) {
   let white = 0;
   let magenta = 0;
   let green = 0;
+  let black = 0;
   // The logo sits centred near the bottom; the bar is roughly the lower third.
   const y0 = Math.floor(height * 0.60);
-  const y1 = Math.floor(height * 0.95);
-  const x0 = Math.floor(width * 0.20);
-  const x1 = Math.floor(width * 0.80);
+  const y1 = Math.floor(height * 0.97);
+  const x0 = Math.floor(width * 0.18);
+  const x1 = Math.floor(width * 0.82);
   for (let y = y0; y < y1; y++) {
     for (let x = x0; x < x1; x++) {
       const i = (y * width + x) * 4;
       const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
       if (a < 200) continue;
       if (r > 235 && g > 235 && b > 235) white++;
+      else if (r < 45 && g < 45 && b < 45) black++;               // the regression: a black hole
       else if (r > 150 && g < 110 && b > 60 && b < 160) magenta++; // #E6007E-ish
-      else if (g > 90 && r < 110 && b < 110) green++;              // green canvas / old fill
+      else if (g > 90 && r < 110 && b < 110) green++;              // green canvas show-through
     }
   }
-  return { white, magenta, green };
+  return { white, magenta, green, black };
 }
 
 test.describe('Visual Regression - Logo region-name knockout (#40)', () => {
@@ -173,14 +163,8 @@ test.describe('Visual Regression - Logo region-name knockout (#40)', () => {
     }, magentaDataUrl());
     await page.waitForTimeout(2000);
 
-    // Sanity: the logo group + its knockout text must exist. The bundle does
-    // not expose `logo`/`logoName` globals, so probe the canvas object graph.
-    const state = await probeLogo(page);
-    expect(state).not.toBeNull();
-    expect(state.hasText).toBe(true);
-    // The text must be a destination-out knockout, never a solid fill.
-    expect(state.compositeOp).toBe('destination-out');
-
+    // Export via the real download path (high-DPI multiplier) — this is exactly
+    // where the old live destination-out leaked the knockout to solid BLACK.
     const png = await exportPng(page, 'photo');
     const bar = classifyBarBand(png);
     console.log('Knockout-over-photo bar band classification:', bar);
@@ -188,9 +172,10 @@ test.describe('Visual Regression - Logo region-name knockout (#40)', () => {
     // The white bar must survive (not be fully erased)…
     expect(bar.white).toBeGreaterThan(200);
     // …and the magenta background MUST show through the letter holes. If the region
-    // name were still painted (green or any solid fill), there would be no magenta
-    // inside the bar band.
+    // name were still painted (green or any solid fill), there would be no magenta.
     expect(bar.magenta).toBeGreaterThan(50);
+    // …and there must be NO black hole in the logo (the regression this fixes).
+    expect(bar.black).toBeLessThan(50);
   });
 
   test('Region name over the green canvas keeps the logo looking unchanged', async ({ page }) => {
@@ -211,6 +196,8 @@ test.describe('Visual Regression - Logo region-name knockout (#40)', () => {
     expect(bar.green).toBeGreaterThan(50);
     // No magenta anywhere — there is no photo here.
     expect(bar.magenta).toBe(0);
+    // And no black hole.
+    expect(bar.black).toBeLessThan(50);
   });
 
   test('Long (two-line) region name knockout over a photo', async ({ page }) => {
@@ -226,15 +213,11 @@ test.describe('Visual Regression - Logo region-name knockout (#40)', () => {
     }, magentaDataUrl());
     await page.waitForTimeout(2000);
 
-    const twoLine = await probeLogo(page);
-    expect(twoLine).not.toBeNull();
-    expect(twoLine.text.includes('\n')).toBe(true);
-    expect(twoLine.compositeOp).toBe('destination-out');
-
     const png = await exportPng(page, 'photo-twoline');
     const bar = classifyBarBand(png);
     console.log('Two-line knockout-over-photo bar band classification:', bar);
     expect(bar.white).toBeGreaterThan(200);
     expect(bar.magenta).toBeGreaterThan(50);
+    expect(bar.black).toBeLessThan(50);
   });
 });
