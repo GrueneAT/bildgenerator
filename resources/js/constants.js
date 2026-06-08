@@ -80,13 +80,21 @@ const AppConstants = {
 
     // Font Configuration
     FONTS: {
-        DEFAULT_LOGO: "Gotham Narrow Bold",
-        DEFAULT_TEXT: "Gotham Narrow Ultra",
+        FAMILY: "Raleway",
+        DEFAULT_LOGO: "Raleway",
+        DEFAULT_TEXT: "Raleway",
+        WEIGHT_TEXT: 900,    // default canvas text (Black)
+        WEIGHT_LOGO: 800,    // logo overlay text (ExtraBold)
+        WEIGHT_BOOK: 400,    // body / book equivalent (Regular)
+        // Manual tracking for fabric.js text (charSpacing is in 1/1000 em).
+        // -30 = -0.03 em = the "Raleway -3" decision (tightens letters + word
+        // spacing), matching the Scribus KERN -3 used in the print templates.
+        CHAR_SPACING: -30,
         PRELOAD_FONTS: [
-            'Gotham Narrow Ultra Italic',
-            'Gotham Narrow Ultra',
-            'Gotham Narrow Book',
-            'Gotham Narrow Bold'
+            { weight: 900, style: 'italic' },  // italic accent
+            { weight: 900 },                   // default text
+            { weight: 400 },                   // book / body
+            { weight: 800 }                    // default logo
         ]
     },
 

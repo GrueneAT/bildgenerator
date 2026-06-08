@@ -203,6 +203,8 @@ function addLogo() {
         logoName = new fabric.Text(logoText, {
           top: textTopPosition,
           fontFamily: AppConstants.FONTS.DEFAULT_LOGO,
+          fontWeight: AppConstants.FONTS.WEIGHT_LOGO,
+          charSpacing: AppConstants.FONTS.CHAR_SPACING,
           fontSize: Math.floor(image.getScaledWidth() / 10),
           fontStyle: "normal",
           textAlign: "right",

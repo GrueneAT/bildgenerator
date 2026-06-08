@@ -13,7 +13,6 @@ const VENDOR_CSS_FILES = [
 // Define the CSS files to bundle in order
 const CSS_FILES_ORDER = [
     ...VENDOR_CSS_FILES,          // Vendor CSS files first
-    'resources/css/fonts.css',     // Custom fonts
     'resources/css/output.css',    // Tailwind CSS (needs to be built first)
     'resources/css/style.css'      // Custom styles last
 ];

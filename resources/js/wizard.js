@@ -19,12 +19,9 @@ function initializeWizard() {
 
 // Preload custom fonts
 function preloadFonts() {
-    const fonts = [
-        new FontFaceObserver('Gotham Narrow Ultra Italic'),
-        new FontFaceObserver('Gotham Narrow Ultra'),
-        new FontFaceObserver('Gotham Narrow Book'),
-        new FontFaceObserver('Gotham Narrow Bold')
-    ];
+    const fonts = AppConstants.FONTS.PRELOAD_FONTS.map(
+        d => new FontFaceObserver(AppConstants.FONTS.FAMILY, d)
+    );
 
     fonts.forEach(font => {
         font.load().then(function() {

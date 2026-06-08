@@ -111,7 +111,7 @@ The application supports multiple image formats defined in `TemplateConstants.TE
 - Dynamic logo sizing based on canvas dimensions (formula: `(contentRect.width + contentRect.height) / 10`)
 - Percentage-based logo positioning for consistent placement across templates
 - Border control (0 = full-bleed, 10-20 = green border in pixels)
-- Default text font: Gotham Narrow Ultra (non-italic)
+- Default text font: Raleway (Black weight, with -3 charSpacing tracking)
 - Text color options: Gelb (Yellow), Weiß (White)
 - Line-height options: Klein (0.8), Mittel (0.9), Groß (1.1)
 
@@ -127,7 +127,7 @@ Logos are organized in a hierarchical structure:
 ### Styling
 
 - **Custom Theme**: GRÜNE brand colors (`gruene-primary`, `gruene-secondary`, `gruene-dark`)
-- **Typography**: Gotham Narrow font family
+- **Typography**: Raleway (via Google Fonts CDN); Vollkorn for italic accents
 - **Responsive Design**: Tailwind CSS utility classes
 
 ## File Organization
@@ -294,7 +294,7 @@ All vendor CSS files are automatically bundled into `app.min.css` during the bui
 
 **CSS Bundle Order:**
 1. Vendor CSS files (FontAwesome)
-2. Custom fonts (`resources/css/fonts.css`)
+2. (Fonts now load via Google Fonts CDN — Raleway; the local fonts.css was removed)
 3. Tailwind CSS (`resources/css/output.css`)
 4. Custom styles (`resources/css/style.css`)
 

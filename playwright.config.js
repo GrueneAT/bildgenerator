@@ -4,6 +4,10 @@ import { cpus } from "os";
 export default defineConfig({
   testDir: ".",
   testMatch: ["e2e/**/*.spec.js", "visual-regression/**/*.spec.js"],
+  // Exclude worktree copies (.worktrees/, .claude/worktrees/) and build/deps
+  // so test discovery only sees this checkout's specs (otherwise the same
+  // suite is collected once per worktree).
+  testIgnore: ["**/.worktrees/**", "**/.claude/**", "**/node_modules/**", "**/dist/**", "**/build/**"],
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
