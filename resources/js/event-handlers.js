@@ -162,7 +162,6 @@ const EventHandlerUtils = {
                 fontFamily: selectedFont,
                 fontSize: initialFontSize,
                 fontWeight: opt.weight,
-                charSpacing: AppConstants.FONTS.CHAR_SPACING,
                 fontStyle: opt.style,
                 textAlign: jQuery('input[name="align"]:checked').val(),
                 fill: jQuery("#text-color").find(":selected").attr("value"),
