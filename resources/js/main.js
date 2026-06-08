@@ -200,7 +200,6 @@ function addLogo() {
         canvas.add(image);
         canvas.centerObjectH(image);
         canvas.bringToFront(image);
-        logo = image;
 
         // Calculate text position relative to logo top
         // Using logo WIDTH as reference since it's constant between short and long logos
@@ -208,6 +207,16 @@ function addLogo() {
         const offsetFromTop = image.getScaledWidth() * barOffset;
         const textTopPosition = image.top + offsetFromTop;
 
+        // The region name is a transparent KNOCKOUT cut out of the white bar,
+        // NOT solid green fill. The text uses 'destination-out' compositing so it
+        // erases the bar pixels of the (white) logo. Because the text and the logo
+        // image live in a single cached fabric.Group, that erase happens inside the
+        // group's own offscreen cache: the letters become genuinely transparent in
+        // the cache, and whatever is BEHIND the logo (the green canvas or an
+        // uploaded background photo) shows through them once the group is composited
+        // onto the canvas. A plain destination-out on a loose text object would
+        // instead punch a hole straight through to nothing; isolating it in the
+        // group is what makes it a true knockout limited to the bar.
         logoName = new fabric.Text(logoText, {
           top: textTopPosition,
           fontFamily: AppConstants.FONTS.DEFAULT_LOGO,
@@ -215,15 +224,21 @@ function addLogo() {
           fontWeight: AppConstants.FONTS.WEIGHT_LOGO,
           fontStyle: "normal",
           textAlign: "right",
-          fill: AppConstants.COLORS.LOGO_TEXT,
+          // fill is irrelevant under destination-out (only the text's alpha
+          // matters), but a solid opaque fill keeps the erase crisp.
+          fill: AppConstants.COLORS.LOGO_KNOCKOUT,
           stroke: AppConstants.COLORS.TEXT_STROKE,
           strokeWidth: 0,
           objectCaching: false,
           lineHeight: AppConstants.LOGO.LINE_HEIGHT,
           angle: AppConstants.LOGO.ANGLE,
           selectable: false,
+          globalCompositeOperation: "destination-out",
         });
 
+        // Add the text to the canvas only to size/position it with the exact same
+        // logic as before; it is removed again before grouping so the knockout is
+        // not double-rendered.
         canvas.add(logoName);
 
         const linebreak = logoText.lastIndexOf("\n");
@@ -236,6 +251,25 @@ function addLogo() {
         }
 
         canvas.centerObjectH(logoName);
+
+        // Combine the white logo image and the knockout text into one cached group.
+        // Fabric recomputes each child's coordinates relative to the group, so the
+        // absolute positioning computed above is preserved. objectCaching:true makes
+        // the group render to its own cache, where the destination-out text cuts the
+        // letters out of the white bar before the group is drawn to the canvas.
+        canvas.remove(image);
+        canvas.remove(logoName);
+
+        logo = new fabric.Group([image, logoName], {
+          selectable: false,
+          objectCaching: true,
+          lockMovementX: true,
+          lockMovementY: true,
+        });
+        CanvasUtils.disableScalingControls(logo);
+
+        canvas.add(logo);
+        canvas.centerObjectH(logo);
         CanvasUtils.bringLogoToFront();
         canvas.renderAll();
       } catch (error) {

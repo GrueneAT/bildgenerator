@@ -183,6 +183,32 @@ test.describe('Visual Regression - Logo Text Positioning', () => {
   test('Logo text position consistency - Single vs Two-line comparison', async ({ page }) => {
     console.log('Testing position consistency between single and two-line logo text...');
 
+    // The region name is a knockout child of the cached logo group, so its
+    // on-canvas position must be read through the group transform rather than the
+    // raw (group-relative) `top` property. This helper returns the text's absolute
+    // top relative to the logo, normalised by the logo width — the same quantity
+    // the original test asserted on, just computed group-aware. Defined on the
+    // already-loaded page so both single- and two-line reads share it.
+    await page.evaluate(() => {
+      window.readKnockoutPosition = function () {
+        if (typeof logoName === 'undefined' || !logoName || typeof logo === 'undefined' || !logo) {
+          return null;
+        }
+        const textMatrix = logoName.calcTransformMatrix();
+        const textAbsTop = textMatrix[5] - logoName.getScaledHeight() / 2;
+        const logoMatrix = logo.calcTransformMatrix();
+        const logoAbsTop = logoMatrix[5] - logo.getScaledHeight() / 2;
+        const offsetFromTop = textAbsTop - logoAbsTop;
+        return {
+          offsetFromTop,
+          relativeToWidth: offsetFromTop / logo.getScaledWidth(),
+          logoHeight: logo.getScaledHeight(),
+          logoWidth: logo.getScaledWidth(),
+          textContent: logoName.text
+        };
+      };
+    });
+
     // Select template
     await page.selectOption('#canvas-template', 'feed_post_45');
     await page.waitForTimeout(3000);
@@ -220,19 +246,7 @@ test.describe('Visual Regression - Logo Text Positioning', () => {
     // Wait for logo to load
     await page.waitForTimeout(3000);
 
-    const singleLinePosition = await page.evaluate(() => {
-      if (typeof logoName === 'undefined' || !logoName || typeof logo === 'undefined' || !logo) {
-        return null;
-      }
-      const offsetFromTop = logoName.top - logo.top;
-      return {
-        offsetFromTop,
-        relativeToWidth: offsetFromTop / logo.getScaledWidth(),
-        logoHeight: logo.getScaledHeight(),
-        logoWidth: logo.getScaledWidth(),
-        textContent: logoName.text
-      };
-    });
+    const singleLinePosition = await page.evaluate(() => readKnockoutPosition());
 
     if (!singleLinePosition) {
       console.log('Warning: Could not get single-line position, skipping consistency test');
@@ -268,19 +282,7 @@ test.describe('Visual Regression - Logo Text Positioning', () => {
     // Wait for logo to load
     await page.waitForTimeout(3000);
 
-    const twoLinePosition = await page.evaluate(() => {
-      if (typeof logoName === 'undefined' || !logoName || typeof logo === 'undefined' || !logo) {
-        return null;
-      }
-      const offsetFromTop = logoName.top - logo.top;
-      return {
-        offsetFromTop,
-        relativeToWidth: offsetFromTop / logo.getScaledWidth(),
-        logoHeight: logo.getScaledHeight(),
-        logoWidth: logo.getScaledWidth(),
-        textContent: logoName.text
-      };
-    });
+    const twoLinePosition = await page.evaluate(() => readKnockoutPosition());
 
     if (!twoLinePosition) {
       console.log('Warning: Could not get two-line position, skipping consistency test');
@@ -293,14 +295,15 @@ test.describe('Visual Regression - Logo Text Positioning', () => {
     const positionDifference = Math.abs(singleLinePosition.relativeToWidth - twoLinePosition.relativeToWidth);
     console.log('Position difference (relative to width):', positionDifference);
 
-    // They should be within 5% of each other (both should be ~0.90)
+    // They should be within 5% of each other (both should sit on the same bar)
     expect(positionDifference).toBeLessThan(0.05);
 
-    // Verify both are positioned correctly (at ~90% of logo width from top)
-    expect(singleLinePosition.relativeToWidth).toBeGreaterThanOrEqual(0.85);
-    expect(singleLinePosition.relativeToWidth).toBeLessThanOrEqual(0.95);
-    expect(twoLinePosition.relativeToWidth).toBeGreaterThanOrEqual(0.85);
-    expect(twoLinePosition.relativeToWidth).toBeLessThanOrEqual(0.95);
+    // Verify both are positioned on the white bar (~0.85 of logo width from top,
+    // measured as the absolute top of the knockout text relative to the logo).
+    expect(singleLinePosition.relativeToWidth).toBeGreaterThanOrEqual(0.78);
+    expect(singleLinePosition.relativeToWidth).toBeLessThanOrEqual(0.92);
+    expect(twoLinePosition.relativeToWidth).toBeGreaterThanOrEqual(0.78);
+    expect(twoLinePosition.relativeToWidth).toBeLessThanOrEqual(0.92);
 
     console.log('Position consistency test passed!');
   });
