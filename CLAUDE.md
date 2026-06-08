@@ -118,7 +118,10 @@ The application supports multiple image formats defined in `TemplateConstants.TE
   loaded via the Google Fonts CDN. See `schriften.html` for the examples page
   explaining which font for what.
 - Text color options: Gelb (Yellow), Weiß (White)
-- Line-height options: Klein (0.8), Mittel (0.9), Groß (1.1)
+- Line-height options: Klein (1.0, default), Mittel (1.15), Groß (1.35). Values
+  chosen so even the tightest (default) setting clears the descenders (g, p, y)
+  of the heavy display fonts (Raleway 900 / Vollkorn 900) above the caps of the
+  line below; the previous 0.8/0.9/1.1 scale let glyphs overlap.
 
 ### Logo System
 

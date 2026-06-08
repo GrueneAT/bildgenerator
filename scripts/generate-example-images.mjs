@@ -86,7 +86,7 @@ const WHITE = '#FFFFFF';
 //                 widthRatio target text width as a fraction of the content rect
 //                 band       vertical center as a fraction of the content rect
 //                 align      'left' | 'center' | 'right' (default center)
-//                 lineHeight '0.8' | '0.9' | '1.1' (default 0.9)
+//                 lineHeight '1.0' | '1.15' | '1.35' (default 1.15)
 //   stoerer     { date, corner } -> round pink Störer with the date as a text
 //               badge centered over it (the shape itself can't hold text)
 //   qr          { text, label, corner } -> QR code + a small label above it
@@ -102,7 +102,7 @@ const EXAMPLES = [
     logo: 'WIEN',
     background: 'radboerse-feed-bg.jpg',
     blocks: [
-      { text: 'RADBÖRSE\nAM HAUPTPLATZ', fontOption: 'standard', color: YELLOW, widthRatio: 0.86, band: 0.46, lineHeight: '0.8' },
+      { text: 'RADBÖRSE\nAM HAUPTPLATZ', fontOption: 'standard', color: YELLOW, widthRatio: 0.86, band: 0.46, lineHeight: '1.0' },
       { text: 'Sa 13. Juni · 9–14 Uhr · Hauptplatz', fontOption: 'standard', color: WHITE, widthRatio: 0.82, band: 0.62 },
     ],
     stoerer: { date: '13.\nJUNI', corner: 'top-right' },
@@ -118,7 +118,7 @@ const EXAMPLES = [
     logo: 'STEIERMARK',
     background: 'openair-kino-story-bg.jpg',
     blocks: [
-      { text: 'OPEN-AIR\nKINO', fontOption: 'standard', color: WHITE, widthRatio: 0.84, band: 0.40, lineHeight: '0.8' },
+      { text: 'OPEN-AIR\nKINO', fontOption: 'standard', color: WHITE, widthRatio: 0.84, band: 0.40, lineHeight: '1.0' },
       { text: 'Fr 20. Juni · ab 21 Uhr\nStadtpark', fontOption: 'standard', color: YELLOW, widthRatio: 0.78, band: 0.56 },
     ],
     qr: { text: 'https://gruene.at/programm', label: 'Programm', corner: 'bottom-right' },
@@ -169,10 +169,10 @@ const EXAMPLES = [
     logo: 'VORARLBERG',
     background: 'kandidatin-portrait-feed-bg.jpg',
     blocks: [
-      { text: '„Veränderung\nbeginnt hier."', fontOption: 'accent', color: WHITE, widthRatio: 0.84, band: 0.34, lineHeight: '0.9' },
+      { text: '„Veränderung\nbeginnt hier."', fontOption: 'accent', color: WHITE, widthRatio: 0.84, band: 0.34, lineHeight: '1.15' },
       { text: 'Mag.ª Lena Berger', fontOption: 'standard', color: YELLOW, widthRatio: 0.68, band: 0.52 },
       { text: 'Spitzenkandidatin', fontOption: 'standard', color: WHITE, widthRatio: 0.44, band: 0.585 },
-      { text: 'Am 5. Oktober\nGRÜN wählen', fontOption: 'standard', color: YELLOW, widthRatio: 0.52, band: 0.71, lineHeight: '0.8' },
+      { text: 'Am 5. Oktober\nGRÜN wählen', fontOption: 'standard', color: YELLOW, widthRatio: 0.52, band: 0.71, lineHeight: '1.0' },
     ],
     wahlkreuz: { corner: 'bottom-left', widthRatio: 0.16 },
     occasion: 'Zitat',
@@ -186,7 +186,7 @@ const EXAMPLES = [
     logo: 'KÄRNTEN',
     background: 'infostand-natur-story-bg.jpg',
     blocks: [
-      { text: 'INFOSTAND\nAM MARKT', fontOption: 'standard', color: YELLOW, widthRatio: 0.84, band: 0.42, lineHeight: '0.8' },
+      { text: 'INFOSTAND\nAM MARKT', fontOption: 'standard', color: YELLOW, widthRatio: 0.84, band: 0.42, lineHeight: '1.0' },
       { text: 'Jeden Samstag · 9–12 Uhr\nWochenmarkt', fontOption: 'standard', color: WHITE, widthRatio: 0.78, band: 0.58 },
     ],
     occasion: 'Infostand',
@@ -206,8 +206,8 @@ const EXAMPLES = [
     logo: 'WIEN',
     noBackground: true,
     blocks: [
-      { text: 'AUS DEM\nGEMEINDERAT', fontOption: 'standard', color: YELLOW, widthRatio: 0.86, band: 0.22, lineHeight: '0.8' },
-      { text: '✓ Mehr Tempo 30 beschlossen\n✓ Radweg Hauptstraße kommt\n✓ Budget für Kinderbetreuung erhöht', fontOption: 'standard', color: WHITE, widthRatio: 0.84, band: 0.52, align: 'left', lineHeight: '1.1' },
+      { text: 'AUS DEM\nGEMEINDERAT', fontOption: 'standard', color: YELLOW, widthRatio: 0.86, band: 0.22, lineHeight: '1.0' },
+      { text: '✓ Mehr Tempo 30 beschlossen\n✓ Radweg Hauptstraße kommt\n✓ Budget für Kinderbetreuung erhöht', fontOption: 'standard', color: WHITE, widthRatio: 0.84, band: 0.52, align: 'left', lineHeight: '1.35' },
       { text: 'Sitzung vom 14. Mai', fontOption: 'standard', color: YELLOW, widthRatio: 0.5, band: 0.74 },
     ],
     occasion: 'Aus dem Gemeinderat',
@@ -222,8 +222,8 @@ const EXAMPLES = [
     logo: 'STEIERMARK',
     noBackground: true,
     blocks: [
-      { text: 'KLIMA-\nWORKSHOP', fontOption: 'standard', color: YELLOW, widthRatio: 0.84, band: 0.30, lineHeight: '0.8' },
-      { text: 'Mi 18. Juni · 18 Uhr\nVolkshaus, Saal 2', fontOption: 'standard', color: WHITE, widthRatio: 0.8, band: 0.50, lineHeight: '1.1' },
+      { text: 'KLIMA-\nWORKSHOP', fontOption: 'standard', color: YELLOW, widthRatio: 0.84, band: 0.30, lineHeight: '1.0' },
+      { text: 'Mi 18. Juni · 18 Uhr\nVolkshaus, Saal 2', fontOption: 'standard', color: WHITE, widthRatio: 0.8, band: 0.50, lineHeight: '1.35' },
     ],
     qr: { text: 'https://gruene.at/workshop', label: 'Anmeldung', corner: 'bottom-right' },
     occasion: 'Veranstaltungsankündigung',
@@ -238,8 +238,8 @@ const EXAMPLES = [
     logo: 'TIROL',
     noBackground: true,
     blocks: [
-      { text: 'AM 5. OKTOBER\nGRÜN WÄHLEN', fontOption: 'standard', color: YELLOW, widthRatio: 0.86, band: 0.30, lineHeight: '0.8' },
-      { text: 'Deine Stimme für\neine grüne Gemeinde', fontOption: 'standard', color: WHITE, widthRatio: 0.74, band: 0.54, lineHeight: '1.1' },
+      { text: 'AM 5. OKTOBER\nGRÜN WÄHLEN', fontOption: 'standard', color: YELLOW, widthRatio: 0.86, band: 0.30, lineHeight: '1.0' },
+      { text: 'Deine Stimme für\neine grüne Gemeinde', fontOption: 'standard', color: WHITE, widthRatio: 0.74, band: 0.54, lineHeight: '1.35' },
     ],
     wahlkreuz: { corner: 'bottom-right', widthRatio: 0.22 },
     occasion: 'Wahlaufruf',
@@ -362,7 +362,7 @@ async function placeText(page, block) {
   await deselect(page);
   await page.selectOption('#font-style-select', block.fontOption);
   await page.selectOption('#text-color', block.color);
-  await page.selectOption('#line-height', block.lineHeight || '0.9');
+  await page.selectOption('#line-height', block.lineHeight || '1.15');
   const align = block.align || 'center';
   await setAlign(page, align);
   await page.fill('#text', block.text);
@@ -383,7 +383,7 @@ async function addStoererDateBadge(page, dateText) {
   await deselect(page);
   await page.selectOption('#font-style-select', 'standard');
   await page.selectOption('#text-color', '#FFFFFF');
-  await page.selectOption('#line-height', '0.8');
+  await page.selectOption('#line-height', '1.0');
   await setAlign(page, 'center');
   await page.fill('#text', dateText);
   await page.click('#add-text');
@@ -480,7 +480,7 @@ async function addQrLabel(page, labelText) {
   await deselect(page);
   await page.selectOption('#font-style-select', 'standard');
   await page.selectOption('#text-color', '#FFFFFF');
-  await page.selectOption('#line-height', '0.9');
+  await page.selectOption('#line-height', '1.15');
   await setAlign(page, 'center');
   await page.fill('#text', labelText);
   await page.click('#add-text');
