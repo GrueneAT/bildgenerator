@@ -65,9 +65,15 @@ global.fabric = {
     Group: jest.fn(function(objects, options) {
         this.objects = objects;
         this.options = options;
+        this.left = 0;
+        this.top = 0;
         this.set = jest.fn();
         this.getScaledWidth = () => 200;
         this.getScaledHeight = () => 100;
+        // The knockout group is flattened to a PNG before being placed on the
+        // canvas (see addLogo) so the high-DPI export can't leak destination-out
+        // to black.
+        this.toDataURL = jest.fn(() => 'data:image/png;base64,MOCK');
     })
 };
 
@@ -359,30 +365,36 @@ describe('Logo Processing Integration Tests', () => {
             expect(textOptions.globalCompositeOperation).toBe('destination-out');
         });
 
-        test('logo image and knockout text are combined into a single fabric.Group', () => {
+        test('logo image and knockout text are combined into a group, then FLATTENED to an image', () => {
             jQuery('#logo-selection').html(`
                 <option value="WIEN" selected>WIEN</option>
             `);
 
             addLogo();
 
-            // Grouping the white logo image with the destination-out text is what
-            // isolates the knockout to the bar: the group renders to its own cache,
-            // so the letters become transparent there and reveal whatever is behind
-            // the logo (green canvas or uploaded photo) rather than the white bar.
+            // The white logo image + the destination-out text are grouped, and the
+            // group is FLATTENED to a PNG (real transparent letter-holes) which is
+            // placed on the canvas as a plain image. A live destination-out object
+            // would render fine on screen but leak the knockout to solid BLACK in
+            // the high-DPI download; a flattened image scales cleanly.
             expect(fabric.Group).toHaveBeenCalledTimes(1);
             const [groupObjects] = fabric.Group.mock.calls[0];
             expect(Array.isArray(groupObjects)).toBe(true);
             expect(groupObjects.length).toBe(2);
-            // The group must contain the knockout text instance.
             const textInstance = fabric.Text.mock.instances[0];
             expect(groupObjects).toContain(textInstance);
-            // logo global now references the cached group, logoName the inner text.
-            expect(global.logo).toBe(fabric.Group.mock.instances[0]);
-            expect(global.logoName).toBe(textInstance);
+            // The group is flattened (toDataURL) and re-loaded as a plain image.
+            const groupInstance = fabric.Group.mock.instances[0];
+            expect(groupInstance.toDataURL).toHaveBeenCalled();
+            // fabric.Image.fromURL is called twice: the blanko logo + the flat PNG.
+            expect(fabric.Image.fromURL).toHaveBeenCalledTimes(2);
+            // The on-canvas logo is the FLAT image, not the live group; the loose
+            // text reference is cleared so it can never be rendered live.
+            expect(global.logo).not.toBe(groupInstance);
+            expect(global.logoName).toBeNull();
         });
 
-        test('the cached group exposes the knockout via objectCaching', () => {
+        test('the knockout group caches so the flatten captures the transparent holes', () => {
             jQuery('#logo-selection').html(`
                 <option value="WIEN" selected>WIEN</option>
             `);
@@ -390,8 +402,8 @@ describe('Logo Processing Integration Tests', () => {
             addLogo();
 
             const groupOptions = fabric.Group.mock.calls[0][1];
-            // Caching must be on so the destination-out child composites within the
-            // group cache (producing transparent holes) rather than against the canvas.
+            // Caching on => the destination-out child composites within the group's
+            // own cache (transparent holes) before toDataURL flattens it.
             expect(groupOptions.objectCaching).toBe(true);
         });
     });

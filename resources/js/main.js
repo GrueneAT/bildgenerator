@@ -260,18 +260,45 @@ function addLogo() {
         canvas.remove(image);
         canvas.remove(logoName);
 
-        logo = new fabric.Group([image, logoName], {
+        const knockoutGroup = new fabric.Group([image, logoName], {
           selectable: false,
           objectCaching: true,
           lockMovementX: true,
           lockMovementY: true,
         });
-        CanvasUtils.disableScalingControls(logo);
+        canvas.centerObjectH(knockoutGroup);
 
-        canvas.add(logo);
-        canvas.centerObjectH(logo);
-        CanvasUtils.bringLogoToFront();
-        canvas.renderAll();
+        // FLATTEN the destination-out group into a single PNG with real
+        // transparent letter-holes, then place THAT plain image on the canvas.
+        // Rationale: a live destination-out object renders fine in the editor but
+        // the high-DPI download (canvas.toDataURL({multiplier})) re-renders it and
+        // leaks the erase to solid BLACK. A plain image with baked alpha holes
+        // scales cleanly at any export multiplier — the background (green canvas or
+        // photo) shows through the holes both on screen and in the download.
+        // Bake at the logo's native resolution so the upscaled export stays crisp.
+        const gx = knockoutGroup.left;
+        const gy = knockoutGroup.top;
+        const gw = knockoutGroup.getScaledWidth();
+        const nativeMultiplier = Math.max(1, (image.width || gw) / gw);
+        const flatUrl = knockoutGroup.toDataURL({
+          format: "png",
+          multiplier: nativeMultiplier,
+          enableRetinaScaling: false,
+        });
+
+        fabric.Image.fromURL(flatUrl, function (flat) {
+          flat.set({ left: gx, top: gy });
+          flat.scaleToWidth(gw);
+          flat.selectable = false;
+          flat.lockMovementX = true;
+          flat.lockMovementY = true;
+          CanvasUtils.disableScalingControls(flat);
+          logo = flat;
+          logoName = null;
+          canvas.add(flat);
+          CanvasUtils.bringLogoToFront();
+          canvas.renderAll();
+        });
       } catch (error) {
         console.error('Error while adding logo to canvas:', error);
       }
