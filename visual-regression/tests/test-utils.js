@@ -264,17 +264,17 @@ export async function setupTestEnvironment(page) {
     return document.fonts.ready.then(() => true);
   }, { timeout: 30000 });
 
-  // Verify Raleway fonts are loaded
+  // Verify Barlow Semi Condensed fonts are loaded
   const fontsLoaded = await page.evaluate(async () => {
     // Wait for fonts to be ready
     await document.fonts.ready;
 
     // Check if key fonts are available
     const fonts = [
-      '900 16px "Raleway"',
-      '800 16px "Raleway"',
-      '400 16px "Raleway"',
-      'italic 900 16px "Raleway"'
+      '900 16px "Barlow Semi Condensed"',
+      '800 16px "Barlow Semi Condensed"',
+      '400 16px "Barlow Semi Condensed"',
+      'italic 900 16px "Barlow Semi Condensed"'
     ];
 
     const results = fonts.map(font => document.fonts.check(font));
