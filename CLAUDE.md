@@ -112,7 +112,7 @@ The application supports multiple image formats defined in `TemplateConstants.TE
 - Percentage-based logo positioning for consistent placement across templates
 - Border control (0 = full-bleed, 10-20 = green border in pixels)
 - Text font is user-selectable via a descriptive 2-option picker (labelled by
-  type/use, not brand name): standard = Raleway (weight 900, -3 charSpacing tracking,
+  type/use, not brand name): standard = Barlow Semi Condensed (weight 900,
   upright; default), accent serif = Vollkorn (weight 900, italic — "Black
   Italic"). Both are
   loaded via the Google Fonts CDN. See `schriften.html` for the examples page
@@ -132,7 +132,7 @@ Logos are organized in a hierarchical structure:
 ### Styling
 
 - **Custom Theme**: GRÜNE brand colors (`gruene-primary`, `gruene-secondary`, `gruene-dark`)
-- **Typography**: Raleway (loaded via Google Fonts, -3 charSpacing tracking); Vollkorn for italic accents
+- **Typography**: Barlow Semi Condensed (Grüne-AT house font, loaded via Google Fonts)
 - **Responsive Design**: Tailwind CSS utility classes
 
 ## File Organization

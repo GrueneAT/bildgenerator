@@ -222,7 +222,6 @@ function addLogo() {
           fontFamily: AppConstants.FONTS.DEFAULT_LOGO,
           fontSize: Math.floor(image.getScaledWidth() / 10),
           fontWeight: AppConstants.FONTS.WEIGHT_LOGO,
-          charSpacing: AppConstants.FONTS.CHAR_SPACING,
           fontStyle: "normal",
           textAlign: "right",
           // fill is irrelevant under destination-out (only the text's alpha
