@@ -117,7 +117,7 @@ global.AppConstants = {
         WIDTH_SCALE: 0.95
     },
     FONTS: {
-        DEFAULT_LOGO: 'Barlow Semi Condensed'
+        DEFAULT_LOGO: 'Raleway'
     },
     COLORS: {
         WHITE: '#FFFFFF'
