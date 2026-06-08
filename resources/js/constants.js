@@ -116,7 +116,7 @@ const AppConstants = {
         TEXT_SCALE_SHORT: 6,
         MAX_TEXT_LENGTH: 16,
         LINE_HEIGHT: 0.8,
-        ANGLE: -5.5,
+        ANGLE: -5.0,  // matches the logo bar's actual slope (white bar edges measured at -5.0°); keeps the region name parallel to the bar
         WIDTH_SCALE: 0.95,
         // Bar text positioning - use WIDTH as reference since it's constant
         BAR_OFFSET_FROM_TOP: 0.90, // Single-line text starts at 90% of logo WIDTH from logo top
