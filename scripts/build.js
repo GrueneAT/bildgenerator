@@ -77,7 +77,7 @@ async function createProductionHTML() {
     // tokens (var(--gat-*)) used by the bundled Tailwind utilities resolve.
     html = html.replace(
         /<link rel="stylesheet" href="vendors\/fontawesome\/css\/all\.css"\s*\/?>[\s\S]*?<link rel="stylesheet"[\s\S]*?href="resources\/css\/style\.css\?v=[\d\.]+"\s*\/?>/g,
-        '<link rel="stylesheet" href="https://grueneat.github.io/design-system/design-system.css">\n    <link rel="stylesheet" href="app.min.css">'
+        '<link rel="stylesheet" href="https://design-system.gruene.at/design-system.css">\n    <link rel="stylesheet" href="app.min.css">'
     );
 
     // Replace vendor JavaScript files with bundled version
@@ -114,7 +114,7 @@ async function createStaticPage(filename) {
 
     html = html.replace(
         /<link rel="stylesheet" href="vendors\/fontawesome\/css\/all\.css"\s*\/?>[\s\S]*?<link rel="stylesheet"[\s\S]*?href="resources\/css\/style\.css\?v=[\d\.]+"\s*\/?>/g,
-        '<link rel="stylesheet" href="https://grueneat.github.io/design-system/design-system.css">\n    <link rel="stylesheet" href="app.min.css">'
+        '<link rel="stylesheet" href="https://design-system.gruene.at/design-system.css">\n    <link rel="stylesheet" href="app.min.css">'
     );
 
     const timestamp = Date.now();
