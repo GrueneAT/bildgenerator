@@ -55,6 +55,10 @@ global.fabric = {
         this.height = 20;
         this.top = options.top || 0;
         this.scaleToWidth = jest.fn();
+        // Mirror real fabric.Text: getScaledWidth() = width * scaleX (scaleX
+        // defaults to 1). addLogo() reads this to decide whether the region name
+        // overflows the bar and must be scaled down to fit.
+        this.getScaledWidth = () => this.width;
         this.getScaledHeight = () => 20;
         this.set = jest.fn();
     }),
@@ -405,6 +409,48 @@ describe('Logo Processing Integration Tests', () => {
             // Caching on => the destination-out child composites within the group's
             // own cache (transparent holes) before toDataURL flattens it.
             expect(groupOptions.objectCaching).toBe(true);
+        });
+
+        // Available bar width = image.getScaledWidth() (200) * WIDTH_SCALE (0.95) = 190.
+        test('a region name wider than the bar is scaled down to fit (no clipping)', () => {
+            // Force the next text instance to be wider than the bar so the overflow
+            // branch runs. This is the regression guard for long single-line names
+            // (e.g. OBERHOFEN/IRRSEE) that previously overflowed and clipped left.
+            fabric.Text.mockImplementationOnce(function (text, options) {
+                this.text = text;
+                this.options = options;
+                this.width = 300; // > 190 => overflows the bar
+                this.height = 20;
+                this.top = options.top || 0;
+                this.scaleToWidth = jest.fn();
+                this.getScaledWidth = () => this.width;
+                this.getScaledHeight = () => 20;
+                this.set = jest.fn();
+            });
+
+            jQuery('#logo-selection').html(`
+                <option value="WIEN" selected>WIEN</option>
+            `);
+
+            addLogo();
+
+            const textInstance = fabric.Text.mock.instances[0];
+            // Scaled to exactly the available bar width so nothing is clipped.
+            expect(textInstance.scaleToWidth).toHaveBeenCalledWith(190);
+        });
+
+        test('a region name that already fits keeps its size (only box width is set)', () => {
+            jQuery('#logo-selection').html(`
+                <option value="WIEN" selected>WIEN</option>
+            `);
+
+            addLogo();
+
+            const textInstance = fabric.Text.mock.instances[0];
+            // Default mock width 100 <= 190 => not scaled down; the box width is
+            // set to the available area for right-alignment/centering.
+            expect(textInstance.scaleToWidth).not.toHaveBeenCalled();
+            expect(textInstance.width).toBe(190);
         });
     });
 });
