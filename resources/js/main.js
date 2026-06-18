@@ -242,13 +242,21 @@ function addLogo() {
         // not double-rendered.
         canvas.add(logoName);
 
-        const linebreak = logoText.lastIndexOf("\n");
-        if (linebreak > 17 || logoText.length - linebreak > 17) {
-          logoName.scaleToWidth(image.getScaledWidth() * AppConstants.LOGO.WIDTH_SCALE);
+        // Fit the region name to the bar by ACTUAL rendered width, not by a
+        // character-count heuristic. Some names that stay on one line (e.g.
+        // "OBERHOFEN/IRRSEE", or any name without a space to break on) are still
+        // wider than the bar; the old length check left them unscaled so the
+        // right-aligned text overflowed and clipped the leading letter. Whenever
+        // the text is wider than the available bar width we scale it down to fit;
+        // otherwise we keep its natural size and just set the box width so the
+        // right-alignment/centering stays unchanged for names that already fit.
+        const availableWidth = image.getScaledWidth() * AppConstants.LOGO.WIDTH_SCALE;
+        if (logoName.getScaledWidth() > availableWidth) {
+          logoName.scaleToWidth(availableWidth);
           const topAdd = Math.floor((logoName.height - logoName.getScaledHeight()) / 2);
           logoName.top = logoName.top + topAdd;
         } else {
-          logoName.width = image.getScaledWidth() * AppConstants.LOGO.WIDTH_SCALE;
+          logoName.width = availableWidth;
         }
 
         canvas.centerObjectH(logoName);
