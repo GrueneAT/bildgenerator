@@ -121,7 +121,7 @@ global.AppConstants = {
         WIDTH_SCALE: 0.95
     },
     FONTS: {
-        DEFAULT_LOGO: 'Raleway'
+        DEFAULT_LOGO: 'Gotham Narrow'
     },
     COLORS: {
         WHITE: '#FFFFFF'

@@ -29,9 +29,9 @@ describe('AppConstants.FONTS.OPTIONS', () => {
     expect(FONTS.OPTIONS.map(o => o.id)).toEqual(['standard', 'accent']);
   });
 
-  it('resolves the standard option to Raleway 900 upright', () => {
+  it('resolves the standard option to Gotham Narrow 900 upright', () => {
     const opt = lookup('standard');
-    expect(opt.family).toBe('Raleway');
+    expect(opt.family).toBe('Gotham Narrow');
     expect(opt.weight).toBe(900);
     expect(opt.style).toBe('normal');
   });
@@ -55,14 +55,14 @@ describe('AppConstants.FONTS.OPTIONS', () => {
 
   it('labels both options descriptively, never by brand name', () => {
     for (const opt of FONTS.OPTIONS) {
-      expect(opt.label).not.toMatch(/Vollkorn|Barlow|Raleway/i);
+      expect(opt.label).not.toMatch(/Vollkorn|Barlow|Raleway|Gotham/i);
       expect(opt.label.length).toBeGreaterThan(0);
     }
   });
 
   it('preloads each font family, including Vollkorn', () => {
     const families = FONTS.PRELOAD_FONTS.map(d => d.family);
-    expect(families).toContain('Raleway');
+    expect(families).toContain('Gotham Narrow');
     expect(families).toContain('Vollkorn');
     // Every preload entry must carry a family (the preload trap fix).
     expect(FONTS.PRELOAD_FONTS.every(d => typeof d.family === 'string')).toBe(true);

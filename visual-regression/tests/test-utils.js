@@ -264,17 +264,17 @@ export async function setupTestEnvironment(page) {
     return document.fonts.ready.then(() => true);
   }, { timeout: 30000 });
 
-  // Verify Raleway fonts are loaded
+  // Verify Gotham Narrow fonts are loaded
   const fontsLoaded = await page.evaluate(async () => {
     // Wait for fonts to be ready
     await document.fonts.ready;
 
     // Check if key fonts are available
     const fonts = [
-      '900 16px "Raleway"',
-      '800 16px "Raleway"',
-      '400 16px "Raleway"',
-      'italic 900 16px "Raleway"'
+      '900 16px "Gotham Narrow"',
+      '700 16px "Gotham Narrow"',
+      '400 16px "Gotham Narrow"',
+      'italic 900 16px "Gotham Narrow"'
     ];
 
     const results = fonts.map(font => document.fonts.check(font));

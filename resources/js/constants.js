@@ -85,31 +85,34 @@ const AppConstants = {
 
     // Font Configuration
     FONTS: {
-        FAMILY: "Raleway",
-        DEFAULT_LOGO: "Raleway",
-        DEFAULT_TEXT: "Raleway",
-        WEIGHT_TEXT: 900,    // default canvas text (Black)
-        WEIGHT_LOGO: 800,    // logo overlay text (ExtraBold)
-        WEIGHT_BOOK: 400,    // body / book equivalent (Regular)
+        FAMILY: "Gotham Narrow",
+        DEFAULT_LOGO: "Gotham Narrow",
+        DEFAULT_TEXT: "Gotham Narrow",
+        // Gotham Narrow ships as four separate faces, registered under one
+        // family in input.css. Only these three weights exist — 500/600/800
+        // would silently snap to a neighbour.
+        WEIGHT_TEXT: 900,    // default canvas text (Ultra)
+        WEIGHT_LOGO: 700,    // logo overlay text (Bold)
+        WEIGHT_BOOK: 400,    // body / book equivalent (Book)
         // Manual tracking for fabric.js text (charSpacing, 1/1000 em).
-        // -30 = -0.03 em = the "Raleway -3" decision (tightens letters
-        // and word spacing), matching the Scribus KERN -3 of the print
-        // templates.
-        CHAR_SPACING: -30,
+        // 0 = Gotham Narrow's own metrics. The -30 ("-3") tracking existed
+        // only to make the wider Raleway approximate Gotham's set width;
+        // with the real font it would over-tighten.
+        CHAR_SPACING: 0,
         // User-selectable text fonts, labelled DESCRIPTIVELY (type + use),
         // never by brand name. Option ids match #font-style-select values.
         OPTIONS: [
-            { id: 'standard', label: 'Standardschrift — Headlines & Fließtext', family: 'Raleway', weight: 900, style: 'normal' },
+            { id: 'standard', label: 'Standardschrift — Headlines & Fließtext', family: 'Gotham Narrow', weight: 900, style: 'normal' },
             { id: 'accent',   label: 'Betonte Serifenschrift — für Zitate & Akzente', family: 'Vollkorn', weight: 900, style: 'italic' }
         ],
         // Each entry carries its own family so the preload observer binds to
         // the correct font. Mixing families under a single observer family
         // would leave the other font unloaded (serif fallback on first use).
         PRELOAD_FONTS: [
-            { family: 'Raleway', weight: 900, style: 'italic' },  // italic accent
-            { family: 'Raleway', weight: 900 },                   // default text
-            { family: 'Raleway', weight: 400 },                   // book / body
-            { family: 'Raleway', weight: 800 },                   // default logo
+            { family: 'Gotham Narrow', weight: 900, style: 'italic' },  // italic accent
+            { family: 'Gotham Narrow', weight: 900 },                   // default text
+            { family: 'Gotham Narrow', weight: 400 },                   // book / body
+            { family: 'Gotham Narrow', weight: 700 },                   // default logo
             { family: 'Vollkorn', weight: 900, style: 'italic' },              // accent serif (Black Italic)
             { family: 'Vollkorn', weight: 400 }                                // accent serif (book)
         ]

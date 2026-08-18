@@ -365,7 +365,7 @@ const CanvasUtils = {
         // and .check() are NOT sufficient. Awaiting the load here makes the
         // export deterministic regardless of how late the font finished loading
         // relative to text being added (fixed fallback glyphs in headless
-        // reference runs and guarantees real downloads use Raleway too).
+        // reference runs and guarantees real downloads use Gotham Narrow too).
         if (typeof document !== "undefined" && document.fonts && document.fonts.load) {
             try {
                 const fontSpecs = (typeof AppConstants !== "undefined" &&
@@ -385,7 +385,7 @@ const CanvasUtils = {
 
         // Re-measure text with the now-loaded fonts before exporting.
         // Fabric caches a text object's char metrics at creation time; if a
-        // web font (Raleway) finished loading AFTER the text was added, the
+        // web font (Gotham Narrow) finished loading AFTER the text was added, the
         // cached fallback metrics — and thus the exported PNG — stick unless we
         // force a re-measure. This makes the export deterministic regardless of
         // font-load timing (fixes fallback glyphs in headless reference runs).

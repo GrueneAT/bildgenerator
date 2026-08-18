@@ -112,15 +112,16 @@ The application supports multiple image formats defined in `TemplateConstants.TE
 - Percentage-based logo positioning for consistent placement across templates
 - Border control (0 = full-bleed, 10-20 = green border in pixels)
 - Text font is user-selectable via a descriptive 2-option picker (labelled by
-  type/use, not brand name): standard = Raleway (weight 900, -3 charSpacing tracking,
+  type/use, not brand name): standard = Gotham Narrow (weight 900 = Ultra,
   upright; default), accent serif = Vollkorn (weight 900, italic — "Black
-  Italic"). Both are
-  loaded via the Google Fonts CDN. See `schriften.html` for the examples page
-  explaining which font for what.
+  Italic"). Gotham Narrow is proprietary and therefore shipped locally
+  (`resources/fonts/*.otf`, registered per @font-face in `resources/css/input.css`);
+  Vollkorn is loaded via the Google Fonts CDN. See `schriften.html` for the
+  examples page explaining which font for what.
 - Text color options: Gelb (Yellow), Weiß (White)
 - Line-height options: Klein (1.0, default), Mittel (1.15), Groß (1.35). Values
   chosen so even the tightest (default) setting clears the descenders (g, p, y)
-  of the heavy display fonts (Raleway 900 / Vollkorn 900) above the caps of the
+  of the heavy display fonts (Gotham Narrow 900 / Vollkorn 900) above the caps of the
   line below; the previous 0.8/0.9/1.1 scale let glyphs overlap.
 
 ### Logo System
@@ -135,7 +136,7 @@ Logos are organized in a hierarchical structure:
 ### Styling
 
 - **Custom Theme**: GRÜNE brand colors (`gruene-primary`, `gruene-secondary`, `gruene-dark`)
-- **Typography**: Raleway (loaded via Google Fonts, -3 charSpacing tracking); Vollkorn for italic accents
+- **Typography**: Gotham Narrow (Hausschrift, lokal per @font-face aus `resources/fonts/`); Vollkorn for italic accents (Google Fonts)
 - **Responsive Design**: Tailwind CSS utility classes
 
 ## File Organization

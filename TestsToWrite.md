@@ -42,8 +42,8 @@
 ### **CATEGORY 2: Text System Testing (24 tests)**
 
 #### **2.1 Font and Typography (8 tests)**
-- [ ] **Barlow Semi Condensed (weight 900)** - Headline font rendering
-- [ ] **Barlow Semi Condensed (weight 400)** - Body text font rendering
+- [ ] **Gotham Narrow (weight 900)** - Headline font rendering
+- [ ] **Gotham Narrow (weight 400)** - Body text font rendering
 - [ ] **Font Loading States** - Test with FontFaceObserver loading completion
 - [ ] **Mixed Font Layout** - Combination of both fonts in single design
 - [ ] **Long Text Wrapping** - Multi-line text behavior and overflow
