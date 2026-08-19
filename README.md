@@ -26,8 +26,8 @@ Der grüne Bildgenerator ist ein browser-basiertes Tool zur Erstellung professio
 ### ✏️ **Text System**
 
 #### **Typography**
-- **Barlow Semi Condensed 900** - Headlines und Akzente
-- **Barlow Semi Condensed 400** - Fließtext und Beschreibungen
+- **Gotham Narrow Ultra (900)** - Headlines und Akzente
+- **Gotham Narrow Book (400)** - Fließtext und Beschreibungen
 - **FontFaceObserver Integration** - Optimierte Schriftarten-Ladung
 - **Multi-line Text Support** - Mehrzeilige Texteingabe
 - **Auto-scaling** - Automatische Größenanpassung an Canvas

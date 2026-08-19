@@ -18,8 +18,8 @@ module.exports = {
         'gruene-gelb': 'var(--gat-color-gelb, #ffed00)',
       },
       fontFamily: {
-        'barlow': ['Barlow Semi Condensed', 'Arial', 'sans-serif'],
-        'barlow-bold': ['Barlow Semi Condensed', 'Arial Black', 'sans-serif'],
+        'gotham': ['Gotham Narrow', 'Arial', 'sans-serif'],
+        'gotham-bold': ['Gotham Narrow', 'Arial Black', 'sans-serif'],
       }
     },
   },

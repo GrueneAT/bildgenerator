@@ -2,6 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  /* Gotham Narrow — die Hausschrift. Proprietaer, daher lokal ausgeliefert
+     (kein CDN-Anbieter fuehrt sie). Die vier Schnitte werden bewusst unter
+     EINER Familie mit numerischen Gewichten registriert, damit die
+     gewichtsbasierte Auswahl in constants.js/fabric.js greift:
+     Book = 400, Bold = 700, Ultra = 900, Ultra Italic = 900 kursiv.
+     Die url()-Pfade sind relativ zu resources/css/; scripts/build-css.js
+     schreibt sie fuer das gebuendelte app.min.css auf resources/fonts/ um. */
+  @font-face {
+    font-family: 'Gotham Narrow';
+    src: url('../fonts/Gotham-Narrow-Book.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Gotham Narrow';
+    src: url('../fonts/GothamNarrow-Bold.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Gotham Narrow';
+    src: url('../fonts/Gotham-Narrow-Ultra.otf') format('opentype');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Gotham Narrow';
+    src: url('../fonts/GothamNarrow-UltraItalic.otf') format('opentype');
+    font-weight: 900;
+    font-style: italic;
+    font-display: swap;
+  }
+}
+
 @layer components {
   /* Button components */
   .btn-primary {

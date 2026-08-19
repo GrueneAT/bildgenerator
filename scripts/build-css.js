@@ -42,6 +42,13 @@ async function buildCSS() {
                     // Fix FontAwesome webfont URLs for bundled CSS
                     content = content.replace(/url\("\.\.\/webfonts\//g, 'url("vendors/fontawesome/webfonts/');
                     content = content.replace(/url\('\.\.\/webfonts\//g, 'url(\'vendors/fontawesome/webfonts/');
+                } else if (filePath === 'resources/css/output.css') {
+                    // The Gotham Narrow @font-face srcs are relative to
+                    // resources/css/; app.min.css sits at the build root, so
+                    // they have to point at the copied resources/fonts/ tree.
+                    // Tailwind's minifier drops the quotes, so all three
+                    // url() spellings have to be covered.
+                    content = content.replace(/url\((["']?)\.\.\/fonts\//g, 'url($1resources/fonts/');
                 }
                 
                 concatenatedCSS += `\n/* === ${filePath} === */\n`;

@@ -1,6 +1,6 @@
 // Font management
 function loadFont(font) {
-    const customFonts = ['Raleway', 'Vollkorn'];
+    const customFonts = ['Gotham Narrow', 'Vollkorn'];
     const text = canvas.getActiveObject();
     
     if (!text) return;
