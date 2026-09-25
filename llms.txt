@@ -49,7 +49,7 @@ weitere Freigabe.
 
 Seite laden, warten bis `window.Bildgenerator` existiert, dann aufrufen.
 Alle Methoden sind asynchron und liefern erst zurück, wenn das Canvas seine
-Ruhelage erreicht hat. Aktuelle Schnittstellenversion: `Bildgenerator.VERSION === 13`.
+Ruhelage erreicht hat. Aktuelle Schnittstellenversion: `Bildgenerator.VERSION === 14`.
 
 ```js
 const bild = await window.Bildgenerator.render({
@@ -143,7 +143,8 @@ Objekt zurück, sind also verkettbar.
 | `clipToCircle(size)` | das zuletzt hinzugefügte Objekt kreisrund beschneiden |
 | `lastAdded()` | das zuletzt hinzugefügte Objekt |
 | `protectiveMargin()` | die Schutzzone M in Pixeln |
-| `export(opts)` | Bild erzeugen: `{ dataURL, width, height, dpi }` |
+| `check()` | das Bild gegen die messbaren Regeln prüfen |
+| `export(opts)` | Bild erzeugen: `{ dataURL, width, height, dpi, quality }` |
 | `reset()` | zurück auf einen leeren Entwurf |
 
 **Zu `clipToCircle`:** Der Knopf heißt in der Oberfläche „Kreis", fügt aber
@@ -674,6 +675,47 @@ Faustregeln:
   immer jemanden ab.
 
 Steht Text auf dem Foto, gehört eine grüne Fläche darunter — siehe oben.
+
+## Prüfen, ob das Bild etwas taugt
+
+Geschmack lässt sich nicht messen. Einiges von dem, was ein Sujet falsch
+aussehen lässt, aber schon — und genau das prüft `check()`:
+
+```js
+const B = window.Bildgenerator;
+await B.render({ template: 'artikel_23', logo: 'HERZOGENBURG', text: 'Windpark kommt' });
+
+const ergebnis = B.check();
+// { ok, errors, warnings, findings }
+```
+
+Jeder Befund nennt `rule`, `severity` und eine lesbare `message`.
+
+**`error`** sind Regelverstöße, keine Geschmacksfragen:
+
+| Regel | Was sie erkennt |
+|---|---|
+| `margin` | Ein Element ragt in die Schutzzone, rotationsbewusst und an allen vier Kanten |
+| `overlap` | Zwei Texte überdecken sich, oder ein Element verdeckt ein anderes zu über 35 % |
+| `textGap` | Zwei Textblöcke stehen enger als ein Viertel Zeilenhöhe |
+| `textWidth` | Ein Textblock ist breiter als die nutzbare Fläche |
+| `accents` | Mehr als ein Störer |
+| `typeOnGreen` | Text liegt auf einem Foto ohne grüne Fläche darunter |
+
+**`warning`** sind Hinweise, über die du entscheidest: enge Textabstände,
+mehr als drei Zeilen, verwaiste Schlusszeile, sehr kleiner Text im Export,
+mehr als zwei konkurrierende Akzente, eine Komposition die stark aus der
+Mitte hängt.
+
+`export()` führt die Prüfung von selbst aus und legt das Ergebnis als
+`quality` bei — **das Bild wird trotzdem geliefert.** Ob eine Überlappung von
+12 % ein Fehler oder die Absicht ist, weiß nur du. Mit `export({ check: false })`
+lässt sich die Prüfung abschalten.
+
+Alle Regeln rechnen aus dem Objektmodell, ohne zweites Rendering. Die
+Schwellwerte stammen aus drei unabhängigen externen Reviews; wo sie
+auseinanderlagen, gilt der großzügigste Wert — damit eine Warnung etwas
+bedeutet.
 
 ## Formate
 

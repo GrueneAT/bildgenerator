@@ -31,7 +31,7 @@
  * breakage surfaces in e2e/api.spec.js instead of in somebody else's script.
  */
 const Bildgenerator = {
-    VERSION: 13,
+    VERSION: 14,
 
     /** The object the most recent add* call put on the canvas. */
     _lastAdded: null,
@@ -957,6 +957,23 @@ const Bildgenerator = {
         throw new Error("Expected an index from objects(), or an element that was added first");
     },
 
+    /**
+     * Measure the current design against the checkable rules.
+     *
+     * Taste is not testable, but several of the things that make a sujet look
+     * wrong are — elements that collide, type breaking the protective margin,
+     * text too small to survive the export, a composition leaning to one side,
+     * accents competing with each other.
+     *
+     * Everything is computed from the canvas object model; there is no second
+     * rendering pass. Errors are brand rules, warnings are judgement calls.
+     *
+     * @returns {{ok: boolean, errors: Array, warnings: Array, findings: Array}}
+     */
+    check() {
+        return QualityCheck.run();
+    },
+
     // ----------------------------------------------------------- step 4: export
 
     /**
@@ -981,6 +998,12 @@ const Bildgenerator = {
         if (!validation.isValid) {
             throw new Error(validation.error);
         }
+
+        // Report the measurable problems alongside the image rather than
+        // blocking on them: only the caller knows whether a 12 % overlap is a
+        // mistake or the intended composition. Silence, though, would make
+        // the whole checker pointless — nobody calls check() by habit.
+        const quality = opts.check === false ? null : QualityCheck.run();
         // The download button reads the DPI from the template
         // (event-handlers.js); a hardcoded 200 silently produced a different
         // resolution than the same template yields for a person.
@@ -997,6 +1020,7 @@ const Bildgenerator = {
             width: Math.round(canvas.width * scale),
             height: Math.round(canvas.height * scale),
             dpi: result.actualDPI,
+            quality: quality,
         };
     },
 
