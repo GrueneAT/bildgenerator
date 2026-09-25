@@ -104,6 +104,13 @@ The application supports multiple image formats defined in `TemplateConstants.TE
 - **Event format** (1920x1005) - Event headers without border
 - **Facebook Header** (820x360) - Facebook profile headers without border
 
+**Website Templates**:
+- **Artikelbild 2:3** (1080x1620) - Article/card image for our own Gemeinde- and
+  Bezirks-Websites. The sites serve images via Cloudflare Image Resizing at an
+  explicit height; news and person cards request ratio 0.667 (640x960 up to
+  1920x2880). Blocks asking for another ratio centre-crop, so text belongs in
+  the middle.
+
 **Print Templates**:
 - A2, A3, A4, A5 formats (portrait and landscape variants with borders)
 
@@ -123,6 +130,27 @@ The application supports multiple image formats defined in `TemplateConstants.TE
   chosen so even the tightest (default) setting clears the descenders (g, p, y)
   of the heavy display fonts (Gotham Narrow 900 / Vollkorn 900) above the caps of the
   line below; the previous 0.8/0.9/1.1 scale let glyphs overlap.
+
+### Programmatic Interface (`window.Bildgenerator`)
+
+`resources/js/api.js` exposes the full feature set of both tools — image
+generator and standalone QR generator — as one object, so headless callers and
+AI assistants do not have to reverse-engineer the wizard. It drives the same
+controls and handlers a person does; it is NOT a second rendering path.
+
+- Documented for outside callers in `llms.txt`, for people in `ki.html`.
+- Covered by `e2e/api.spec.js`. `e2e/llms-txt.spec.js` asserts that everything
+  `llms.txt` promises actually exists, so the document cannot drift from the
+  code — a documented-but-missing method would send an assistant down a dead
+  end, and it would improvise rather than report back.
+- **Bump `VERSION` and update `llms.txt` when the surface changes.**
+- The facade waits for canvas *quiescence*, not for a flag: `replaceCanvas()`
+  re-adds the logo asynchronously, `addLogo()` is two image loads deep, and
+  `window.logo` is snapshotted once at init and never synced. Continuing early
+  stacks a second logo pixel-on-pixel on the first.
+- `api.js` must stay inside the script block that `build.js` folds into
+  `app.min.js` (from "Core utilities" through `qrcode-handlers.js`). A tag
+  after it is served separately and goes stale.
 
 ### Logo System
 

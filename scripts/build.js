@@ -32,6 +32,7 @@ async function build() {
         await createProductionHTML();
         await createStaticPage('impressum.html');
         await createStaticPage('schriften.html');
+        await createStaticPage('ki.html');
         console.log('✅ Production HTML created\n');
         
         // Step 5: Copy assets
@@ -169,13 +170,18 @@ async function copyAssets() {
 
     console.log('   ✅ Vendor JavaScript libraries are now bundled in vendors.min.js and jquery.min.js');
 
-    // Copy resources directory (fonts, images, etc.)
+    // Copy resources directory (fonts, images, etc.). Remove the previous copy
+    // first: `cp -r resources/ build/resources/` only lands correctly while the
+    // destination does not exist yet. On every later build cp descends into the
+    // existing directory and writes build/resources/resources/, leaving the
+    // files actually served frozen at the state of the very first build.
     const resourcesDir = path.join(buildDir, 'resources');
+    fs.rmSync(resourcesDir, { recursive: true, force: true });
     execSync(`cp -r resources/ "${resourcesDir}/"`, { cwd: path.join(__dirname, '..') });
     console.log('   📋 Copied: resources/');
 
     // Copy root-level files needed for GitHub Pages deployment
-    const rootFiles = ['robots.txt', '.nojekyll', 'CNAME'];
+    const rootFiles = ['robots.txt', '.nojekyll', 'CNAME', 'llms.txt'];
     for (const file of rootFiles) {
         const srcPath = path.join(rootDir, file);
         const destPath = path.join(buildDir, file);

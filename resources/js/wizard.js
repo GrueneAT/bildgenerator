@@ -347,6 +347,23 @@ function setupAutoAdvance() {
                 window.AlertSystem.closeAll();
             }
 
+            // Article images are delivered through Cloudflare Image Resizing
+            // with fit=cover and a centred gravity, so a block that asks for a
+            // different ratio than 2:3 crops the edges away rather than
+            // letterboxing. Keeping text central keeps it readable everywhere.
+            if (templateName === 'artikel_23') {
+                if (window.AlertSystem) {
+                    window.AlertSystem.show(
+                        'Hinweis: Artikelbilder werden je nach Block der Website unterschiedlich beschnitten — immer aus der Mitte heraus. Text und wichtige Bildteile daher möglichst mittig platzieren.',
+                        'info',
+                        {
+                            autoClose: false,
+                            scrollIntoView: false
+                        }
+                    );
+                }
+            }
+
             // Show Facebook mobile warning
             if (templateName === 'facebook_header') {
                 if (window.AlertSystem) {

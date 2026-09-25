@@ -156,6 +156,14 @@ const TemplateConstants = {
         facebook_header: {
             width: 820, height: 360, topBorderMultiplier: 1, border: 0, dpi: 150, logoWidth: 163,
         },
+        // Article image for our own Gemeinde-/Bezirks-Websites. 2:3 portrait is
+        // what the sites actually render: their images go through Cloudflare
+        // Image Resizing with an explicit height, and the news/person cards ask
+        // for ratio 0.667 (e.g. 640x960, up to 1920x2880). Canvas kept at the
+        // 1080 width of the social templates so logo sizing stays comparable.
+        artikel_23: {
+            width: 1080, height: 1620, topBorderMultiplier: 1, border: 0, dpi: 200, logoWidth: 163,
+        },
         a4: {
             width: 2480, height: 3508, topBorderMultiplier: 1, border: 0, dpi: 250, logoWidth: 374,
         },
