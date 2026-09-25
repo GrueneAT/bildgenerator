@@ -31,7 +31,7 @@
  * breakage surfaces in e2e/api.spec.js instead of in somebody else's script.
  */
 const Bildgenerator = {
-    VERSION: 10,
+    VERSION: 11,
 
     /** The object the most recent add* call put on the canvas. */
     _lastAdded: null,
@@ -58,7 +58,7 @@ const Bildgenerator = {
             fontStyles: AppConstants.FONTS.OPTIONS.map(function (o) { return o.id; }),
             lineHeights: this._optionValues("#line-height"),
             alignments: ["left", "center", "right"],
-            shapes: ["pinkCircle", "cross"],
+            shapes: ["pinkCircle", "cross", "panel"],
             clipSizes: this._optionValues("#circle-radius"),
             qrColorsOnImage: this._optionValues("#qr-color"),
             qrColors: this._optionValues("#qr-color-select"),
@@ -152,11 +152,33 @@ const Bildgenerator = {
      * Set the background image from a data: URL or an absolute URL. Goes
      * straight to processMeme() rather than through the #meme-input file
      * picker, so callers never have to synthesise a File.
+     *
+     * The photo is cover-scaled, so one axis overflows and gets cropped.
+     * `focusX` / `focusY` decide which part survives: 0.5 is the centre and
+     * the long-standing default, 0 pins the left or top edge, 1 the right or
+     * bottom. A portrait in a landscape template usually wants focusY near 0
+     * so the face is not cut off — centring is a guess, and often the wrong
+     * one.
+     *
+     * @param {string} url
+     * @param {Object} [options]
+     * @param {number} [options.focusX=0.5]
+     * @param {number} [options.focusY=0.5]
      */
-    async setBackground(url) {
+    async setBackground(url, options) {
         if (typeof url !== "string" || !url) {
             throw new Error("setBackground() needs a data: URL or an absolute URL");
         }
+        const opts = options || {};
+        const focus = function (v) {
+            if (v === undefined) return undefined;
+            if (typeof v !== "number" || v < 0 || v > 1) {
+                throw new Error("setBackground() focus values run from 0 to 1");
+            }
+            return v;
+        };
+        // Set before the image loads: positionBackgroundImage() reads it.
+        CanvasUtils.setBackgroundFocus(focus(opts.focusX), focus(opts.focusY));
         processMeme({ url: url });
         await this._waitFor(() => !!window.contentImage, "background image to load");
         await this._waitUntilQuiet();
@@ -177,6 +199,9 @@ const Bildgenerator = {
      *                                        the block itself, use place().
      * @param {string} [options.lineHeight] value from options().lineHeights
      * @param {number} [options.shadow]     shadow depth
+     * @param {boolean|Object} [options.panel] put a green surface behind this
+     *                                        text — required by the brand rule
+     *                                        when a background photo is set
      */
     async addText(text, options) {
         const opts = options || {};
@@ -197,6 +222,14 @@ const Bildgenerator = {
             jQuery("#text").val(text);
             jQuery("#add-text").trigger("click");
         }, "text object to be added to the canvas");
+
+        // Convenience for the brand rule: put a green surface under this text,
+        // sized to it. Doing it here rather than leaving the arithmetic to the
+        // caller is the difference between a rule that gets followed and one
+        // that gets skipped.
+        if (opts.panel) {
+            await this._panelBehind(this.lastAdded(), opts.panel);
+        }
         return this;
     },
 
@@ -206,7 +239,11 @@ const Bildgenerator = {
      * entirely — see clipToCircle().
      */
     async addShape(kind) {
-        const buttons = { pinkCircle: "#add-pink-circle", cross: "#add-cross" };
+        const buttons = {
+            pinkCircle: "#add-pink-circle",
+            cross: "#add-cross",
+            panel: "#add-panel",
+        };
         const selector = buttons[kind];
         if (!selector) {
             throw new Error(
@@ -217,6 +254,91 @@ const Bildgenerator = {
         await this._addTracking(function () {
             jQuery(selector).trigger("click");
         }, `shape "${kind}" to be added`);
+        return this;
+    },
+
+    /**
+     * Put a green surface behind one text, sized to it with padding, and keep
+     * the text on top. The padding is a share of the text's own height, so it
+     * scales with the type rather than with the canvas.
+     */
+    async _panelBehind(text, options) {
+        const opts = typeof options === "object" && options !== null ? options : {};
+        await this.addPanel();
+        const panel = this.lastAdded();
+
+        // Bind the two together. Without this a later place() moves the text
+        // and leaves the surface where it was — the text ends up half off its
+        // own panel, which is worse than having no panel at all.
+        text._gatPanel = panel;
+        text._gatPanelPadding = typeof opts.padding === "number" ? opts.padding : 0.35;
+        this._refitPanel(text);
+
+        // The text stays the tracked element: a caller writing
+        // addText(t, { panel: true }) then place(...) means the text.
+        this._lastAdded = text;
+        return this;
+    },
+
+    /**
+     * Re-size and re-centre a text's green surface on the text. Called after
+     * anything that moves or scales the text, so the two never come apart.
+     */
+    _refitPanel(text) {
+        const panel = text && text._gatPanel;
+        if (!panel || !canvas.getObjects().includes(panel)) return;
+
+        const padding = text._gatPanelPadding || 0.35;
+        const width = text.getScaledWidth();
+        const height = text.getScaledHeight();
+
+        panel.set({
+            scaleX: (width + height * padding * 2) / panel.width,
+            scaleY: (height + height * padding) / panel.height,
+        });
+        panel._gatBaseScale = panel.scaleX;
+        panel.setCoords();
+        panel.set({
+            left: text.left + width / 2 - panel.getScaledWidth() / 2,
+            top: text.top + height / 2 - panel.getScaledHeight() / 2,
+        });
+        panel.setCoords();
+
+        canvas.bringToFront(text);
+        CanvasUtils.bringLogoToFront();
+        canvas.renderAll();
+    },
+
+    /**
+     * Add a green surface for type to sit on.
+     *
+     * The brand guide requires typography to be combined with green. Without
+     * a photo the whole canvas already is green, so this is only needed over
+     * a background image — but there it is not optional: white text laid
+     * straight over a photograph breaks the rule, however legible it looks.
+     *
+     * The panel lands behind every text already on the canvas.
+     *
+     * @param {Object} [options]
+     * @param {number} [options.width=0.8]  share of the usable width
+     * @param {number} [options.height=0.28] share of the usable height
+     */
+    async addPanel(options) {
+        const opts = options || {};
+        this._openSection("elements-section");
+        const panel = await this._addTracking(function () {
+            jQuery("#add-panel").trigger("click");
+        }, "green panel to be added");
+
+        if (typeof opts.width === "number" || typeof opts.height === "number") {
+            const width = (typeof opts.width === "number" ? opts.width : 0.8) * contentRect.width;
+            const height = (typeof opts.height === "number" ? opts.height : 0.28) * contentRect.height;
+            panel.set({ scaleX: width / panel.width, scaleY: height / panel.height });
+            panel._gatBaseScale = panel.scaleX;
+            panel.setCoords();
+            canvas.centerObject(panel);
+            canvas.renderAll();
+        }
         return this;
     },
 
@@ -335,6 +457,7 @@ const Bildgenerator = {
                 top: host.top + (host.getScaledHeight() - height) / 2,
             });
             target.setCoords();
+            this._refitPanel(target);
             canvas.renderAll();
             return this;
         }
@@ -356,6 +479,7 @@ const Bildgenerator = {
                 top: margin + Math.max(0, usableHeight) * (position.y || 0),
             });
             target.setCoords();
+            this._refitPanel(target);
             canvas.renderAll();
             return this;
         }
@@ -395,6 +519,7 @@ const Bildgenerator = {
 
         target.set({ left: left, top: top });
         target.setCoords();
+        this._refitPanel(target);
         canvas.renderAll();
         return this;
     },
@@ -428,6 +553,7 @@ const Bildgenerator = {
         }
         const base = target._gatBaseScale || target.scaleX || 1;
         target.scale(base * factor).setCoords();
+        this._refitPanel(target);
         canvas.renderAll();
         return this;
     },
@@ -474,6 +600,7 @@ const Bildgenerator = {
         }
         target.rotate(((degrees % 360) + 360) % 360);
         target.setCoords();
+        this._refitPanel(target);
         canvas.renderAll();
         return this;
     },
@@ -543,9 +670,13 @@ const Bildgenerator = {
             return {
                 index: index,
                 type: o.type,
+                // Only the ONE rect the app created as the canvas surface is
+                // "canvas". Any other rect is a green panel a caller added,
+                // and must not inherit the canvas's protected status.
                 role: o === logoObject ? "logo"
                     : o === contentImage ? "background"
-                    : o.type === "rect" ? "canvas"
+                    : o === contentRect ? "canvas"
+                    : o.type === "rect" ? "panel"
                     : o.type,
                 text: o.type === "text" ? o.text : undefined,
                 color: o.fill,
@@ -634,6 +765,7 @@ const Bildgenerator = {
             target.initDimensions();
         }
         target.setCoords();
+        this._refitPanel(target);
         canvas.renderAll();
         return this;
     },

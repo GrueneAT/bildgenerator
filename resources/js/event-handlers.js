@@ -287,6 +287,40 @@ const EventHandlerUtils = {
         });
     },
 
+    // Green panel handler.
+    //
+    // The brand guide requires type to sit on a green surface. Without a
+    // photo the whole canvas already is one, so this is only needed over a
+    // background image — but there it is not optional: white text laid
+    // straight over a photograph breaks the rule, however legible it looks.
+    setupPanelHandler() {
+        this.bindHandler('#add-panel', 'click', function() {
+            const panel = new fabric.Rect({
+                width: contentRect.width * 0.8,
+                height: contentRect.height * 0.28,
+                fill: AppConstants.COLORS.BACKGROUND_SECONDARY,
+                objectCaching: false,
+            });
+
+            CanvasUtils.relativeScalingControlsOnly(panel);
+            canvas.add(panel);
+            canvas.centerObject(panel);
+
+            // Behind every text already on the canvas — a panel added after a
+            // headline is meant to go under it, not over it.
+            canvas.getObjects().forEach(function (object) {
+                if (object.get("type") === "text") {
+                    canvas.bringToFront(object);
+                }
+            });
+            CanvasUtils.bringLogoToFront();
+
+            canvas.setActiveObject(panel);
+            updateScale(panel);
+            canvas.renderAll();
+        });
+    },
+
     // Cross/check mark handler
     setupCrossHandler() {
         this.bindHandler('#add-cross', 'click', function() {
@@ -451,6 +485,7 @@ const EventHandlerUtils = {
         this.setupCircleClipHandler();
         this.setupPinkCircleHandler();
         this.setupCrossHandler();
+        this.setupPanelHandler();
         this.setupQRCodeHandler();
         this.setupDownloadHandler();
         this.setupLogoToggleHandler();

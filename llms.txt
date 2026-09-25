@@ -49,7 +49,7 @@ weitere Freigabe.
 
 Seite laden, warten bis `window.Bildgenerator` existiert, dann aufrufen.
 Alle Methoden sind asynchron und liefern erst zurück, wenn das Canvas seine
-Ruhelage erreicht hat. Aktuelle Schnittstellenversion: `Bildgenerator.VERSION === 10`.
+Ruhelage erreicht hat. Aktuelle Schnittstellenversion: `Bildgenerator.VERSION === 11`.
 
 ```js
 const bild = await window.Bildgenerator.render({
@@ -120,9 +120,10 @@ Objekt zurück, sind also verkettbar.
 | `setLogo(name)` | Organisationslogo setzen |
 | `setLogoEnabled(false)` | Organisationslogo entfernen |
 | `setLogoKnockout(bool)` | Ortsname im Logo durchsichtig oder grün gefüllt |
-| `setBackground(url)` | Hintergrundbild setzen |
+| `setBackground(url, opts)` | Hintergrundbild setzen, mit Bildausschnitt |
 | `addText(text, opts)` | Text hinzufügen, beliebig oft — Optionen siehe unten |
-| `addShape(kind)` | `'pinkCircle'` oder `'cross'` hinzufügen |
+| `addShape(kind)` | `'pinkCircle'`, `'cross'` oder `'panel'` hinzufügen |
+| `addPanel(opts)` | grüne Fläche für Text |
 | `addImage(url)` | weiteres Bild auf das Motiv legen |
 | `addQRCode({text, color})` | QR-Code auf das Bild setzen |
 | `place(position)` | das zuletzt hinzugefügte Element positionieren |
@@ -337,9 +338,27 @@ Text wird ausschließlich auf einer grünen Farbfläche platziert. Auf einem
 Hintergrundfoto ist Text nur zulässig, wenn er auf einer grünen Fläche liegt —
 oder wenn die abgebildete Person eindeutig vor Grün steht.
 
-Das erzwingt der Generator **nicht**. Ohne Hintergrundbild ist die Fläche
-ohnehin grün, dann passt es immer. Sobald du ein Foto setzt, liegt es an dir:
-Entweder du lässt den Text weg, oder du sorgst dafür, dass er auf Grün sitzt.
+Ohne Hintergrundbild ist die Fläche ohnehin grün, dann passt es immer. Sobald
+du ein Foto setzt, gehört unter jeden Text eine grüne Fläche:
+
+```js
+const B = window.Bildgenerator;
+const foto = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFUlEQVR42mP8z8BQz0AEYBxVSF+FAP5FDvcfRYWgAAAAAElFTkSuQmCC';
+
+await B.setTemplate('artikel_23');
+await B.setBackground(foto);
+await B.addText('Windpark kommt', { panel: true });
+await B.place('bottom');
+```
+
+`panel: true` legt die Fläche an, passt sie an den Text an und hält sie
+darunter — auch wenn du den Text danach verschiebst oder skalierst. Der Text
+bleibt dabei das aktive Element, `place()` und `resize()` meinen also weiter
+ihn.
+
+Brauchst du die Fläche für sich, etwa als Farbblock ohne Text, gibt es
+`addPanel({ width, height })` mit Anteilen der nutzbaren Fläche.
+
 Weißer Text quer über ein Foto ist CD-widrig, auch wenn er lesbar ist.
 
 Hintergründe sind entweder Foto **oder** Farbfläche — nicht beides vermischt.
@@ -543,6 +562,42 @@ Steuern lässt es sich über `setLogoKnockout(true|false)` oder
 
 In der Oberfläche ist es die Checkbox „Ortsname im Logo durchsichtig" in
 Schritt 1.
+
+## Hintergrundbilder
+
+Das Foto wird formatfüllend skaliert. Eine Achse steht dabei fast immer über
+und wird beschnitten — ein Hochformat in einer Querformat-Vorlage verliert
+links und rechts, ein Querformat in einer hohen Vorlage oben und unten.
+
+**Welcher Teil überlebt, entscheidest du.** Ohne Angabe wird mittig
+beschnitten, und das ist oft falsch: Bei einem Porträt in einer breiten
+Vorlage fehlt dann der Kopf.
+
+```js
+const B = window.Bildgenerator;
+const foto = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFUlEQVR42mP8z8BQz0AEYBxVSF+FAP5FDvcfRYWgAAAAAElFTkSuQmCC';
+await B.setTemplate('event');
+
+await B.setBackground(foto, { focusY: 0 });     // oberer Bildrand, Gesichter
+await B.setBackground(foto, { focusX: 1 });     // rechter Bildrand
+await B.setBackground(foto);                    // mittig, wie bisher
+```
+
+`focusX` und `focusY` laufen von `0` (links beziehungsweise oben) über `0.5`
+(Mitte, Vorgabe) bis `1` (rechts beziehungsweise unten). Werte außerhalb
+werden abgelehnt.
+
+Faustregeln:
+
+- **Porträt oder Person:** `focusY: 0` bis `0.3`, damit der Kopf im Bild
+  bleibt.
+- **Landschaft mit Himmel:** `focusY: 0.6` bis `1`, damit nicht der halbe
+  Himmel das Bild füllt.
+- **Gruppenbild:** mittig lassen und lieber ein Foto wählen, dessen
+  Seitenverhältnis zur Vorlage passt — ein starker Beschnitt schneidet sonst
+  immer jemanden ab.
+
+Steht Text auf dem Foto, gehört eine grüne Fläche darunter — siehe oben.
 
 ## Formate
 
