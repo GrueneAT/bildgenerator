@@ -190,6 +190,10 @@ const EventHandlerUtils = {
             text.setCoords();
             canvas.setActiveObject(text);
             updateScale(text);
+            // Keep the organisation logo on top. Without this a headline
+            // placed near the bottom covers it, which the other add handlers
+            // already guard against.
+            CanvasUtils.bringLogoToFront();
             canvas.renderAll();
         });
     },
@@ -276,7 +280,9 @@ const EventHandlerUtils = {
                     canvas.bringToFront(object);
                 }
             });
-            
+
+            // ...and the organisation logo above those.
+            CanvasUtils.bringLogoToFront();
             canvas.renderAll();
         });
     },
@@ -291,6 +297,9 @@ const EventHandlerUtils = {
                     canvas.add(image);
                     canvas.centerObject(image);
                     canvas.bringToFront(image);
+                    // The Wahlkreuz is brought to the very front above, which
+                    // would otherwise put it over the organisation logo.
+                    CanvasUtils.bringLogoToFront();
                 }
             );
         });

@@ -31,7 +31,7 @@
  * breakage surfaces in e2e/api.spec.js instead of in somebody else's script.
  */
 const Bildgenerator = {
-    VERSION: 9,
+    VERSION: 10,
 
     /** The object the most recent add* call put on the canvas. */
     _lastAdded: null,
@@ -309,10 +309,13 @@ const Bildgenerator = {
     async place(position, options) {
         const opts = options || {};
         const objects = canvas.getObjects();
-        const target = opts.target || this._lastAdded;
+        const target = opts.target !== undefined
+            ? this._resolveTarget(opts.target)
+            : this._lastAdded;
         if (!target || !objects.includes(target)) {
             throw new Error("place() needs an element that was added first");
         }
+        this._assertEditable(target, "place");
 
         const margin = this.protectiveMargin();
         const width = target.getScaledWidth();
@@ -415,8 +418,11 @@ const Bildgenerator = {
      */
     async resize(factor, options) {
         const opts = options || {};
-        const target = opts.target || this.lastAdded();
+        const target = opts.target !== undefined
+            ? this._resolveTarget(opts.target)
+            : this.lastAdded();
         if (!target) throw new Error("resize() needs an element that was added first");
+        this._assertEditable(target, "resize");
         if (typeof factor !== "number" || !(factor > 0)) {
             throw new Error("resize() needs a positive number");
         }
@@ -458,8 +464,11 @@ const Bildgenerator = {
      */
     async rotate(degrees, options) {
         const opts = options || {};
-        const target = opts.target || this.lastAdded();
+        const target = opts.target !== undefined
+            ? this._resolveTarget(opts.target)
+            : this.lastAdded();
         if (!target) throw new Error("rotate() needs an element that was added first");
+        this._assertEditable(target, "rotate");
         if (typeof degrees !== "number" || !isFinite(degrees)) {
             throw new Error("rotate() needs a number of degrees");
         }
@@ -546,7 +555,15 @@ const Bildgenerator = {
                 height: Math.round(o.getScaledHeight()),
                 angle: Math.round(o.angle || 0),
                 scale: Math.round((o.scaleX || 1) * 1000) / 1000,
-                insideMargin: o.left >= margin - 0.5 && o.top >= margin - 0.5,
+                // All four edges, not just the origin. An element wider or
+                // taller than the usable area sits at the margin on the left
+                // and still runs off the right — reporting that as "inside"
+                // is worse than not reporting at all.
+                insideMargin:
+                    o.left >= margin - 0.5 &&
+                    o.top >= margin - 0.5 &&
+                    o.left + o.getScaledWidth() <= canvas.width - margin + 0.5 &&
+                    o.top + o.getScaledHeight() <= canvas.height - margin + 0.5,
                 editable: o !== logoObject && o !== contentImage && o.type !== "rect",
             };
         });
@@ -581,6 +598,7 @@ const Bildgenerator = {
         const target = this._resolveTarget(
             opts.target !== undefined ? opts.target : this.lastAdded()
         );
+        this._assertEditable(target, "update");
         const spec = changes || {};
 
         if (spec.text !== undefined) {
@@ -632,20 +650,58 @@ const Bildgenerator = {
         if (target === contentImage) {
             throw new Error("The background image cannot be removed; set a different one");
         }
+        if (target === contentRect) {
+            throw new Error("The canvas surface cannot be removed");
+        }
         canvas.remove(target);
         if (this._lastAdded === target) this._lastAdded = null;
         canvas.renderAll();
         return this;
     },
 
-    /** Move an element to the front of the stack. */
+    /**
+     * Move an element to the front of the stack.
+     *
+     * The UI's own handler guards contentImage and contentRect
+     * (event-handlers.js) — bringing the canvas surface to the front would
+     * cover the entire image in flat green.
+     */
     async bringToFront(which) {
         const target = this._resolveTarget(which !== undefined ? which : this.lastAdded());
+        this._assertEditable(target, "bringToFront");
         canvas.bringToFront(target);
         // The organisation logo is meant to stay on top.
         CanvasUtils.bringLogoToFront();
         canvas.renderAll();
         return this;
+    },
+
+    /**
+     * Refuse to move, scale, rotate or restyle the things objects() reports as
+     * editable:false — the plain canvas rectangle, the background photo and
+     * the organisation logo.
+     *
+     * The UI protects these through its own handlers; the facade advertised
+     * them as off-limits in objects() but let every other method touch them.
+     * Dragging the logo out of its position or scaling the background breaks
+     * the brand, and the caller would have no way to put it back.
+     */
+    _assertEditable(target, what) {
+        if (target === this._logoObject()) {
+            throw new Error(
+                `${what}() will not touch the organisation logo — ` +
+                `use setLogoEnabled(false) or setLogo() instead`
+            );
+        }
+        if (target === contentImage) {
+            throw new Error(
+                `${what}() will not touch the background image — ` +
+                `use setBackground() to replace it`
+            );
+        }
+        if (target === contentRect) {
+            throw new Error(`${what}() will not touch the canvas surface`);
+        }
     },
 
     _resolveTarget(which) {
@@ -676,10 +732,15 @@ const Bildgenerator = {
      */
     async export(options) {
         const opts = options || {};
+        // The download button reads the DPI from the template
+        // (event-handlers.js); a hardcoded 200 silently produced a different
+        // resolution than the same template yields for a person.
+        const template = TemplateConstants.getCurrentTemplate();
+        const defaultDpi = (template && template.dpi) || 200;
         const result = await CanvasUtils.exportCanvas(
             opts.format || "png",
             typeof opts.quality === "number" ? opts.quality : 1,
-            typeof opts.dpi === "number" ? opts.dpi : 200
+            typeof opts.dpi === "number" ? opts.dpi : defaultDpi
         );
         const scale = result.actualDPI / 72;
         return {
@@ -922,14 +983,43 @@ const Bildgenerator = {
      * canvas state rather than events — addLogo() alone is two async image
      * loads deep — so quiescence is the only honest completion signal.
      */
-    async _waitUntilQuiet(settleMs = 400, timeout = 15000) {
+    /**
+     * A cheap fingerprint of everything the canvas currently shows.
+     *
+     * Counting objects is not enough. A late image load can replace an object
+     * or move one without changing the count — addLogo() removes the old logo
+     * and adds the flattened one, and replaceCanvas() re-adds a logo whose
+     * geometry only settles once both image decodes finish. The count is
+     * identical before and after; the picture is not.
+     */
+    _canvasSignature() {
+        if (!canvas) return "";
+        return canvas.getObjects().map(function (o) {
+            return [
+                o.type,
+                Math.round(o.left),
+                Math.round(o.top),
+                Math.round(o.getScaledWidth()),
+                Math.round(o.getScaledHeight()),
+                Math.round(o.angle || 0),
+                o.type === "text" ? o.text : "",
+            ].join(",");
+        }).join("|");
+    },
+
+    /**
+     * Wait until the canvas stops changing. The app offers no completion
+     * signal — addLogo() alone is two async image decodes deep — so stability
+     * of the rendered state is the only honest one available.
+     */
+    async _waitUntilQuiet(settleMs = 500, timeout = 15000) {
         const started = Date.now();
-        let last = -1;
+        let last = null;
         let stableSince = 0;
         while (Date.now() - started < timeout) {
-            const count = canvas ? canvas.getObjects().length : -1;
-            if (count !== last) {
-                last = count;
+            const signature = this._canvasSignature();
+            if (signature !== last) {
+                last = signature;
                 stableSince = Date.now();
             } else if (Date.now() - stableSince >= settleMs) {
                 return;
