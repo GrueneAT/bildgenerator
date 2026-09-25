@@ -31,7 +31,7 @@
  * breakage surfaces in e2e/api.spec.js instead of in somebody else's script.
  */
 const Bildgenerator = {
-    VERSION: 8,
+    VERSION: 9,
 
     /** The object the most recent add* call put on the canvas. */
     _lastAdded: null,
@@ -106,6 +106,25 @@ const Bildgenerator = {
         // feature is off and re-adds it when it is on.
         addLogo();
         await this._waitUntilQuiet();
+        return this;
+    },
+
+    /**
+     * Whether the region name on the logo bar is transparent (a knockout) or
+     * filled with the brand green.
+     *
+     * Transparent shows whatever lies behind the logo through the letters. On
+     * the plain green canvas that is the green and looks right; over a
+     * background photo the photo shows through and the name becomes
+     * unreadable. setBackground() therefore turns this off by itself the
+     * first time a photo arrives — call this afterwards to override.
+     */
+    async setLogoKnockout(enabled) {
+        LogoState.setKnockoutEnabled(Boolean(enabled));
+        if (LogoState.isLogoEnabled()) {
+            addLogo();
+            await this._waitUntilQuiet();
+        }
         return this;
     },
 
@@ -684,6 +703,8 @@ const Bildgenerator = {
      * @param {string}   [spec.background]  data: URL or absolute URL
      * @param {string}   [spec.logo]        from logos()
      * @param {boolean}  [spec.logoEnabled] false to leave the logo off
+     * @param {boolean}  [spec.logoKnockout] transparent region name; turns
+     *                                       itself off when a background is set
      * @param {string}   [spec.text]        a single headline
      * @param {Array}    [spec.texts]       several texts, each
      *                                      { text, color, fontStyle, align,
@@ -715,6 +736,8 @@ const Bildgenerator = {
         if (spec.logoEnabled === false) await this.setLogoEnabled(false);
         if (spec.background) await this.setBackground(spec.background);
         if (spec.logo) await this.setLogo(spec.logo);
+        // After the logo, so it survives addLogo() being called again.
+        if (spec.logoKnockout !== undefined) await this.setLogoKnockout(spec.logoKnockout);
 
         // Everything lands centred, so each element is placed right after it is
         // added — otherwise the next one would cover it.

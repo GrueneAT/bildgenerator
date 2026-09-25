@@ -395,6 +395,16 @@ const EventHandlerUtils = {
         });
     },
 
+    // Knockout toggle: transparent region name versus a green one.
+    setupLogoKnockoutHandler() {
+        this.bindHandler('#logo-knockout-toggle', 'change', function() {
+            LogoState.setKnockoutEnabled(jQuery(this).is(':checked'));
+            if (LogoState.isLogoEnabled()) {
+                addLogo();
+            }
+        });
+    },
+
     // Logo toggle handler
     setupLogoToggleHandler() {
         this.bindHandler('#logo-toggle', 'change', function() {
@@ -435,6 +445,7 @@ const EventHandlerUtils = {
         this.setupQRCodeHandler();
         this.setupDownloadHandler();
         this.setupLogoToggleHandler();
+        this.setupLogoKnockoutHandler();
     }
 };
 
