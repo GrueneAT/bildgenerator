@@ -187,6 +187,23 @@ controls and handlers a person does; it is NOT a second rendering path.
   `app.min.js` (from "Core utilities" through `qrcode-handlers.js`). A tag
   after it is served separately and goes stale.
 
+### Determinism and the export gate
+
+- `addText()` sets EVERY control, not only the named ones. The handler reads
+  all of them, so an omitted field used to inherit the previous call: one
+  yellow right-aligned text and every later one was too. The same spec must
+  produce the same text.
+- `render()` derives the logo state from the spec (`logo` named, or
+  `logoEnabled === true`) instead of leaving `LogoState` as the last call left
+  it.
+- `export()` applies `ValidationUtils.validateDownload()`, the same gate the
+  download button uses. Without it an image rendered before a logo was chosen
+  shipped a blank white logo bar — the bar is drawn unconditionally and only
+  the region name is missing, so nothing looks broken until it is published.
+- `setBackground()` waits for a DIFFERENT `contentImage`, not for one to
+  exist. `contentImage` is a one-shot latch that `replaceCanvas()` and
+  `resetWizard()` never clear.
+
 ### Background photographs and the green panel
 
 `CanvasUtils.backgroundFocus` decides which part of an overflowing background
