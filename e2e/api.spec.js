@@ -34,7 +34,9 @@ test.describe('Bildgenerator facade', () => {
       version: window.Bildgenerator.VERSION,
     }));
 
-    expect(version).toBe(5);
+    // The exact number is asserted in llms-txt.spec.js, against the document.
+    // Repeating it here would just be a second place to forget on a bump.
+    expect(Number.isInteger(version) && version > 0).toBe(true);
     expect(templates).toContain('artikel_23');
     expect(templates).toContain('feed_post_45');
     expect(logos).toContain('HERZOGENBURG');

@@ -31,7 +31,7 @@
  * breakage surfaces in e2e/api.spec.js instead of in somebody else's script.
  */
 const Bildgenerator = {
-    VERSION: 5,
+    VERSION: 6,
 
     /** The object the most recent add* call put on the canvas. */
     _lastAdded: null,
@@ -254,13 +254,19 @@ const Bildgenerator = {
      */
     async addQRCode(spec) {
         const opts = spec || {};
-        if (!opts.text) throw new Error("addQRCode() needs { text }");
+        const payload = opts.text || this.qrPayload(opts);
+        if (!payload) {
+            throw new Error(
+                "addQRCode() needs { text }, or a { type } of " +
+                "text | url | email | vcard with its fields"
+            );
+        }
 
         this._openSection("qr-section", "#show-qr-section");
 
         if (opts.color) jQuery("#qr-color").val(opts.color);
         await this._addTracking(function () {
-            jQuery("#qr-text").val(opts.text);
+            jQuery("#qr-text").val(payload);
             jQuery("#add-qr-code").trigger("click");
         }, "QR code to be added to the canvas");
         return this;
@@ -445,6 +451,151 @@ const Bildgenerator = {
         return [row, column];
     },
 
+    // ------------------------------------------------- inspect and edit what is there
+
+    /**
+     * Everything currently on the canvas, in stacking order (last = in front).
+     *
+     * Without this a caller is blind: it can add elements but never check what
+     * it built, and it cannot address anything but the most recent element.
+     * `index` is what select(), remove(), update() and the *target* options
+     * take.
+     */
+    objects() {
+        const margin = this.protectiveMargin();
+        const logoObject = this._logoObject();
+        return canvas.getObjects().map(function (o, index) {
+            return {
+                index: index,
+                type: o.type,
+                role: o === logoObject ? "logo"
+                    : o === contentImage ? "background"
+                    : o.type === "rect" ? "canvas"
+                    : o.type,
+                text: o.type === "text" ? o.text : undefined,
+                color: o.fill,
+                left: Math.round(o.left),
+                top: Math.round(o.top),
+                width: Math.round(o.getScaledWidth()),
+                height: Math.round(o.getScaledHeight()),
+                angle: Math.round(o.angle || 0),
+                scale: Math.round((o.scaleX || 1) * 1000) / 1000,
+                insideMargin: o.left >= margin - 0.5 && o.top >= margin - 0.5,
+                editable: o !== logoObject && o !== contentImage && o.type !== "rect",
+            };
+        });
+    },
+
+    /**
+     * Make an element the active one and the target of the next edit.
+     * Accepts the index from objects(), or a fabric object.
+     */
+    select(which) {
+        const target = this._resolveTarget(which);
+        canvas.setActiveObject(target);
+        canvas.renderAll();
+        this._lastAdded = target;
+        return this;
+    },
+
+    /**
+     * Change properties of an element that is already on the canvas.
+     *
+     * The wizard does this by selecting an object and touching the colour,
+     * alignment, line-height or shadow control; the handlers write straight
+     * onto the active object. Without this a caller has to delete and rebuild
+     * an element to change its colour.
+     *
+     * @param {Object} changes  text, color, align, lineHeight, shadow, fontStyle
+     * @param {Object} [options]
+     * @param {number|Object} [options.target] index from objects(), or object
+     */
+    async update(changes, options) {
+        const opts = options || {};
+        const target = this._resolveTarget(
+            opts.target !== undefined ? opts.target : this.lastAdded()
+        );
+        const spec = changes || {};
+
+        if (spec.text !== undefined) {
+            const validation = ValidationUtils.validateTextInput(spec.text);
+            if (!validation.isValid) throw new Error(`Invalid text: ${validation.error}`);
+            target.set("text", spec.text);
+        }
+        if (spec.color !== undefined) target.set("fill", spec.color);
+        if (spec.align !== undefined) target.set("textAlign", spec.align);
+        if (spec.lineHeight !== undefined) target.set("lineHeight", parseFloat(spec.lineHeight));
+        if (spec.shadow !== undefined) target.set("shadow", createShadow("#000000", spec.shadow));
+        if (spec.fontStyle !== undefined) {
+            const option = AppConstants.FONTS.OPTIONS.find(function (o) {
+                return o.id === spec.fontStyle;
+            });
+            if (!option) {
+                throw new Error(
+                    `Unknown fontStyle "${spec.fontStyle}". ` +
+                    `Available: ${AppConstants.FONTS.OPTIONS.map((o) => o.id).join(", ")}`
+                );
+            }
+            target.set({
+                fontFamily: option.family,
+                fontWeight: option.weight,
+                fontStyle: option.style,
+            });
+        }
+
+        // Text caches its metrics, so a changed string or font needs a
+        // re-measure or the old dimensions stick.
+        if (typeof target.initDimensions === "function") {
+            target.dirty = true;
+            target.initDimensions();
+        }
+        target.setCoords();
+        canvas.renderAll();
+        return this;
+    },
+
+    /**
+     * Remove an element. The organisation logo and the background image are
+     * protected, exactly as the wizard's delete button protects them.
+     */
+    async remove(which) {
+        const target = this._resolveTarget(which !== undefined ? which : this.lastAdded());
+        if (target === this._logoObject()) {
+            throw new Error("The organisation logo cannot be removed; use setLogoEnabled(false)");
+        }
+        if (target === contentImage) {
+            throw new Error("The background image cannot be removed; set a different one");
+        }
+        canvas.remove(target);
+        if (this._lastAdded === target) this._lastAdded = null;
+        canvas.renderAll();
+        return this;
+    },
+
+    /** Move an element to the front of the stack. */
+    async bringToFront(which) {
+        const target = this._resolveTarget(which !== undefined ? which : this.lastAdded());
+        canvas.bringToFront(target);
+        // The organisation logo is meant to stay on top.
+        CanvasUtils.bringLogoToFront();
+        canvas.renderAll();
+        return this;
+    },
+
+    _resolveTarget(which) {
+        if (which && typeof which === "object") return which;
+        if (typeof which === "number") {
+            const target = canvas.getObjects()[which];
+            if (!target) {
+                throw new Error(
+                    `No element at index ${which}. See Bildgenerator.objects().`
+                );
+            }
+            return target;
+        }
+        throw new Error("Expected an index from objects(), or an element that was added first");
+    },
+
     // ----------------------------------------------------------- step 4: export
 
     /**
@@ -584,10 +735,16 @@ const Bildgenerator = {
      */
     async renderQRCode(spec) {
         const opts = spec || {};
-        if (!opts.data) throw new Error("renderQRCode() needs { data }");
+        const data = opts.data || this.qrPayload(opts);
+        if (!data) {
+            throw new Error(
+                "renderQRCode() needs { data }, or a { type } of " +
+                "text | url | email | vcard with its fields"
+            );
+        }
 
         const element = await generateQRCode(
-            opts.data,
+            data,
             opts.color || "#000000",
             opts.background || "#FFFFFF"
         );
@@ -596,6 +753,33 @@ const Bildgenerator = {
             width: element.width,
             height: element.height,
         };
+    },
+
+    /**
+     * Build the payload string for one of the four content types the QR wizard
+     * offers. Without this a caller has to hand-assemble mailto: query strings
+     * and vCard records — error-prone, and the formatting rules already live
+     * in the app.
+     *
+     * @param {Object} spec { type: 'text'|'url'|'email'|'vcard', ...fields }
+     * @returns {string|null}
+     */
+    qrPayload(spec) {
+        const opts = spec || {};
+        switch (opts.type) {
+            case "text":
+                return opts.text || null;
+            case "url":
+                return opts.url ? QRFormatHelpers.formatURL(opts.url) : null;
+            case "email":
+                return opts.email
+                    ? QRFormatHelpers.formatEmail(opts.email, opts.subject || "", opts.body || "")
+                    : null;
+            case "vcard":
+                return QRFormatHelpers.formatVCard(opts);
+            default:
+                return null;
+        }
     },
 
     // ----------------------------------------------------------- housekeeping
