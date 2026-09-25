@@ -31,7 +31,7 @@
  * breakage surfaces in e2e/api.spec.js instead of in somebody else's script.
  */
 const Bildgenerator = {
-    VERSION: 6,
+    VERSION: 7,
 
     /** The object the most recent add* call put on the canvas. */
     _lastAdded: null,
@@ -339,16 +339,22 @@ const Bildgenerator = {
         }
 
         const [row, column] = this._resolvePosition(position);
-        const left = {
+        let left = {
             start: margin,
             centre: (canvas.width - width) / 2,
             end: canvas.width - margin - width,
         }[column];
-        const top = {
+        let top = {
             start: margin,
             centre: (canvas.height - height) / 2,
             end: bottomLimit - height,
         }[row];
+
+        // An element wider or taller than the usable area would otherwise be
+        // pushed off the canvas entirely. Clamp instead — objects() still
+        // reports insideMargin false, so the caller can see it does not fit.
+        left = Math.max(0, left);
+        top = Math.max(0, top);
 
         target.set({ left: left, top: top });
         target.setCoords();
@@ -361,10 +367,15 @@ const Bildgenerator = {
      * object; there is no font-size field, so this is how text gets bigger or
      * smaller too.
      *
-     * A new text object is scaled to fit 80 % of the canvas width, so 1 is
-     * "as added". The UI slider allows 0.1 to 2.
+     * The factor is RELATIVE TO THE SIZE IT WAS ADDED AT: 1 leaves it as the
+     * app placed it, 0.5 is half, 2 is double.
      *
-     * @param {number} factor absolute scale, not a multiplier
+     * Relative on purpose. The app inserts a text at whatever scale makes it
+     * fit 80 % of the canvas — for a longer headline that is around 0.1. An
+     * absolute resize(0.35) would therefore make it roughly three times WIDER
+     * than the canvas, the opposite of what the number suggests.
+     *
+     * @param {number} factor relative to the inserted size, must be positive
      * @param {Object} [options]
      * @param {fabric.Object} [options.target] default: the last element added
      */
@@ -372,10 +383,11 @@ const Bildgenerator = {
         const opts = options || {};
         const target = opts.target || this.lastAdded();
         if (!target) throw new Error("resize() needs an element that was added first");
-        if (typeof factor !== "number" || factor <= 0) {
+        if (typeof factor !== "number" || !(factor > 0)) {
             throw new Error("resize() needs a positive number");
         }
-        target.scale(factor).setCoords();
+        const base = target._gatBaseScale || target.scaleX || 1;
+        target.scale(base * factor).setCoords();
         canvas.renderAll();
         return this;
     },
@@ -816,6 +828,13 @@ const Bildgenerator = {
         );
         await this._waitUntilQuiet();
         this._lastAdded = canvas.getObjects().find((o) => !before.has(o)) || null;
+        if (this._lastAdded) {
+            // The size the app gave it. resize() is relative to THIS, not to
+            // fabric's raw scale: a text is inserted at roughly 0.1, so an
+            // absolute resize(0.35) would make it three times wider than the
+            // canvas instead of a third of its size.
+            this._lastAdded._gatBaseScale = this._lastAdded.scaleX || 1;
+        }
         return this._lastAdded;
     },
 

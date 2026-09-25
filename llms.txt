@@ -49,7 +49,7 @@ weitere Freigabe.
 
 Seite laden, warten bis `window.Bildgenerator` existiert, dann aufrufen.
 Alle Methoden sind asynchron und liefern erst zurück, wenn das Canvas seine
-Ruhelage erreicht hat. Aktuelle Schnittstellenversion: `Bildgenerator.VERSION === 6`.
+Ruhelage erreicht hat. Aktuelle Schnittstellenversion: `Bildgenerator.VERSION === 7`.
 
 ```js
 const bild = await window.Bildgenerator.render({
@@ -172,15 +172,21 @@ Linksbündig am linken Bildrand heißt also beides: `addText(t, { align: 'left' 
 
 ### Größe
 
-Es gibt kein Schriftgrößenfeld. Ein neuer Text wird automatisch auf 80 % der
-Bildbreite skaliert — je mehr Wörter, desto kleiner wird er.
+Es gibt kein Schriftgrößenfeld. Ein neuer Text wird automatisch so skaliert,
+dass er in 80 % der Bildbreite Platz findet — je mehr Wörter, desto kleiner
+wird er.
 
-`resize(faktor)` ändert das nachträglich: `1` ist die eingefügte Größe, `0.5`
-die Hälfte, `2` das Doppelte. Der Regler in der Oberfläche erlaubt 0,1 bis 2;
-darüber hinaus wird es unbrauchbar.
+`resize(faktor)` ändert das nachträglich, **relativ zu dieser eingefügten
+Größe**: `1` lässt alles, wie es ist, `0.5` halbiert, `2` verdoppelt.
+
+Der Faktor ist bewusst relativ und kein absoluter Skalierungswert. Die
+tatsächliche Skalierung einer eingefügten Schlagzeile liegt bei etwa 0,1 —
+ein absolutes `0.35` würde den Text also rund dreimal **breiter** als das Bild
+machen, genau umgekehrt zu dem, was die Zahl nahelegt.
 
 Für eine kleine Subline unter einer großen Headline ist etwa `0.4` bis `0.5`
-ein brauchbarer Ausgangswert.
+ein brauchbarer Ausgangswert. Prüf das Ergebnis mit `objects()`: Ist
+`insideMargin` falsch, passt das Element nicht.
 
 ### Mehrere Texte
 
