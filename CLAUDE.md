@@ -225,6 +225,28 @@ move, scale, rotate or update. Without that binding a later `place()` moves
 the text and leaves the surface behind — the text ends up half off its own
 panel, which is worse than no panel at all.
 
+### Two logo artworks
+
+`LOGO.FILES` holds four files, not two. The `_blanko` artwork is pure white on
+transparent: the counters of the G and the letters in the white bar are holes,
+so the green canvas shows through them. That is how the logo is meant to read —
+and it only works because the canvas IS green. Over a background photograph
+those holes show the photo and the wordmark washes out.
+
+The `_gruen` artwork has exactly those ENCLOSED holes filled with the brand
+green; the outer transparency is untouched, so the logo still has no box around
+it. Inside/outside is decided by a flood fill from the image border
+(`scripts/make-green-logo.py`), and interior anti-aliased edges are blended
+towards green rather than towards whatever lies behind.
+
+`addLogo()` picks the artwork from `LogoState.isKnockoutEnabled()` — the same
+switch that decides whether the region name is a knockout or a green fill, so
+the two never disagree.
+
+Note: the CD quick guide's own layout examples DO place the knockout logo on a
+photograph. It works there because the photo behind it is dark and even. The
+filled variant is for the cases the guide does not show.
+
 ### Logo region name: knockout or filled
 
 The region name on the white logo bar is cut OUT of the bar
