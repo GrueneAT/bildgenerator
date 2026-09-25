@@ -31,7 +31,10 @@
  * breakage surfaces in e2e/api.spec.js instead of in somebody else's script.
  */
 const Bildgenerator = {
-    VERSION: 2,
+    VERSION: 3,
+
+    /** The object the most recent add* call put on the canvas. */
+    _lastAdded: null,
 
     // ---------------------------------------------------------------- lookup
 
@@ -61,6 +64,11 @@ const Bildgenerator = {
             qrColors: this._optionValues("#qr-color-select"),
             qrBackgrounds: this._optionValues("#qr-background-select"),
             formats: ["png", "jpeg"],
+            positions: [
+                "top-left", "top", "top-right",
+                "left", "center", "right",
+                "bottom-left", "bottom", "bottom-right",
+            ],
         };
     },
 
@@ -78,6 +86,7 @@ const Bildgenerator = {
                 `Unknown template "${name}". Available: ${this.templates().join(", ")}`
             );
         }
+        this._lastAdded = null; // the canvas is discarded and rebuilt
         jQuery("#canvas-template").val(name).trigger("change");
         await this._waitFor(
             () => canvas && canvas.width === template.width && canvas.height === template.height,
@@ -163,14 +172,10 @@ const Bildgenerator = {
         if (opts.lineHeight) jQuery("#line-height").val(opts.lineHeight);
         if (typeof opts.shadow === "number") jQuery("#shadow-depth").val(opts.shadow);
 
-        const before = canvas.getObjects().length;
-        jQuery("#text").val(text);
-        jQuery("#add-text").trigger("click");
-        await this._waitFor(
-            () => canvas.getObjects().length > before,
-            "text object to be added to the canvas"
-        );
-        await this._waitUntilQuiet();
+        await this._addTracking(function () {
+            jQuery("#text").val(text);
+            jQuery("#add-text").trigger("click");
+        }, "text object to be added to the canvas");
         return this;
     },
 
@@ -188,13 +193,9 @@ const Bildgenerator = {
             );
         }
         this._openSection("elements-section");
-        const before = canvas.getObjects().length;
-        jQuery(selector).trigger("click");
-        await this._waitFor(
-            () => canvas.getObjects().length > before,
-            `shape "${kind}" to be added`
-        );
-        await this._waitUntilQuiet();
+        await this._addTracking(function () {
+            jQuery(selector).trigger("click");
+        }, `shape "${kind}" to be added`);
         return this;
     },
 
@@ -218,13 +219,9 @@ const Bildgenerator = {
         const input = document.getElementById("add-image");
         input.files = transfer.files;
 
-        const before = canvas.getObjects().length;
-        jQuery(input).trigger("input");
-        await this._waitFor(
-            () => canvas.getObjects().length > before,
-            "image to be added to the canvas"
-        );
-        await this._waitUntilQuiet();
+        await this._addTracking(function () {
+            jQuery(input).trigger("input");
+        }, "image to be added to the canvas");
         return this;
     },
 
@@ -237,9 +234,8 @@ const Bildgenerator = {
      */
     async clipToCircle(size) {
         this._openSection("elements-section");
-        const objects = canvas.getObjects();
-        if (!canvas.getActiveObject() && objects.length) {
-            canvas.setActiveObject(objects[objects.length - 1]);
+        if (this._lastAdded && canvas.getObjects().includes(this._lastAdded)) {
+            canvas.setActiveObject(this._lastAdded);
         }
         if (size) jQuery("#circle-radius").val(String(size));
         jQuery("#add-circle").trigger("click");
@@ -261,15 +257,118 @@ const Bildgenerator = {
         this._openSection("qr-section", "#show-qr-section");
 
         if (opts.color) jQuery("#qr-color").val(opts.color);
-        const before = canvas.getObjects().length;
-        jQuery("#qr-text").val(opts.text);
-        jQuery("#add-qr-code").trigger("click");
-        await this._waitFor(
-            () => canvas.getObjects().length > before,
-            "QR code to be added to the canvas"
-        );
-        await this._waitUntilQuiet();
+        await this._addTracking(function () {
+            jQuery("#qr-text").val(opts.text);
+            jQuery("#add-qr-code").trigger("click");
+        }, "QR code to be added to the canvas");
         return this;
+    },
+
+    /**
+     * Move the most recently added object to a named position.
+     *
+     * Everything the wizard adds lands centred — text, QR, shapes and images
+     * all pile up on the same spot. Dragging them apart is what a person does
+     * next; this is that drag.
+     *
+     * The target box is the canvas inset by the brand's protective margin
+     * M = 0.06 x short edge, which no element may enter. When an organisation
+     * logo is present, the bottom row stops above it instead of overlapping.
+     *
+     * @param {string} position from options().positions
+     * @param {Object} [options]
+     * @param {fabric.Object} [options.target] object to move (default: the last one)
+     */
+    async place(position, options) {
+        const opts = options || {};
+        const objects = canvas.getObjects();
+        const target = opts.target || this._lastAdded;
+        if (!target || !objects.includes(target)) {
+            throw new Error("place() needs an element that was added first");
+        }
+
+        const valid = this.options().positions;
+        if (!valid.includes(position)) {
+            throw new Error(
+                `Unknown position "${position}". Available: ${valid.join(", ")}`
+            );
+        }
+
+        const margin = this.protectiveMargin();
+        const width = target.getScaledWidth();
+        const height = target.getScaledHeight();
+
+        // The logo is placed by the app at the bottom; keep clear of it.
+        let bottomLimit = canvas.height - margin;
+        const placedLogo = this._logoObject();
+        if (placedLogo && placedLogo !== target) {
+            bottomLimit = Math.min(bottomLimit, placedLogo.top - margin);
+        }
+
+        const [row, column] = this._resolvePosition(position);
+        const left = {
+            start: margin,
+            centre: (canvas.width - width) / 2,
+            end: canvas.width - margin - width,
+        }[column];
+        const top = {
+            start: margin,
+            centre: (canvas.height - height) / 2,
+            end: bottomLimit - height,
+        }[row];
+
+        target.set({ left: left, top: top });
+        target.setCoords();
+        canvas.renderAll();
+        return this;
+    },
+
+    /**
+     * The brand's protective margin in canvas pixels: M = 0.06 x short edge.
+     * No element may fall inside it. Exposed so callers can reason about
+     * placement themselves.
+     */
+    protectiveMargin() {
+        return 0.06 * Math.min(canvas.width, canvas.height);
+    },
+
+    /**
+     * The object the most recent add* call put on the canvas.
+     *
+     * Deliberately public: callers that inspect the canvas themselves hit the
+     * same trap the facade had to solve. canvas.getObjects() ends with the
+     * organisation LOGO, not with the element just added — addLogo() and the
+     * QR handler both call bringLogoToFront(). Reading the last entry gives
+     * you the logo.
+     */
+    lastAdded() {
+        const objects = canvas.getObjects();
+        return this._lastAdded && objects.includes(this._lastAdded) ? this._lastAdded : null;
+    },
+
+    /**
+     * The placed organisation logo, or null. addLogo() flattens it into a
+     * non-selectable image and keeps it in front, so it is the last
+     * non-selectable image on the canvas.
+     */
+    _logoObject() {
+        const images = canvas.getObjects().filter(function (o) {
+            return o.type === "image" && o.selectable === false;
+        });
+        return images.length ? images[images.length - 1] : null;
+    },
+
+    _resolvePosition(position) {
+        const rows = { top: "start", bottom: "end" };
+        const columns = { left: "start", right: "end" };
+        const parts = position.split("-");
+        let row = "centre";
+        let column = "centre";
+        for (const part of parts) {
+            if (rows[part]) row = rows[part];
+            else if (columns[part]) column = columns[part];
+        }
+        return [row, column];
     },
 
     // ----------------------------------------------------------- step 4: export
@@ -319,9 +418,11 @@ const Bildgenerator = {
      * @param {string}   [spec.align]       left | center | right
      * @param {string}   [spec.lineHeight]  from options().lineHeights
      * @param {number}   [spec.shadow]      shadow depth
-     * @param {string[]} [spec.shapes]      any of options().shapes
-     * @param {string[]} [spec.images]      data: or absolute URLs
-     * @param {Object}   [spec.qr]          { text, color } — QR on the image
+     * @param {string}   [spec.textPosition] from options().positions
+     * @param {Array}    [spec.shapes]      names from options().shapes, or
+     *                                      { kind, position } objects
+     * @param {Array}    [spec.images]      URLs, or { url, position } objects
+     * @param {Object}   [spec.qr]          { text, color, position }
      * @param {string}   [spec.format='png']
      * @param {number}   [spec.quality]
      * @param {number}   [spec.dpi=200]
@@ -336,13 +437,22 @@ const Bildgenerator = {
         if (spec.background) await this.setBackground(spec.background);
         if (spec.logo) await this.setLogo(spec.logo);
 
-        for (const url of spec.images || []) {
+        // Everything lands centred, so each element is placed right after it is
+        // added — otherwise the next one would cover it.
+        for (const image of spec.images || []) {
+            const url = typeof image === "string" ? image : image.url;
             await this.addImage(url);
+            if (image.position) await this.place(image.position);
         }
         for (const shape of spec.shapes || []) {
-            await this.addShape(shape);
+            const kind = typeof shape === "string" ? shape : shape.kind;
+            await this.addShape(kind);
+            if (shape.position) await this.place(shape.position);
         }
-        if (spec.qr) await this.addQRCode(spec.qr);
+        if (spec.qr) {
+            await this.addQRCode(spec.qr);
+            if (spec.qr.position) await this.place(spec.qr.position);
+        }
         if (spec.text) {
             await this.addText(spec.text, {
                 color: spec.textColor,
@@ -351,6 +461,7 @@ const Bildgenerator = {
                 lineHeight: spec.lineHeight,
                 shadow: spec.shadow,
             });
+            if (spec.textPosition) await this.place(spec.textPosition);
         }
         return this.export({
             format: spec.format,
@@ -396,12 +507,34 @@ const Bildgenerator = {
      * a headless run.
      */
     async reset() {
+        this._lastAdded = null;
         resetWizard();
         await this._waitUntilQuiet();
         return this;
     },
 
     // --------------------------------------------------------------- internals
+
+    /**
+     * Run an action that adds one object and remember which one it was.
+     *
+     * "The last object" is NOT the one just added: addLogo() and the QR
+     * handler both call bringLogoToFront(), which moves the organisation logo
+     * to the end of the list. Taking the last entry would hand back the logo —
+     * and place() or clipToCircle() would then move or crop the logo instead
+     * of the new element.
+     */
+    async _addTracking(action, description) {
+        const before = new Set(canvas.getObjects());
+        await action();
+        await this._waitFor(
+            () => canvas.getObjects().some((o) => !before.has(o)),
+            description
+        );
+        await this._waitUntilQuiet();
+        this._lastAdded = canvas.getObjects().find((o) => !before.has(o)) || null;
+        return this._lastAdded;
+    },
 
     _optionValues(selector) {
         return jQuery(`${selector} option`)
