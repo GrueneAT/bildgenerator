@@ -107,6 +107,9 @@ test.describe('Review findings', () => {
       const out = {};
       for (const name of ['facebook_header', 'a6']) {
         await B.setTemplate(name);
+        // No organisation wanted here — export() now refuses an image whose
+        // logo bar would be blank, exactly as the download button does.
+        await B.setLogoEnabled(false);
         const exported = await B.export();
         const template = window.TemplateConstants.getTemplate(name);
         out[name] = { got: exported.dpi, expected: template.dpi };
@@ -139,6 +142,91 @@ test.describe('Review findings', () => {
     // bringLogoToFront() was wired for images and QR codes but not for text,
     // the Störer or the Wahlkreuz — those rendered over the logo.
     expect(result).toEqual(['logo', 'logo', 'logo']);
+  });
+
+  test('export refuses an image whose logo bar would be blank', async ({ page }) => {
+    const result = await page.evaluate(async () => {
+      const B = window.Bildgenerator;
+      await B.setTemplate('feed_post_45');
+      // Logo feature on, but no organisation picked — the app draws the white
+      // bar anyway and only the region name is missing.
+      LogoState.setLogoEnabled(true);
+      jQuery('#logo-selection').val('').trigger('change');
+
+      let refused = null;
+      try {
+        await B.export();
+      } catch (e) {
+        refused = e.message;
+      }
+
+      await B.setLogo('HERZOGENBURG');
+      const afterChoosing = await B.export({ dpi: 72 });
+      return { refused, ok: afterChoosing.dataURL.length > 0 };
+    });
+
+    // The download button applies this gate; the facade skipped it, so a
+    // blank logo bar shipped without anything looking broken.
+    expect(result.refused).toContain('Logo');
+    expect(result.ok).toBe(true);
+  });
+
+  test('setBackground waits for the NEW photo, not merely for any photo', async ({ page }) => {
+    const result = await page.evaluate(async () => {
+      const B = window.Bildgenerator;
+      const make = (colour) => {
+        const c = document.createElement('canvas');
+        c.width = 40; c.height = 40;
+        const x = c.getContext('2d');
+        x.fillStyle = colour; x.fillRect(0, 0, 40, 40);
+        return c.toDataURL();
+      };
+
+      await B.setTemplate('feed_post_45');
+      await B.setBackground(make('#ff0000'));
+      const first = contentImage;
+
+      // A template change disposes the canvas but never clears contentImage,
+      // so the old latch was still truthy here and a replacement returned
+      // before the new photo had loaded.
+      await B.setTemplate('story');
+      await B.setBackground(make('#0000ff'));
+      return { replaced: contentImage !== first, present: !!contentImage };
+    });
+
+    expect(result.present).toBe(true);
+    expect(result.replaced).toBe(true);
+  });
+
+  test('the same render spec produces the same text, whatever came before', async ({ page }) => {
+    const result = await page.evaluate(async () => {
+      const B = window.Bildgenerator;
+      const spec = { template: 'feed_post_45', text: 'Gleich', dpi: 72 };
+
+      // A first call that sets colour, alignment and shadow explicitly.
+      await B.render({
+        ...spec,
+        text: 'Vorher',
+        textColor: '#FFED00',
+        align: 'right',
+        shadow: 20,
+        lineHeight: '1.35',
+      });
+
+      await B.render(spec);
+      const a = B.objects().find((o) => o.type === 'text');
+
+      await B.reset();
+      await B.render(spec);
+      const b = B.objects().find((o) => o.type === 'text');
+      return { a, b };
+    });
+
+    // addText() read every control, so omitted fields inherited the previous
+    // call: one yellow right-aligned text and every later one was too.
+    expect(result.a.color).toBe(result.b.color);
+    expect(result.a.width).toBe(result.b.width);
+    expect(result.a.height).toBe(result.b.height);
   });
 
   test('quiescence notices a change that leaves the object count untouched', async ({ page }) => {

@@ -31,7 +31,7 @@
  * breakage surfaces in e2e/api.spec.js instead of in somebody else's script.
  */
 const Bildgenerator = {
-    VERSION: 11,
+    VERSION: 13,
 
     /** The object the most recent add* call put on the canvas. */
     _lastAdded: null,
@@ -179,8 +179,18 @@ const Bildgenerator = {
         };
         // Set before the image loads: positionBackgroundImage() reads it.
         CanvasUtils.setBackgroundFocus(focus(opts.focusX), focus(opts.focusY));
+
+        // Wait for a DIFFERENT image, not merely for one to exist.
+        // contentImage is a one-shot latch: replaceCanvas() and resetWizard()
+        // dispose the canvas without clearing it, so after a template change
+        // it is still truthy and a replacement would return immediately —
+        // before the new photo had loaded.
+        const previous = contentImage;
         processMeme({ url: url });
-        await this._waitFor(() => !!window.contentImage, "background image to load");
+        await this._waitFor(
+            () => !!contentImage && contentImage !== previous,
+            "background image to load"
+        );
         await this._waitUntilQuiet();
         return this;
     },
@@ -212,11 +222,16 @@ const Bildgenerator = {
 
         this._openSection("text-section");
 
-        if (opts.color) jQuery("#text-color").val(opts.color);
-        if (opts.fontStyle) jQuery("#font-style-select").val(opts.fontStyle);
-        if (opts.align) jQuery(`input[name="align"]#${opts.align}`).prop("checked", true);
-        if (opts.lineHeight) jQuery("#line-height").val(opts.lineHeight);
-        if (typeof opts.shadow === "number") jQuery("#shadow-depth").val(opts.shadow);
+        // Set EVERY control, not only the ones the caller named. The handler
+        // reads all of them, so an omitted field would otherwise inherit
+        // whatever the last call left behind: one yellow right-aligned text
+        // and every later one is yellow and right-aligned too. The same spec
+        // has to produce the same text.
+        jQuery("#text-color").val(opts.color || this._optionValues("#text-color")[0]);
+        jQuery("#font-style-select").val(opts.fontStyle || AppConstants.FONTS.OPTIONS[0].id);
+        jQuery(`input[name="align"]#${opts.align || "center"}`).prop("checked", true);
+        jQuery("#line-height").val(opts.lineHeight || this._optionValues("#line-height")[0]);
+        jQuery("#shadow-depth").val(typeof opts.shadow === "number" ? opts.shadow : 0);
 
         await this._addTracking(function () {
             jQuery("#text").val(text);
@@ -836,6 +851,98 @@ const Bildgenerator = {
         }
     },
 
+    /**
+     * Move an element one step back, or all the way behind everything except
+     * the canvas surface and the background photo.
+     *
+     * Fabric has both; the app wires neither, and the UI has only a
+     * bring-to-front button. Without them a caller can never undo an overlap
+     * — every new element goes on top and stays there.
+     */
+    async sendToBack(which) {
+        const target = this._resolveTarget(which !== undefined ? which : this.lastAdded());
+        this._assertEditable(target, "sendToBack");
+        canvas.sendToBack(target);
+        // Never behind the surface or the photo — that would hide it entirely.
+        if (contentRect) canvas.sendToBack(contentRect);
+        if (contentImage) canvas.sendToBack(contentImage);
+        canvas.renderAll();
+        return this;
+    },
+
+    /** Move an element one step back in the stack. */
+    async sendBackwards(which) {
+        const target = this._resolveTarget(which !== undefined ? which : this.lastAdded());
+        this._assertEditable(target, "sendBackwards");
+        canvas.sendBackwards(target);
+        if (contentRect) canvas.sendToBack(contentRect);
+        if (contentImage) canvas.sendToBack(contentImage);
+        canvas.renderAll();
+        return this;
+    },
+
+    /**
+     * Add the photo credit or the AI disclosure as a small line inside the
+     * margin. Both are obligations rather than design choices, so they get a
+     * fixed relative size instead of the automatic 80 % fit — a credit as
+     * large as a headline is not a credit.
+     *
+     * @param {string} text
+     * @param {Object} [options]
+     * @param {string} [options.position='bottom-left'] from options().positions
+     * @param {number} [options.size=0.018] share of the short edge
+     */
+    async addCredit(text, options) {
+        const opts = options || {};
+        await this.addText(text, { color: "#FFFFFF", align: "left" });
+        const credit = this.lastAdded();
+
+        const shortEdge = Math.min(canvas.width, canvas.height);
+        const wanted = shortEdge * (typeof opts.size === "number" ? opts.size : 0.018);
+        const current = credit.getScaledHeight();
+        if (current) {
+            credit.scale((credit.scaleX || 1) * (wanted / current)).setCoords();
+            credit._gatBaseScale = credit.scaleX;
+        }
+        await this.place(opts.position || "bottom-left");
+        return this;
+    },
+
+    /**
+     * Repeat the most recently added element. Clones the fabric object rather
+     * than fetching and decoding the image again — a row of six bicycles for
+     * a bike-swap poster is one decode, not six.
+     *
+     * The clones are returned so the caller can place each one; the tracked
+     * element stays the original.
+     *
+     * @param {Object} [options]
+     * @param {number} [options.count=1]
+     * @returns {Promise<Array>} the new objects, in creation order
+     */
+    async duplicate(options) {
+        const opts = options || {};
+        const source = this.lastAdded();
+        if (!source) throw new Error("duplicate() needs an element that was added first");
+        this._assertEditable(source, "duplicate");
+
+        const count = typeof opts.count === "number" ? Math.floor(opts.count) : 1;
+        if (!(count > 0)) throw new Error("duplicate() needs a positive count");
+
+        const clones = [];
+        for (let i = 0; i < count; i++) {
+            const clone = await new Promise(function (resolve) {
+                source.clone(resolve);
+            });
+            clone._gatBaseScale = source._gatBaseScale || source.scaleX || 1;
+            canvas.add(clone);
+            clones.push(clone);
+        }
+        CanvasUtils.bringLogoToFront();
+        canvas.renderAll();
+        return clones;
+    },
+
     _resolveTarget(which) {
         if (which && typeof which === "object") return which;
         if (typeof which === "number") {
@@ -864,6 +971,16 @@ const Bildgenerator = {
      */
     async export(options) {
         const opts = options || {};
+
+        // The same gate the download button applies (event-handlers.js).
+        // Without it an image rendered before a logo was chosen ships a blank
+        // white logo bar — the app draws the bar unconditionally and only the
+        // region name is missing, so nothing looks broken until someone
+        // publishes it.
+        const validation = ValidationUtils.validateDownload();
+        if (!validation.isValid) {
+            throw new Error(validation.error);
+        }
         // The download button reads the DPI from the template
         // (event-handlers.js); a hardcoded 200 silently produced a different
         // resolution than the same template yields for a person.
@@ -926,7 +1043,13 @@ const Bildgenerator = {
             throw new Error("render() needs at least { template }");
         }
         await this.setTemplate(spec.template);
-        if (spec.logoEnabled === false) await this.setLogoEnabled(false);
+        // LogoState persists across calls, so a previous render({logoEnabled:
+        // false}) would silently drop the logo from the next one. Derive the
+        // state from the spec instead: a logo is wanted when one is named, or
+        // when logoEnabled says so explicitly. Naming neither means none —
+        // otherwise export() would refuse the render for a logo the caller
+        // never asked for.
+        await this.setLogoEnabled(spec.logoEnabled === true || !!spec.logo);
         if (spec.background) await this.setBackground(spec.background);
         if (spec.logo) await this.setLogo(spec.logo);
         // After the logo, so it survives addLogo() being called again.

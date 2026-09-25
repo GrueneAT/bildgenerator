@@ -49,7 +49,7 @@ weitere Freigabe.
 
 Seite laden, warten bis `window.Bildgenerator` existiert, dann aufrufen.
 Alle Methoden sind asynchron und liefern erst zurück, wenn das Canvas seine
-Ruhelage erreicht hat. Aktuelle Schnittstellenversion: `Bildgenerator.VERSION === 11`.
+Ruhelage erreicht hat. Aktuelle Schnittstellenversion: `Bildgenerator.VERSION === 13`.
 
 ```js
 const bild = await window.Bildgenerator.render({
@@ -135,6 +135,10 @@ Objekt zurück, sind also verkettbar.
 | `update(änderungen)` | ein gesetztes Element ändern |
 | `remove(index)` | ein Element löschen |
 | `bringToFront(index)` | ein Element nach vorne holen |
+| `sendBackwards(index)` | ein Element einen Schritt nach hinten |
+| `sendToBack(index)` | ein Element ganz nach hinten |
+| `addCredit(text, opts)` | Bildnachweis oder KI-Kennzeichnung |
+| `duplicate({count})` | das zuletzt hinzugefügte Element vervielfältigen |
 | `qrPayload(spec)` | QR-Inhalt für `url`, `email`, `vcard` bauen |
 | `clipToCircle(size)` | das zuletzt hinzugefügte Objekt kreisrund beschneiden |
 | `lastAdded()` | das zuletzt hinzugefügte Objekt |
@@ -267,6 +271,24 @@ die Schnittstelle wird der Winkel exakt gesetzt, ohne Einrasten.
 
 Sparsam einsetzen. Gedrehte Headlines sind im Erscheinungsbild nicht
 vorgesehen — für Störer und Wahlkreuz ist eine leichte Schräge dagegen üblich.
+
+### Dasselbe Spec ergibt dasselbe Bild
+
+`render()` setzt alle Textoptionen, auch die, die du weglässt. Ein Aufruf mit
+gelbem, rechtsbündigem Text färbt also nicht den nächsten mit ein. Ohne Angabe
+gilt: weiß, zentriert, engster Zeilenabstand, kein Schatten, Standardschrift.
+
+Ebenso das Logo: Nennst du keines und setzt auch `logoEnabled` nicht, wird
+ohne Logo gerendert. Ein zuvor gesetztes Logo wirkt nicht nach.
+
+### Export ohne Logo
+
+Ist das Logo eingeschaltet, aber keine Organisation gewählt, **verweigert**
+`export()` das Bild — genau wie der Downloadknopf in der Oberfläche. Der
+Generator zeichnet den weißen Balken nämlich trotzdem, nur der Ortsname fehlt,
+und das fällt erst nach der Veröffentlichung auf.
+
+Wähle also entweder eine Organisation oder setz `logoEnabled: false`.
 
 ### Was nicht geht
 
@@ -542,6 +564,60 @@ Oberfläche. Für das Logo nimm `setLogoEnabled(false)`, für den Hintergrund
 setz einfach ein anderes Bild.
 
 `bringToFront()` holt ein Element nach vorne, lässt das Logo aber oben.
+
+## Wiederholte Elemente
+
+Ein Motiv mehrfach aufs Bild zu setzen — etwa Fahrräder für eine Radbörse —
+geht über `duplicate()`. Das Bild wird dabei **einmal** geladen und danach
+geklont; sechs Aufrufe von `addImage()` wären sechs Ladevorgänge.
+
+```js
+const B = window.Bildgenerator;
+const icon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFUlEQVR42mP8z8BQz0AEYBxVSF+FAP5FDvcfRYWgAAAAAElFTkSuQmCC';
+
+await B.setTemplate('artikel_23');
+await B.setLogoEnabled(false);
+await B.addImage(icon);
+await B.resize(0.25);
+
+const kopien = await B.duplicate({ count: 3 });
+// die Kopien liegen zunächst aufeinander — verteilen:
+[B.lastAdded(), ...kopien].forEach((o, i) => {
+  o.set({ left: 120 + i * 220, top: 900 });
+  o.setCoords();
+});
+```
+
+`duplicate()` liefert die neuen Objekte zurück; das verfolgte Element bleibt
+das Original.
+
+**Emoji sind dafür ungeeignet.** Sie kommen zwar durch, aber aus der
+Systemschrift statt aus der Hausschrift, und zusammengesetzte Emoji zerfallen
+in ihre Bestandteile — Flaggen, Familien, Hauttöne, Herz mit
+Variationsselektor. Ein Symbol als transparentes PNG oder SVG über
+`addImage()` ist verlässlich, ein Emoji nicht.
+
+## Bildnachweis und Kennzeichnung
+
+```js
+const B = window.Bildgenerator;
+await B.setTemplate('artikel_23');
+await B.setLogoEnabled(false);
+await B.addCredit('Symbolfoto — KI-generiert');
+```
+
+`addCredit()` setzt eine kleine Zeile innerhalb der Schutzzone, per Vorgabe
+unten links. Anders als gewöhnlicher Text wird sie **nicht** auf 80 % der
+Bildbreite skaliert, sondern auf einen festen kleinen Anteil der kurzen Kante
+— ein Nachweis in Schlagzeilengröße ist kein Nachweis.
+
+Über `{ position, size }` lässt sich beides ändern.
+
+## Reihenfolge und Überlappung
+
+Jedes neue Element liegt oben. `sendBackwards()` schiebt eines einen Schritt
+zurück, `sendToBack()` ganz nach hinten — aber nie hinter die Grundfläche
+oder das Hintergrundfoto, das würde es unsichtbar machen.
 
 ## Der Ortsname im Logo
 
