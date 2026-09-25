@@ -13,6 +13,9 @@ Der grüne Bildgenerator ist ein browser-basiertes Tool zur Erstellung professio
 - **Veranstaltung/Event** (1200×628px) - Facebook Event Header
 - **Facebook Header** (1958×745px) - Ultra-breite Titelbilder
 
+#### **Website Formats**
+- **Artikelbild 2:3** (1080×1620px) - Artikel- und Kartenbild für Gemeinde- und Bezirksseiten
+
 #### **Print Formats**
 - **A4 Poster** (2480×3508px, 300 DPI) - Standard Poster
 - **A4 Querformat** (3508×2480px, 300 DPI) - Landscape Poster

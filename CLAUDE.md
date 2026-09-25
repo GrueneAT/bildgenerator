@@ -104,6 +104,13 @@ The application supports multiple image formats defined in `TemplateConstants.TE
 - **Event format** (1920x1005) - Event headers without border
 - **Facebook Header** (820x360) - Facebook profile headers without border
 
+**Website Templates**:
+- **Artikelbild 2:3** (1080x1620) - Article/card image for our own Gemeinde- and
+  Bezirks-Websites. The sites serve images via Cloudflare Image Resizing at an
+  explicit height; news and person cards request ratio 0.667 (640x960 up to
+  1920x2880). Blocks asking for another ratio centre-crop, so text belongs in
+  the middle.
+
 **Print Templates**:
 - A2, A3, A4, A5 formats (portrait and landscape variants with borders)
 
