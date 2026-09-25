@@ -34,7 +34,7 @@ test.describe('Bildgenerator facade', () => {
       version: window.Bildgenerator.VERSION,
     }));
 
-    expect(version).toBe(4);
+    expect(version).toBe(5);
     expect(templates).toContain('artikel_23');
     expect(templates).toContain('feed_post_45');
     expect(logos).toContain('HERZOGENBURG');
@@ -456,6 +456,42 @@ test.describe('Bildgenerator facade', () => {
     // moves through place(). Confusing the two is the most common mistake.
     expect(result.textAlign).toBe('right');
     expect(result.placed).toBeLessThan(result.centred);
+  });
+
+  test('rotate() turns an element and normalises the angle', async ({ page }) => {
+    const result = await page.evaluate(async () => {
+      await window.Bildgenerator.setTemplate('feed_post_45');
+      await window.Bildgenerator.addShape('cross');
+      await window.Bildgenerator.rotate(15);
+      const after = window.Bildgenerator.lastAdded().angle;
+      await window.Bildgenerator.rotate(-90);
+      const negative = window.Bildgenerator.lastAdded().angle;
+      return { after, negative };
+    });
+
+    expect(result.after).toBe(15);
+    // Absolute, not relative — and a negative angle comes back in 0..360.
+    expect(result.negative).toBe(270);
+  });
+
+  test('render() rotates shapes and texts', async ({ page }) => {
+    const angles = await page.evaluate(async () => {
+      await window.Bildgenerator.render({
+        template: 'feed_post_45',
+        logoEnabled: false,
+        texts: [{ text: 'Schräg', rotate: 350, position: 'center' }],
+        shapes: [{ kind: 'cross', rotate: 20, position: 'top-right' }],
+        dpi: 72,
+      });
+      const objects = canvas.getObjects();
+      return {
+        text: objects.find((o) => o.type === 'text').angle,
+        cross: objects.find((o) => o.type === 'image').angle,
+      };
+    });
+
+    expect(angles.text).toBe(350);
+    expect(angles.cross).toBe(20);
   });
 
   // --------------------------------------------------------------- failures

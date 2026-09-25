@@ -49,7 +49,7 @@ weitere Freigabe.
 
 Seite laden, warten bis `window.Bildgenerator` existiert, dann aufrufen.
 Alle Methoden sind asynchron und liefern erst zurück, wenn das Canvas seine
-Ruhelage erreicht hat. Aktuelle Schnittstellenversion: `Bildgenerator.VERSION === 4`.
+Ruhelage erreicht hat. Aktuelle Schnittstellenversion: `Bildgenerator.VERSION === 5`.
 
 ```js
 const bild = await window.Bildgenerator.render({
@@ -91,10 +91,11 @@ Bildgenerator.options()    // alle übrigen Auswahlmöglichkeiten
 | `fontStyle` | aus `options().fontStyles` — `'standard'` oder `'accent'` (kursive Akzentschrift) |
 | `align` | `left` \| `center` \| `right` — Ausrichtung **innerhalb** des Textblocks |
 | `textSize` | Skalierung des Textblocks, `1` = wie eingefügt |
+| `textRotate` | Drehung in Grad |
 | `lineHeight` | aus `options().lineHeights` |
 | `shadow` | Schattentiefe als Zahl |
 | `textPosition` | aus `options().positions` |
-| `shapes` | Liste aus `options().shapes` — `'pinkCircle'`, `'cross'` (Wahlkreuz). Auch `{ kind, position }` |
+| `shapes` | Liste aus `options().shapes` — `'pinkCircle'`, `'cross'` (Wahlkreuz). Auch `{ kind, position, size, rotate }` |
 | `images` | Liste weiterer Bilder. Auch `{ url, position }` |
 | `qr` | `{ text, color, position }` — QR-Code auf dem Bild |
 | `format` | `'png'` (Standard) oder `'jpeg'` |
@@ -124,6 +125,7 @@ Objekt zurück, sind also verkettbar.
 | `addQRCode({text, color})` | QR-Code auf das Bild setzen |
 | `place(position)` | das zuletzt hinzugefügte Element positionieren |
 | `resize(faktor)` | das zuletzt hinzugefügte Element vergrößern oder verkleinern |
+| `rotate(grad)` | das zuletzt hinzugefügte Element drehen |
 | `clipToCircle(size)` | das zuletzt hinzugefügte Objekt kreisrund beschneiden |
 | `lastAdded()` | das zuletzt hinzugefügte Objekt |
 | `protectiveMargin()` | die Schutzzone M in Pixeln |
@@ -228,13 +230,32 @@ beziehungsweise unten), jeweils innerhalb der Schutzzone. `{ x: 0.5, y: 0.5 }`
 ist die Mitte. Werte außerhalb von 0 bis 1 werden nicht akzeptiert — die
 Schutzzone gilt immer.
 
+### Drehen
+
+`rotate(grad)` dreht das zuletzt hinzugefügte Element im Uhrzeigersinn. Der
+Wert ist absolut, nicht relativ.
+
+```js
+const B = window.Bildgenerator;
+await B.setTemplate('feed_post_45');
+await B.addShape('cross');
+await B.rotate(15);
+await B.place('top-right');
+```
+
+In der Oberfläche rastet der Drehgriff bei 0, 90, 180 und 270 Grad ein; über
+die Schnittstelle wird der Winkel exakt gesetzt, ohne Einrasten.
+
+Sparsam einsetzen. Gedrehte Headlines sind im Erscheinungsbild nicht
+vorgesehen — für Störer und Wahlkreuz ist eine leichte Schräge dagegen üblich.
+
 ### Was nicht geht
 
-- **Keine freie Schriftgröße in Punkt** — nur `resize()` relativ zur
-  eingefügten Größe.
-- **Keine freien Farben** — nur die drei aus `options().textColors`.
+- **Keine freie Schriftgröße in Punkt** — Größe entsteht ausschließlich über
+  `resize()`, relativ zur eingefügten Größe.
+- **Keine freien Farben** — nur die Werte aus `options().textColors`
+  beziehungsweise `options().qrColors`.
 - **Kein Textrahmen und keine Hintergrundfläche hinter dem Text.**
-- **Keine Drehung.**
 
 Wenn eine Anforderung das braucht, sag es, statt etwas Ähnliches zu liefern.
 

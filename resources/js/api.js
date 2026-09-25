@@ -31,7 +31,7 @@
  * breakage surfaces in e2e/api.spec.js instead of in somebody else's script.
  */
 const Bildgenerator = {
-    VERSION: 4,
+    VERSION: 5,
 
     /** The object the most recent add* call put on the canvas. */
     _lastAdded: null,
@@ -375,6 +375,29 @@ const Bildgenerator = {
     },
 
     /**
+     * Rotate an element. The wizard offers this as the rotation handle on a
+     * selected object, and while dragging it snaps to 0, 90, 180 and 270
+     * degrees within a 2 degree tolerance. Programmatic rotation sets the
+     * angle exactly and does not snap — pass the right angle.
+     *
+     * @param {number} degrees clockwise, absolute (not relative)
+     * @param {Object} [options]
+     * @param {fabric.Object} [options.target] default: the last element added
+     */
+    async rotate(degrees, options) {
+        const opts = options || {};
+        const target = opts.target || this.lastAdded();
+        if (!target) throw new Error("rotate() needs an element that was added first");
+        if (typeof degrees !== "number" || !isFinite(degrees)) {
+            throw new Error("rotate() needs a number of degrees");
+        }
+        target.rotate(((degrees % 360) + 360) % 360);
+        target.setCoords();
+        canvas.renderAll();
+        return this;
+    },
+
+    /**
      * The brand's protective margin in canvas pixels: M = 0.06 x short edge.
      * No element may fall inside it. Exposed so callers can reason about
      * placement themselves.
@@ -466,7 +489,8 @@ const Bildgenerator = {
      * @param {string}   [spec.text]        a single headline
      * @param {Array}    [spec.texts]       several texts, each
      *                                      { text, color, fontStyle, align,
-     *                                        lineHeight, shadow, size, position }
+     *                                        lineHeight, shadow, size, rotate,
+     *                                        position }
      * @param {string}   [spec.textColor]   from options().textColors
      * @param {string}   [spec.fontStyle]   from options().fontStyles
      * @param {string}   [spec.align]       left | center | right — alignment
@@ -474,9 +498,10 @@ const Bildgenerator = {
      * @param {string}   [spec.lineHeight]  from options().lineHeights
      * @param {number}   [spec.shadow]      shadow depth
      * @param {number}   [spec.textSize]    scale, 1 = as added
+     * @param {number}   [spec.textRotate]  degrees clockwise
      * @param {string}   [spec.textPosition] from options().positions
      * @param {Array}    [spec.shapes]      names from options().shapes, or
-     *                                      { kind, position } objects
+     *                                      { kind, position, size, rotate } objects
      * @param {Array}    [spec.images]      URLs, or { url, position } objects
      * @param {Object}   [spec.qr]          { text, color, position }
      * @param {string}   [spec.format='png']
@@ -503,6 +528,8 @@ const Bildgenerator = {
         for (const shape of spec.shapes || []) {
             const kind = typeof shape === "string" ? shape : shape.kind;
             await this.addShape(kind);
+            if (typeof shape.rotate === "number") await this.rotate(shape.rotate);
+            if (typeof shape.size === "number") await this.resize(shape.size);
             if (shape.position) await this.place(shape.position);
         }
         if (spec.qr) {
@@ -524,6 +551,7 @@ const Bildgenerator = {
                     shadow: spec.shadow,
                     position: spec.textPosition,
                     size: spec.textSize,
+                    rotate: spec.textRotate,
                 }]
                 : []);
 
@@ -531,6 +559,7 @@ const Bildgenerator = {
             const item = typeof entry === "string" ? { text: entry } : entry;
             await this.addText(item.text, item);
             if (typeof item.size === "number") await this.resize(item.size);
+            if (typeof item.rotate === "number") await this.rotate(item.rotate);
             if (item.position) await this.place(item.position);
         }
         return this.export({
