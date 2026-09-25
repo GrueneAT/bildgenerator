@@ -34,7 +34,7 @@ test.describe('Bildgenerator facade', () => {
       version: window.Bildgenerator.VERSION,
     }));
 
-    expect(version).toBe(2);
+    expect(version).toBe(3);
     expect(templates).toContain('artikel_23');
     expect(templates).toContain('feed_post_45');
     expect(logos).toContain('HERZOGENBURG');
@@ -43,6 +43,7 @@ test.describe('Bildgenerator facade', () => {
     for (const key of [
       'textColors', 'fontStyles', 'lineHeights', 'alignments', 'shapes',
       'clipSizes', 'qrColorsOnImage', 'qrColors', 'qrBackgrounds', 'formats',
+      'positions',
     ]) {
       expect(options[key], `options().${key}`).toBeTruthy();
       expect(options[key].length, `options().${key} is empty`).toBeGreaterThan(0);
@@ -230,6 +231,125 @@ test.describe('Bildgenerator facade', () => {
     // green rect the canvas starts with is REPLACED by the background photo
     // rather than covered by it.
     expect(result.objects).toBe(5);
+  });
+
+  // ------------------------------------------------------------- placement
+
+  test('place() moves an element out of the centre and respects the margin', async ({ page }) => {
+    const result = await page.evaluate(async () => {
+      await window.Bildgenerator.setTemplate('artikel_23');
+      await window.Bildgenerator.setLogoEnabled(false);
+      await window.Bildgenerator.addShape('pinkCircle');
+
+      const shape = window.Bildgenerator.lastAdded();
+      const centred = { left: shape.left, top: shape.top };
+
+      await window.Bildgenerator.place('top-left');
+      return {
+        centred,
+        placed: { left: shape.left, top: shape.top },
+        margin: window.Bildgenerator.protectiveMargin(),
+      };
+    });
+
+    // M = 0.06 x short edge; for 1080x1620 that is 64.8.
+    expect(result.margin).toBeCloseTo(64.8, 1);
+    expect(result.placed.left).toBeCloseTo(result.margin, 1);
+    expect(result.placed.top).toBeCloseTo(result.margin, 1);
+    expect(result.placed.left).toBeLessThan(result.centred.left);
+  });
+
+  test('no element is placed inside the protective margin', async ({ page }) => {
+    const violations = await page.evaluate(async () => {
+      await window.Bildgenerator.setTemplate('feed_post_45');
+      await window.Bildgenerator.setLogoEnabled(false);
+      const margin = window.Bildgenerator.protectiveMargin();
+      const bad = [];
+
+      for (const position of window.Bildgenerator.options().positions) {
+        await window.Bildgenerator.addShape('pinkCircle');
+        await window.Bildgenerator.place(position);
+        const o = window.Bildgenerator.lastAdded();
+        const right = o.left + o.getScaledWidth();
+        const bottom = o.top + o.getScaledHeight();
+        if (o.left < margin - 0.5 || o.top < margin - 0.5 ||
+            right > canvas.width - margin + 0.5 || bottom > canvas.height - margin + 0.5) {
+          bad.push(position);
+        }
+      }
+      return bad;
+    });
+
+    expect(violations).toEqual([]);
+  });
+
+  test('bottom placement keeps clear of the organisation logo', async ({ page }) => {
+    const result = await page.evaluate(async () => {
+      await window.Bildgenerator.setTemplate('feed_post_45');
+      await window.Bildgenerator.setLogo('HERZOGENBURG');
+      const logoTop = canvas.getObjects().filter((o) => o.type === 'image').pop().top;
+
+      await window.Bildgenerator.addQRCode({ text: 'https://gruene.at' });
+      await window.Bildgenerator.place('bottom-right');
+      // NOT getObjects()[length-1]: bringLogoToFront() puts the logo there.
+      const qr = window.Bildgenerator.lastAdded();
+      return { logoTop, qrBottom: qr.top + qr.getScaledHeight() };
+    });
+
+    // Overlapping the logo is the one thing bottom placement must never do.
+    expect(result.qrBottom).toBeLessThanOrEqual(result.logoTop);
+  });
+
+  test('render() places text and QR where asked', async ({ page }) => {
+    const result = await page.evaluate(async () => {
+      await window.Bildgenerator.render({
+        template: 'artikel_23',
+        text: 'Kurz',
+        textPosition: 'top',
+        qr: { text: 'https://gruene.at', position: 'bottom-left' },
+        dpi: 72,
+      });
+      const objects = canvas.getObjects();
+      const text = objects.find((o) => o.type === 'text');
+      const margin = window.Bildgenerator.protectiveMargin();
+      return { textTop: text.top, margin, canvasHeight: canvas.height };
+    });
+
+    // "top" means at the margin, not floating in the middle.
+    expect(result.textTop).toBeCloseTo(result.margin, 0);
+  });
+
+  test('place() never moves the organisation logo', async ({ page }) => {
+    const result = await page.evaluate(async () => {
+      await window.Bildgenerator.setTemplate('feed_post_45');
+      await window.Bildgenerator.setLogo('HERZOGENBURG');
+      const logo = canvas.getObjects().filter((o) => o.type === 'image').pop();
+      const before = { left: logo.left, top: logo.top };
+
+      await window.Bildgenerator.addShape('cross');
+      await window.Bildgenerator.place('top-left');
+      return { before, after: { left: logo.left, top: logo.top } };
+    });
+
+    // bringLogoToFront() makes the logo the LAST object, so a naive
+    // "move the last object" would drag the logo into the corner.
+    expect(result.after).toEqual(result.before);
+  });
+
+  test('rejects an unknown position and lists the valid ones', async ({ page }) => {
+    const message = await page.evaluate(async () => {
+      await window.Bildgenerator.setTemplate('feed_post_45');
+      await window.Bildgenerator.addShape('cross');
+      try {
+        await window.Bildgenerator.place('oben-links');
+        return null;
+      } catch (error) {
+        return error.message;
+      }
+    });
+
+    expect(message).toContain('oben-links');
+    expect(message).toContain('top-left');
   });
 
   // --------------------------------------------------------------- failures

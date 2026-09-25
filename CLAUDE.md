@@ -144,6 +144,17 @@ controls and handlers a person does; it is NOT a second rendering path.
   code — a documented-but-missing method would send an assistant down a dead
   end, and it would improvise rather than report back.
 - **Bump `VERSION` and update `llms.txt` when the surface changes.**
+- `llms.txt` also carries the layout rules from the CD quick guide
+  (`design-system/260313_DieGrünen_CD-Quickguide.pdf`) — but only the ones the
+  tool does NOT enforce, because those are the only ones a caller can break.
+  Colours, fonts and logo placement need no documenting; "Typografie steht
+  immer in Kombination mit Grün" and the protective margin M = 0.06 x short
+  edge do.
+- `lastAdded()` exists because `canvas.getObjects()` ends with the organisation
+  LOGO, not with the element just added — `addLogo()` and the QR handler both
+  call `bringLogoToFront()`. Anything that operates on "the last object" moves
+  or crops the logo instead. `place()` and `clipToCircle()` use the tracked
+  object; a regression test asserts `place()` never moves the logo.
 - The facade waits for canvas *quiescence*, not for a flag: `replaceCanvas()`
   re-adds the logo asynchronously, `addLogo()` is two image loads deep, and
   `window.logo` is snapshotted once at init and never synced. Continuing early

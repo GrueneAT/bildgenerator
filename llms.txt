@@ -49,7 +49,7 @@ weitere Freigabe.
 
 Seite laden, warten bis `window.Bildgenerator` existiert, dann aufrufen.
 Alle Methoden sind asynchron und liefern erst zurück, wenn das Canvas seine
-Ruhelage erreicht hat. Aktuelle Schnittstellenversion: `Bildgenerator.VERSION === 2`.
+Ruhelage erreicht hat. Aktuelle Schnittstellenversion: `Bildgenerator.VERSION === 3`.
 
 ```js
 const bild = await window.Bildgenerator.render({
@@ -73,7 +73,7 @@ Bildgenerator.options()    // alle übrigen Auswahlmöglichkeiten
 
 `options()` liefert: `textColors`, `fontStyles`, `lineHeights`, `alignments`,
 `shapes`, `clipSizes`, `qrColorsOnImage`, `qrColors`, `qrBackgrounds`,
-`formats`.
+`formats`, `positions`.
 
 ## Bildgenerator
 
@@ -91,9 +91,10 @@ Bildgenerator.options()    // alle übrigen Auswahlmöglichkeiten
 | `align` | `left` \| `center` \| `right` |
 | `lineHeight` | aus `options().lineHeights` |
 | `shadow` | Schattentiefe als Zahl |
-| `shapes` | Liste aus `options().shapes` — `'pinkCircle'`, `'cross'` (Wahlkreuz) |
-| `images` | Liste weiterer Bilder, die auf das Motiv gelegt werden |
-| `qr` | `{ text, color }` — QR-Code auf dem Bild |
+| `textPosition` | aus `options().positions` |
+| `shapes` | Liste aus `options().shapes` — `'pinkCircle'`, `'cross'` (Wahlkreuz). Auch `{ kind, position }` |
+| `images` | Liste weiterer Bilder. Auch `{ url, position }` |
+| `qr` | `{ text, color, position }` — QR-Code auf dem Bild |
 | `format` | `'png'` (Standard) oder `'jpeg'` |
 | `quality` | 0–1, nur bei JPEG wirksam |
 | `dpi` | Standard 200 |
@@ -119,7 +120,10 @@ Objekt zurück, sind also verkettbar.
 | `addShape(kind)` | `'pinkCircle'` oder `'cross'` hinzufügen |
 | `addImage(url)` | weiteres Bild auf das Motiv legen |
 | `addQRCode({text, color})` | QR-Code auf das Bild setzen |
+| `place(position)` | das zuletzt hinzugefügte Element positionieren |
 | `clipToCircle(size)` | das zuletzt hinzugefügte Objekt kreisrund beschneiden |
+| `lastAdded()` | das zuletzt hinzugefügte Objekt |
+| `protectiveMargin()` | die Schutzzone M in Pixeln |
 | `export(opts)` | Bild erzeugen: `{ dataURL, width, height, dpi }` |
 | `reset()` | zurück auf einen leeren Entwurf |
 
@@ -152,6 +156,105 @@ abgelehnt.
 
 Soll der QR-Code *auf* ein Bild, ist `addQRCode()` beziehungsweise
 `render({ qr })` der richtige Weg — nicht dieser hier.
+
+## Gestaltung
+
+Die Regeln in diesem Abschnitt stammen aus dem CD-Quickguide der Grünen.
+Farben, Schriften und Logo setzt der Generator selbst — die kannst du gar
+nicht verletzen. Hier steht nur, was *du* entscheidest.
+
+### Die eine Regel, die zählt
+
+**Typografie steht immer in Kombination mit Grün.**
+
+Text wird ausschließlich auf einer grünen Farbfläche platziert. Auf einem
+Hintergrundfoto ist Text nur zulässig, wenn er auf einer grünen Fläche liegt —
+oder wenn die abgebildete Person eindeutig vor Grün steht.
+
+Das erzwingt der Generator **nicht**. Ohne Hintergrundbild ist die Fläche
+ohnehin grün, dann passt es immer. Sobald du ein Foto setzt, liegt es an dir:
+Entweder du lässt den Text weg, oder du sorgst dafür, dass er auf Grün sitzt.
+Weißer Text quer über ein Foto ist CD-widrig, auch wenn er lesbar ist.
+
+Hintergründe sind entweder Foto **oder** Farbfläche — nicht beides vermischt.
+
+### Die Schutzzone
+
+    M = 0,06 × kurze Kante des Formats
+
+Kein Element darf in diesen Randstreifen hineinragen. `protectiveMargin()`
+liefert den Wert für das aktuelle Format; `place()` hält ihn automatisch ein.
+Wenn du Elemente selbst positionierst, musst du ihn selbst einhalten.
+
+Für `artikel_23` (1080×1620) sind das 64,8 Pixel, für einen Feed-Post
+ebenfalls 64,8, für den Facebook-Header 21,6.
+
+### Wie viel Text
+
+Eine Aussage pro Bild. Die Headline wird automatisch so skaliert, dass sie
+hineinpasst — je mehr Wörter, desto kleiner wird sie und desto schwächer
+wirkt sie. Drei Zeilen sind das Maximum, zwei sind meistens besser.
+
+Die Reihenfolge ist: Headline sagt *was*, eine Subline ergänzt den Kontext,
+Fließtext nur dann, wenn es ohne ihn nicht geht. Wer alles unterbringen will,
+bringt nichts unter.
+
+### Wo die Dinge hingehören
+
+Alles landet zunächst **in der Mitte** — Text, QR-Code, Störer und
+zusätzliche Bilder stapeln sich also übereinander, bis du sie mit `place()`
+auseinanderziehst. Sobald du mehr als ein Element setzt, musst du positionieren.
+
+`options().positions` kennt neun Felder:
+
+    top-left      top      top-right
+    left          center   right
+    bottom-left   bottom   bottom-right
+
+Bewährte Verteilungen:
+
+- **Nur Headline:** `center` oder `top` — bei `top` bleibt unten Luft für das
+  Logo und ein ruhiger Bildbereich.
+- **Headline und QR-Code:** Headline auf `top`, QR auf `bottom-left`. Rechts
+  unten sitzt oft das Logo; `place()` weicht ihm zwar aus, optisch wird es
+  trotzdem eng.
+- **Headline und Störer:** Headline auf `center`, Störer auf `top-right`.
+  Der Störer ist ein Akzent und soll die Headline nicht kreuzen.
+- **Foto als Hintergrund:** Headline dorthin, wo das Foto ruhig ist — nicht
+  über Gesichter, nicht über unruhige Strukturen.
+
+`place()` hält die Schutzzone ein und weicht dem Organisationslogo aus. Es
+prüft aber nicht, ob zwei Elemente einander überdecken. Setz sie auf
+gegenüberliegende Felder.
+
+### Störer
+
+Der magentafarbene Kreis (`addShape('pinkCircle')`) ist der Störer aus dem CD,
+allerdings **nur als Form**. Text hineinzusetzen funktioniert nicht: Der Kreis
+misst rund 30 % der Bildbreite, während Text immer auf bis zu 80 % skaliert
+wird — selbst „31.8." wird deutlich größer als der Kreis. Die Schriftgröße
+lässt sich über die Schnittstelle nicht einzeln steuern.
+
+Setz den Kreis also als reinen Farbakzent ein, und sparsam: einer pro Sujet.
+Mehrere Störer heben sich gegenseitig auf. Wenn ein Störer mit Text gebraucht
+wird, ist das mit diesem Werkzeug derzeit nicht möglich — sag das, statt etwas
+auszuliefern, das danebensitzt.
+
+### Die Akzentschrift
+
+`fontStyle: 'accent'` ist für Hervorhebungen innerhalb einer Headline und für
+Zitate gedacht. Nicht für ganze Fließtexte, nicht als Standardwahl.
+
+### Beschnitt beachten
+
+`artikel_23` wird auf den Gemeinde- und Bezirksseiten je nach Block in
+verschiedenen Seitenverhältnissen ausgespielt, immer aus der Mitte heraus
+beschnitten. Text und wichtige Bildteile gehören deshalb in die Mitte — bei
+diesem Format ist `center` die sichere Wahl, `top` und `bottom` können
+wegfallen.
+
+Beim Facebook-Header schneidet Facebook auf Mobilgeräten seitlich zu. Auch
+dort gehört alles Wichtige in die Mitte.
 
 ## Formate
 
