@@ -49,7 +49,7 @@ weitere Freigabe.
 
 Seite laden, warten bis `window.Bildgenerator` existiert, dann aufrufen.
 Alle Methoden sind asynchron und liefern erst zurück, wenn das Canvas seine
-Ruhelage erreicht hat. Aktuelle Schnittstellenversion: `Bildgenerator.VERSION === 9`.
+Ruhelage erreicht hat. Aktuelle Schnittstellenversion: `Bildgenerator.VERSION === 10`.
 
 ```js
 const bild = await window.Bildgenerator.render({
@@ -393,6 +393,11 @@ Bewährte Verteilungen:
 prüft aber nicht, ob zwei Elemente einander überdecken. Setz sie auf
 gegenüberliegende Felder.
 
+**Reihenfolge:** Erst `resize()` und `rotate()`, dann `place()`. Gedreht wird
+um den Mittelpunkt, dadurch verschiebt sich die Position — wer vorher
+positioniert, findet das Element hinterher woanders. `render()` hält diese
+Reihenfolge von selbst ein.
+
 ### Störer
 
 Der magentafarbene Kreis (`addShape('pinkCircle')`) ist der Störer aus dem CD.
@@ -459,7 +464,15 @@ console.log(B.objects());
 | `text` | der Inhalt, bei Textelementen |
 | `color`, `left`, `top`, `width`, `height`, `angle`, `scale` | Zustand |
 | `editable` | `false` bei Logo, Hintergrund und Grundfläche |
-| `insideMargin` | ob das Element die Schutzzone einhält |
+| `insideMargin` | ob das Element **vollständig** in der Schutzzone liegt, alle vier Kanten |
+
+Elemente mit `editable: false` lassen sich nicht verschieben, skalieren,
+drehen, umfärben oder löschen — die Aufrufe werfen einen Fehler mit dem
+Hinweis, was stattdessen zu tun ist. Für das Logo etwa `setLogoEnabled(false)`
+oder `setLogo()`, für den Hintergrund ein neues `setBackground()`.
+
+Alle ändernden Aufrufe nehmen `{ target: index }` und wirken dann auf dieses
+Element statt auf das zuletzt hinzugefügte.
 
 **Verlass dich nicht auf die Reihenfolge.** Das letzte Element in der Liste ist
 das Organisationslogo, nicht das, was du zuletzt hinzugefügt hast — der

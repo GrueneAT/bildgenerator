@@ -160,6 +160,20 @@ controls and handlers a person does; it is NOT a second rendering path.
   follows it, hits an error it cannot interpret, and improvises — the failure
   this interface exists to prevent. Keep examples complete and runnable, not
   fragments.
+- Quiescence uses a canvas SIGNATURE (type, position, size, angle, text of
+  every object), not an object count. A late image load can replace an object
+  without changing the count — `addLogo()` removes the old logo and adds a
+  flattened one — so a count-based wait returns mid-change. Three independent
+  external reviews flagged the count version, two as critical.
+- Everything `objects()` reports as `editable: false` — canvas surface,
+  background photo, organisation logo — is refused by every mutating method,
+  not just `remove()`. `bringToFront(0)` used to cover the whole image in flat
+  green.
+- `export()` takes its default DPI from the current template, as the download
+  button does. Templates do not all use 200.
+- Order of operations: `resize()` and `rotate()` BEFORE `place()`. Fabric
+  rotates around the centre by default, so rotating after placing moves the
+  element.
 - `lastAdded()` exists because `canvas.getObjects()` ends with the organisation
   LOGO, not with the element just added — `addLogo()` and the QR handler both
   call `bringLogoToFront()`. Anything that operates on "the last object" moves
