@@ -187,6 +187,27 @@ controls and handlers a person does; it is NOT a second rendering path.
   `app.min.js` (from "Core utilities" through `qrcode-handlers.js`). A tag
   after it is served separately and goes stale.
 
+### Background photographs and the green panel
+
+`CanvasUtils.backgroundFocus` decides which part of an overflowing background
+photo survives the cover-crop. 0.5/0.5 is the centre and the long-standing
+behaviour; `setBackgroundFocus(x, y)` moves it. The facade exposes this as
+`setBackground(url, { focusX, focusY })` — a portrait in a landscape template
+loses the head at the default, and a caller that cannot drag the image had no
+way to fix that.
+
+`#add-panel` adds a green rectangle. It exists because the brand rule "type
+always in combination with green" is otherwise unachievable over a photograph
+— there was no way to put a green surface under a headline. It is a real UI
+button, not a facade-only path, so the coverage test stays meaningful and
+people get the capability too.
+
+`addText(text, { panel: true })` binds a panel to that text via
+`text._gatPanel`, and `_refitPanel()` re-sizes and re-centres it after every
+move, scale, rotate or update. Without that binding a later `place()` moves
+the text and leaves the surface behind — the text ends up half off its own
+panel, which is worse than no panel at all.
+
 ### Logo region name: knockout or filled
 
 The region name on the white logo bar is cut OUT of the bar

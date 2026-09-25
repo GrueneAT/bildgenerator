@@ -259,6 +259,30 @@ const CanvasUtils = {
     },
 
     // Background image positioning
+    /**
+     * Where the background photo is anchored when it overflows the frame.
+     * 0.5/0.5 is the centre — what the app has always done. 0 shows the left
+     * or top edge, 1 the right or bottom.
+     *
+     * The photo is cover-scaled, so one axis almost always overflows and
+     * something gets cropped. Centring is a guess: a portrait in a landscape
+     * template loses the top of the head, a group photo loses the people at
+     * the edges. A person can drag the image to fix that (the overflowing
+     * axis is left unlocked below); this is the same choice for callers who
+     * cannot drag.
+     */
+    backgroundFocus: { x: 0.5, y: 0.5 },
+
+    setBackgroundFocus(x, y) {
+        const clamp = function (v, fallback) {
+            return typeof v === "number" && v >= 0 && v <= 1 ? v : fallback;
+        };
+        this.backgroundFocus = {
+            x: clamp(x, this.backgroundFocus.x),
+            y: clamp(y, this.backgroundFocus.y),
+        };
+    },
+
     positionBackgroundImage() {
         if (contentImage != null) {
             canvas.remove(contentRect);
@@ -299,12 +323,15 @@ const CanvasUtils = {
             contentImage.clipPath = clipRect;
             canvas.add(contentImage);
             canvas.sendToBack(contentImage);
-            // Center the image over the CONTENT RECT (not the whole canvas, so
-            // bordered templates stay correct) on both axes. Splitting the
-            // overflow evenly keeps the rect fully covered with no gap.
+            // Anchor the image over the CONTENT RECT (not the whole canvas, so
+            // bordered templates stay correct). The overflow is distributed
+            // according to backgroundFocus: 0.5 splits it evenly, which is the
+            // long-standing centred behaviour; 0 pins the left/top edge, 1 the
+            // right/bottom. Either way the rect stays fully covered.
+            const focus = this.backgroundFocus;
             contentImage.set({
-                left: contentRect.left + (contentRect.width - scaledWidth) / 2,
-                top: contentRect.top + (contentRect.height - scaledHeight) / 2,
+                left: contentRect.left - (scaledWidth - contentRect.width) * focus.x,
+                top: contentRect.top - (scaledHeight - contentRect.height) * focus.y,
             });
             contentImage.setCoords();
         }
