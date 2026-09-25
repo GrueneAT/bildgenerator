@@ -630,8 +630,10 @@ Logo liegt. Auf der einfarbig grünen Fläche ist das genau richtig.
 Buchstaben, und der Ortsname wird unleserlich.
 
 **Das erledigt der Generator selbst:** Sobald ein Hintergrundbild gesetzt
-wird, füllt er den Ortsnamen mit demselben Grün, das sonst durchgeschienen
-hätte. Das passiert genau einmal — wer danach bewusst wieder auf durchsichtig
+wird, schaltet er auf die gefüllte Logo-Variante um. Dann sind sowohl der
+Ortsname als auch „DIE GRÜNEN" und die Innenflächen des G grün gefüllt statt
+durchsichtig — das Logo bringt sein Grün also selbst mit und bleibt über jedem
+Foto lesbar. Das passiert genau einmal — wer danach bewusst wieder auf durchsichtig
 stellt, wird von weiteren Bildern nicht überstimmt.
 
 Steuern lässt es sich über `setLogoKnockout(true|false)` oder

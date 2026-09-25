@@ -155,9 +155,16 @@ function addLogo() {
 
   let logoFilename, textScaleTo, isLongLogo;
 
+  // Same decision as for the region name: with the knockout the artwork
+  // relies on green lying behind it, which only holds on the plain canvas.
+  // Over a photo the filled variant is the one that reads.
+  const useFilled = !LogoState.isKnockoutEnabled();
+
   // Check if text needs breaking (either has % or is too long)
   if (logoText.includes("%") || logoText.length > AppConstants.LOGO.MAX_TEXT_LENGTH) {
-    logoFilename = AppConstants.LOGO.FILES.LONG;
+    logoFilename = useFilled
+      ? AppConstants.LOGO.FILES.LONG_FILLED
+      : AppConstants.LOGO.FILES.LONG;
     isLongLogo = true;
 
     if (logoText.includes("%")) {
@@ -175,7 +182,9 @@ function addLogo() {
 
     textScaleTo = AppConstants.LOGO.TEXT_SCALE_LONG;
   } else {
-    logoFilename = AppConstants.LOGO.FILES.SHORT;
+    logoFilename = useFilled
+      ? AppConstants.LOGO.FILES.SHORT_FILLED
+      : AppConstants.LOGO.FILES.SHORT;
     isLongLogo = false;
     textScaleTo = AppConstants.LOGO.TEXT_SCALE_SHORT;
   }
