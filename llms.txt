@@ -13,10 +13,9 @@ Erscheinungsbild nachbaut.
 
 **Bau das Layout nicht nach. Steuere diese Seite.**
 
-Die Hausschrift ist Gotham Narrow. Sie ist proprietär und darf nicht
-weitergegeben werden; sie liegt ausschließlich auf dieser Seite und wird von
-dort per `@font-face` geladen. Es gibt keine öffentliche Webfont-URL, und es
-wird keine geben.
+Die Hausschriften sind lizenziert und dürfen nicht weitergegeben werden. Sie
+liegen ausschließlich auf dieser Seite und werden von dort geladen. Es gibt
+keine öffentliche Webfont-URL, und es wird keine geben.
 
 Wer das Layout in eigenem HTML, Canvas-Code oder einer Grafikbibliothek
 nachbaut, bekommt die Schrift nicht und fällt still auf eine Ersatzschrift
@@ -32,16 +31,18 @@ Nachbauen ist weder nötig noch erlaubt.
 ## Voraussetzungen
 
 Du brauchst eine Umgebung, die JavaScript in einer echten Browser-Seite
-ausführt — etwa Playwright oder Puppeteer in einer Code-Sandbox.
+ausführt — etwa Playwright oder Puppeteer in einer Code-Sandbox. Ein
+Werkzeug, das nur HTML abrufen kann, reicht nicht: Die Seite baut ihr Bild
+erst im Browser auf.
 
 Falls deine Umgebung Netzwerkzugriffe freischalten muss, werden diese Hosts
 gebraucht:
 
 - `bildgenerator.gruene.at` — die Anwendung selbst
 - `design-system.gruene.at` — Stylesheet und Kopfbereich
-- `fonts.googleapis.com`, `fonts.gstatic.com` — Vollkorn, die kursive Akzentschrift
+- `fonts.googleapis.com`, `fonts.gstatic.com` — die kursive Akzentschrift
 
-Gotham Narrow kommt von `bildgenerator.gruene.at` selbst und braucht keine
+Die Hausschrift kommt von `bildgenerator.gruene.at` selbst und braucht keine
 weitere Freigabe.
 
 ## Einstieg
@@ -86,7 +87,7 @@ Bildgenerator.options()    // alle übrigen Auswahlmöglichkeiten
 | `logoEnabled` | `false`, um ganz ohne Organisationslogo zu arbeiten |
 | `text` | Schlagzeile |
 | `textColor` | aus `options().textColors` |
-| `fontStyle` | aus `options().fontStyles` — `'standard'` (Gotham Narrow) oder `'accent'` (Vollkorn, kursiv) |
+| `fontStyle` | aus `options().fontStyles` — `'standard'` oder `'accent'` (kursive Akzentschrift) |
 | `align` | `left` \| `center` \| `right` |
 | `lineHeight` | aus `options().lineHeights` |
 | `shadow` | Schattentiefe als Zahl |
@@ -177,10 +178,10 @@ gehören deshalb in die Mitte, nicht an den oberen oder unteren Rand.
 
 Zwei Schriften stehen zur Wahl, beide bereits geladen:
 
-- `'standard'` — Gotham Narrow, die Hausschrift. Für Schlagzeilen und Fließtext,
-  also fast immer.
-- `'accent'` — Vollkorn, kursiv. Nur für Zitate und einzelne Akzente, bewusst
-  und sparsam.
+- `'standard'` — die Hausschrift. Für Schlagzeilen und Fließtext, also fast
+  immer.
+- `'accent'` — die kursive Akzentschrift. Nur für Zitate und einzelne Akzente,
+  bewusst und sparsam.
 
 Ausführlich: https://bildgenerator.gruene.at/schriften.html
 
