@@ -173,6 +173,23 @@ controls and handlers a person does; it is NOT a second rendering path.
   `app.min.js` (from "Core utilities" through `qrcode-handlers.js`). A tag
   after it is served separately and goes stale.
 
+### Logo region name: knockout or filled
+
+The region name on the white logo bar is cut OUT of the bar
+(`globalCompositeOperation: 'destination-out'`, main.js), so the letters are
+transparent and show whatever lies behind the logo. On the plain green canvas
+that is the green — correct. Over a background photograph the photo shows
+through and the name becomes unreadable.
+
+`LogoState.setKnockoutEnabled(false)` fills the name with
+`COLORS.BACKGROUND_SECONDARY` instead — deliberately the same constant the
+canvas rectangle uses, i.e. exactly what the knockout would have shown, so the
+two modes look identical on a plain background.
+
+`processMeme()` turns the knockout off the first time a background image
+arrives, and sets a module flag so a later deliberate re-enable is not
+overruled by further uploads.
+
 ### Logo System
 
 Logos are organized in a hierarchical structure:

@@ -5,6 +5,9 @@ let contentImage;
 let logo;
 let logoName;
 let logoText;
+// Set once the first background image has flipped the knockout off, so a
+// later deliberate re-enable by the user survives further uploads.
+let knockoutAutoDisabled = false;
 let scaleMax;
 let template;
 
@@ -217,6 +220,14 @@ function addLogo() {
         // onto the canvas. A plain destination-out on a loose text object would
         // instead punch a hole straight through to nothing; isolating it in the
         // group is what makes it a true knockout limited to the bar.
+        // Knockout or green fill. The knockout erases the letters out of the
+        // white bar, so whatever lies BEHIND the logo shows through them. On
+        // the plain green canvas that is the green — exactly right. Over a
+        // background photo it is wrong: the photo shows through the letters
+        // and the region name becomes unreadable. In that case the name is
+        // filled with the brand green instead, which looks identical on the
+        // plain canvas and stays legible over any photo.
+        const knockout = LogoState.isKnockoutEnabled();
         logoName = new fabric.Text(logoText, {
           top: textTopPosition,
           fontFamily: AppConstants.FONTS.DEFAULT_LOGO,
@@ -225,16 +236,23 @@ function addLogo() {
           charSpacing: AppConstants.FONTS.CHAR_SPACING,
           fontStyle: "normal",
           textAlign: "right",
-          // fill is irrelevant under destination-out (only the text's alpha
-          // matters), but a solid opaque fill keeps the erase crisp.
-          fill: AppConstants.COLORS.LOGO_KNOCKOUT,
+          // Under destination-out only the glyph alpha matters, so the colour
+          // is immaterial there; an opaque white keeps the erase crisp. With a
+          // normal composite the colour IS the result.
+          // Not a second constant that happens to match: this IS the fill of
+          // the canvas rectangle, i.e. exactly what the knockout would have
+          // shown through on a plain background. If that colour ever changes,
+          // the filled name follows it.
+          fill: knockout
+            ? AppConstants.COLORS.LOGO_KNOCKOUT
+            : AppConstants.COLORS.BACKGROUND_SECONDARY,
           stroke: AppConstants.COLORS.TEXT_STROKE,
           strokeWidth: 0,
           objectCaching: false,
           lineHeight: AppConstants.LOGO.LINE_HEIGHT,
           angle: AppConstants.LOGO.ANGLE,
           selectable: false,
-          globalCompositeOperation: "destination-out",
+          globalCompositeOperation: knockout ? "destination-out" : "source-over",
         });
 
         // Add the text to the canvas only to size/position it with the exact same
@@ -396,6 +414,27 @@ function processMeme(memeInfo) {
       // Update global reference for testing
       window.contentImage = contentImage;
       positionBackgroundImage();
+
+      // A transparent region name shows the background THROUGH the letters.
+      // On the plain green canvas that is the point; over a photo it makes
+      // the name unreadable. Switch to the filled name the first time a
+      // background arrives — and only then, so a deliberate choice by the
+      // user is not overruled on every later image.
+      if (LogoState.isKnockoutEnabled() && !knockoutAutoDisabled) {
+        knockoutAutoDisabled = true;
+        LogoState.setKnockoutEnabled(false);
+        jQuery("#logo-knockout-toggle").prop("checked", false);
+        if (LogoState.isLogoEnabled()) {
+          addLogo();
+        }
+        if (typeof showAlert === "function") {
+          showAlert(
+            "Hinweis: Der Ortsname im Logo ist jetzt grün gefüllt statt durchsichtig — " +
+            "über einem Foto wäre er sonst nicht lesbar. Umschaltbar in Schritt 1.",
+            "info"
+          );
+        }
+      }
     },
     {
       crossOrigin: "anonymous",

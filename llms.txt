@@ -49,7 +49,7 @@ weitere Freigabe.
 
 Seite laden, warten bis `window.Bildgenerator` existiert, dann aufrufen.
 Alle Methoden sind asynchron und liefern erst zurück, wenn das Canvas seine
-Ruhelage erreicht hat. Aktuelle Schnittstellenversion: `Bildgenerator.VERSION === 8`.
+Ruhelage erreicht hat. Aktuelle Schnittstellenversion: `Bildgenerator.VERSION === 9`.
 
 ```js
 const bild = await window.Bildgenerator.render({
@@ -85,6 +85,7 @@ Bildgenerator.options()    // alle übrigen Auswahlmöglichkeiten
 | `background` | Hintergrundbild als `data:`-URL oder absolute URL |
 | `logo` | Organisation aus `logos()`, z. B. `'HERZOGENBURG'` |
 | `logoEnabled` | `false`, um ganz ohne Organisationslogo zu arbeiten |
+| `logoKnockout` | Ortsname durchsichtig (`true`) oder grün gefüllt (`false`) |
 | `text` | eine einzelne Schlagzeile |
 | `texts` | **mehrere Texte** mit eigener Farbe, Größe und Position — siehe unten |
 | `textColor` | aus `options().textColors` |
@@ -118,6 +119,7 @@ Objekt zurück, sind also verkettbar.
 | `setTemplate(name)` | Format wählen; baut das Canvas neu |
 | `setLogo(name)` | Organisationslogo setzen |
 | `setLogoEnabled(false)` | Organisationslogo entfernen |
+| `setLogoKnockout(bool)` | Ortsname im Logo durchsichtig oder grün gefüllt |
 | `setBackground(url)` | Hintergrundbild setzen |
 | `addText(text, opts)` | Text hinzufügen, beliebig oft — Optionen siehe unten |
 | `addShape(kind)` | `'pinkCircle'` oder `'cross'` hinzufügen |
@@ -508,6 +510,26 @@ Oberfläche. Für das Logo nimm `setLogoEnabled(false)`, für den Hintergrund
 setz einfach ein anderes Bild.
 
 `bringToFront()` holt ein Element nach vorne, lässt das Logo aber oben.
+
+## Der Ortsname im Logo
+
+Das Logo trägt den Ortsnamen auf einem weißen Balken. Per Vorgabe ist er
+**ausgespart**: Die Buchstaben sind durchsichtig und zeigen, was hinter dem
+Logo liegt. Auf der einfarbig grünen Fläche ist das genau richtig.
+
+Über einem Hintergrundfoto ist es falsch — dann zeigt das Foto durch die
+Buchstaben, und der Ortsname wird unleserlich.
+
+**Das erledigt der Generator selbst:** Sobald ein Hintergrundbild gesetzt
+wird, füllt er den Ortsnamen mit demselben Grün, das sonst durchgeschienen
+hätte. Das passiert genau einmal — wer danach bewusst wieder auf durchsichtig
+stellt, wird von weiteren Bildern nicht überstimmt.
+
+Steuern lässt es sich über `setLogoKnockout(true|false)` oder
+`render({ logoKnockout })`.
+
+In der Oberfläche ist es die Checkbox „Ortsname im Logo durchsichtig" in
+Schritt 1.
 
 ## Formate
 
