@@ -49,7 +49,7 @@ weitere Freigabe.
 
 Seite laden, warten bis `window.Bildgenerator` existiert, dann aufrufen.
 Alle Methoden sind asynchron und liefern erst zurück, wenn das Canvas seine
-Ruhelage erreicht hat. Aktuelle Schnittstellenversion: `Bildgenerator.VERSION === 6`.
+Ruhelage erreicht hat. Aktuelle Schnittstellenversion: `Bildgenerator.VERSION === 8`.
 
 ```js
 const bild = await window.Bildgenerator.render({
@@ -126,6 +126,7 @@ Objekt zurück, sind also verkettbar.
 | `place(position)` | das zuletzt hinzugefügte Element positionieren |
 | `resize(faktor)` | das zuletzt hinzugefügte Element vergrößern oder verkleinern |
 | `rotate(grad)` | das zuletzt hinzugefügte Element drehen |
+| `fitInto(index)` | das zuletzt hinzugefügte Element auf ein anderes verkleinern |
 | `objects()` | alles auflisten, was auf dem Bild liegt |
 | `select(index)` | ein Element ansprechen |
 | `update(änderungen)` | ein gesetztes Element ändern |
@@ -172,15 +173,21 @@ Linksbündig am linken Bildrand heißt also beides: `addText(t, { align: 'left' 
 
 ### Größe
 
-Es gibt kein Schriftgrößenfeld. Ein neuer Text wird automatisch auf 80 % der
-Bildbreite skaliert — je mehr Wörter, desto kleiner wird er.
+Es gibt kein Schriftgrößenfeld. Ein neuer Text wird automatisch so skaliert,
+dass er in 80 % der Bildbreite Platz findet — je mehr Wörter, desto kleiner
+wird er.
 
-`resize(faktor)` ändert das nachträglich: `1` ist die eingefügte Größe, `0.5`
-die Hälfte, `2` das Doppelte. Der Regler in der Oberfläche erlaubt 0,1 bis 2;
-darüber hinaus wird es unbrauchbar.
+`resize(faktor)` ändert das nachträglich, **relativ zu dieser eingefügten
+Größe**: `1` lässt alles, wie es ist, `0.5` halbiert, `2` verdoppelt.
+
+Der Faktor ist bewusst relativ und kein absoluter Skalierungswert. Die
+tatsächliche Skalierung einer eingefügten Schlagzeile liegt bei etwa 0,1 —
+ein absolutes `0.35` würde den Text also rund dreimal **breiter** als das Bild
+machen, genau umgekehrt zu dem, was die Zahl nahelegt.
 
 Für eine kleine Subline unter einer großen Headline ist etwa `0.4` bis `0.5`
-ein brauchbarer Ausgangswert.
+ein brauchbarer Ausgangswert. Prüf das Ergebnis mit `objects()`: Ist
+`insideMargin` falsch, passt das Element nicht.
 
 ### Mehrere Texte
 
@@ -235,6 +242,9 @@ await B.place({ x: 0, y: 0.45 });   // linker Rand, knapp oberhalb der Mitte
 beziehungsweise unten), jeweils innerhalb der Schutzzone. `{ x: 0.5, y: 0.5 }`
 ist die Mitte. Werte außerhalb von 0 bis 1 werden nicht akzeptiert — die
 Schutzzone gilt immer.
+
+`place({ onto: index })` legt ein Element mittig auf ein anderes — gedacht für
+den Störer mit Text, siehe unten.
 
 ### Drehen
 
@@ -383,16 +393,27 @@ gegenüberliegende Felder.
 
 ### Störer
 
-Der magentafarbene Kreis (`addShape('pinkCircle')`) ist der Störer aus dem CD,
-allerdings **nur als Form**. Text hineinzusetzen funktioniert nicht: Der Kreis
-misst rund 30 % der Bildbreite, während Text immer auf bis zu 80 % skaliert
-wird — selbst „31.8." wird deutlich größer als der Kreis. Die Schriftgröße
-lässt sich über die Schnittstelle nicht einzeln steuern.
+Der magentafarbene Kreis (`addShape('pinkCircle')`) ist der Störer aus dem CD.
+Im Quickguide trägt er einen kurzen Text — ein Datum, einen Zuruf, eine Zahl.
 
-Setz den Kreis also als reinen Farbakzent ein, und sparsam: einer pro Sujet.
-Mehrere Störer heben sich gegenseitig auf. Wenn ein Störer mit Text gebraucht
-wird, ist das mit diesem Werkzeug derzeit nicht möglich — sag das, statt etwas
-auszuliefern, das danebensitzt.
+Text wird immer auf bis zu 80 % der Bildbreite eingefügt und ist damit
+zunächst viel größer als der Kreis. `fitInto()` verkleinert ihn auf den Kreis,
+`place({ onto })` legt ihn mittig darauf:
+
+```js
+const B = window.Bildgenerator;
+await B.setTemplate('feed_post_45');
+await B.addShape('pinkCircle');
+await B.place('top-right');
+
+const kreis = B.objects().find(o => o.type === 'circle');
+await B.addText('31.8.');
+await B.fitInto(kreis.index);        // auf 60 % des Kreises verkleinern
+await B.place({ onto: kreis.index }); // mittig darauflegen
+```
+
+Sparsam einsetzen: einer pro Sujet. Mehrere Störer heben sich gegenseitig auf.
+Der Störer ist ein Akzent und soll die Headline nicht kreuzen.
 
 ### Die Akzentschrift
 

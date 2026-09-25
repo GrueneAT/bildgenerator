@@ -31,7 +31,7 @@
  * breakage surfaces in e2e/api.spec.js instead of in somebody else's script.
  */
 const Bildgenerator = {
-    VERSION: 6,
+    VERSION: 8,
 
     /** The object the most recent add* call put on the canvas. */
     _lastAdded: null,
@@ -302,6 +302,21 @@ const Bildgenerator = {
         // Free positioning: { x, y } as fractions of the canvas, 0 = left/top
         // edge of the usable area, 1 = right/bottom. Still clamped to the
         // protective margin, because that is a brand rule and not a default.
+        // Centre on another element — the Stoerer pattern from the brand guide
+        // is a magenta circle with a short text on it, which needs exactly
+        // this and nothing else.
+        if (position && typeof position === "object" && position.onto !== undefined) {
+            const host = this._resolveTarget(position.onto);
+            if (host === target) throw new Error("place({ onto }) needs a different element");
+            target.set({
+                left: host.left + (host.getScaledWidth() - width) / 2,
+                top: host.top + (host.getScaledHeight() - height) / 2,
+            });
+            target.setCoords();
+            canvas.renderAll();
+            return this;
+        }
+
         if (position && typeof position === "object") {
             const inRange = function (v) {
                 return v === undefined || (typeof v === "number" && v >= 0 && v <= 1);
@@ -339,16 +354,22 @@ const Bildgenerator = {
         }
 
         const [row, column] = this._resolvePosition(position);
-        const left = {
+        let left = {
             start: margin,
             centre: (canvas.width - width) / 2,
             end: canvas.width - margin - width,
         }[column];
-        const top = {
+        let top = {
             start: margin,
             centre: (canvas.height - height) / 2,
             end: bottomLimit - height,
         }[row];
+
+        // An element wider or taller than the usable area would otherwise be
+        // pushed off the canvas entirely. Clamp instead — objects() still
+        // reports insideMargin false, so the caller can see it does not fit.
+        left = Math.max(0, left);
+        top = Math.max(0, top);
 
         target.set({ left: left, top: top });
         target.setCoords();
@@ -361,10 +382,15 @@ const Bildgenerator = {
      * object; there is no font-size field, so this is how text gets bigger or
      * smaller too.
      *
-     * A new text object is scaled to fit 80 % of the canvas width, so 1 is
-     * "as added". The UI slider allows 0.1 to 2.
+     * The factor is RELATIVE TO THE SIZE IT WAS ADDED AT: 1 leaves it as the
+     * app placed it, 0.5 is half, 2 is double.
      *
-     * @param {number} factor absolute scale, not a multiplier
+     * Relative on purpose. The app inserts a text at whatever scale makes it
+     * fit 80 % of the canvas — for a longer headline that is around 0.1. An
+     * absolute resize(0.35) would therefore make it roughly three times WIDER
+     * than the canvas, the opposite of what the number suggests.
+     *
+     * @param {number} factor relative to the inserted size, must be positive
      * @param {Object} [options]
      * @param {fabric.Object} [options.target] default: the last element added
      */
@@ -372,10 +398,31 @@ const Bildgenerator = {
         const opts = options || {};
         const target = opts.target || this.lastAdded();
         if (!target) throw new Error("resize() needs an element that was added first");
-        if (typeof factor !== "number" || factor <= 0) {
+        if (typeof factor !== "number" || !(factor > 0)) {
             throw new Error("resize() needs a positive number");
         }
-        target.scale(factor).setCoords();
+        const base = target._gatBaseScale || target.scaleX || 1;
+        target.scale(base * factor).setCoords();
+        canvas.renderAll();
+        return this;
+    },
+
+    /**
+     * Scale an element so it fits inside another one, leaving a little air.
+     * Pairs with place({ onto }) for the Stoerer pattern.
+     *
+     * @param {number|Object} host   index from objects(), or an element
+     * @param {number} [ratio=0.6]   share of the host's width to occupy
+     */
+    async fitInto(host, ratio) {
+        const target = this.lastAdded();
+        if (!target) throw new Error("fitInto() needs an element that was added first");
+        const into = this._resolveTarget(host);
+        const share = typeof ratio === "number" ? ratio : 0.6;
+        const current = target.getScaledWidth();
+        if (!current) throw new Error("fitInto() cannot measure the element");
+        const wanted = into.getScaledWidth() * share;
+        target.scale((target.scaleX || 1) * (wanted / current)).setCoords();
         canvas.renderAll();
         return this;
     },
@@ -816,6 +863,13 @@ const Bildgenerator = {
         );
         await this._waitUntilQuiet();
         this._lastAdded = canvas.getObjects().find((o) => !before.has(o)) || null;
+        if (this._lastAdded) {
+            // The size the app gave it. resize() is relative to THIS, not to
+            // fabric's raw scale: a text is inserted at roughly 0.1, so an
+            // absolute resize(0.35) would make it three times wider than the
+            // canvas instead of a third of its size.
+            this._lastAdded._gatBaseScale = this._lastAdded.scaleX || 1;
+        }
         return this._lastAdded;
     },
 

@@ -401,17 +401,43 @@ test.describe('Bildgenerator facade', () => {
     expect(result[1].top).toBeGreaterThan(result[0].top);
   });
 
-  test('resize() changes an element without moving it off the canvas', async ({ page }) => {
+  test('resize() is relative to the inserted size, not an absolute scale', async ({ page }) => {
     const result = await page.evaluate(async () => {
-      await window.Bildgenerator.setTemplate('feed_post_45');
-      await window.Bildgenerator.addText('Test');
-      const before = window.Bildgenerator.lastAdded().getScaledWidth();
-      await window.Bildgenerator.resize(0.4);
-      const after = window.Bildgenerator.lastAdded().getScaledWidth();
-      return { before, after };
+      const B = window.Bildgenerator;
+      await B.setTemplate('artikel_23');
+      await B.addText('Gemeinderat beschliesst Standort');
+      const inserted = B.lastAdded().getScaledWidth();
+
+      await B.resize(0.5);
+      const half = B.lastAdded().getScaledWidth();
+      await B.resize(1);
+      const back = B.lastAdded().getScaledWidth();
+      return { inserted, half, back, canvasWidth: canvas.width };
     });
 
-    expect(result.after).toBeLessThan(result.before);
+    // The app inserts a long headline at roughly scale 0.1. Treating the
+    // factor as an absolute fabric scale made resize(0.35) roughly three
+    // times WIDER than the canvas — the opposite of what the number says.
+    expect(result.half).toBeCloseTo(result.inserted / 2, 0);
+    expect(result.back).toBeCloseTo(result.inserted, 0);
+    expect(result.half).toBeLessThan(result.canvasWidth);
+  });
+
+  test('a text scaled down in render() stays inside the canvas', async ({ page }) => {
+    const text = await page.evaluate(async () => {
+      await window.Bildgenerator.render({
+        template: 'artikel_23',
+        logoEnabled: false,
+        texts: [{ text: 'Gemeinderat beschliesst Standort', size: 0.35, position: 'center' }],
+        dpi: 72,
+      });
+      return window.Bildgenerator.objects().find((o) => o.type === 'text');
+    });
+
+    // This is the combination that produced a headline three canvases wide.
+    expect(text.width).toBeLessThan(1080);
+    expect(text.left).toBeGreaterThanOrEqual(0);
+    expect(text.insideMargin).toBe(true);
   });
 
   test('place() accepts free coordinates and still honours the margin', async ({ page }) => {
@@ -494,6 +520,36 @@ test.describe('Bildgenerator facade', () => {
 
     expect(angles.text).toBe(350);
     expect(angles.cross).toBe(20);
+  });
+
+  test('a text can be fitted onto the Stoerer, as the brand guide shows it', async ({ page }) => {
+    const result = await page.evaluate(async () => {
+      const B = window.Bildgenerator;
+      await B.setTemplate('feed_post_45');
+      await B.setLogoEnabled(false);
+      await B.addShape('pinkCircle');
+      await B.place('top-right');
+
+      const kreis = B.objects().find((o) => o.type === 'circle');
+      await B.addText('31.8.');
+      const raw = B.lastAdded().getScaledWidth();
+      await B.fitInto(kreis.index);
+      await B.place({ onto: kreis.index });
+
+      const text = B.lastAdded();
+      const circle = canvas.getObjects()[kreis.index];
+      return {
+        raw,
+        circle: { w: circle.getScaledWidth(), cx: circle.left + circle.getScaledWidth() / 2 },
+        text: { w: text.getScaledWidth(), cx: text.left + text.getScaledWidth() / 2 },
+      };
+    });
+
+    // Inserted far wider than the circle, then shrunk to sit inside it.
+    expect(result.raw).toBeGreaterThan(result.circle.w);
+    expect(result.text.w).toBeLessThan(result.circle.w);
+    // And centred on it.
+    expect(result.text.cx).toBeCloseTo(result.circle.cx, 0);
   });
 
   // --------------------------------------------------------------- failures
