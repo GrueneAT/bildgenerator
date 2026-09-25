@@ -31,7 +31,7 @@
  * breakage surfaces in e2e/api.spec.js instead of in somebody else's script.
  */
 const Bildgenerator = {
-    VERSION: 3,
+    VERSION: 6,
 
     /** The object the most recent add* call put on the canvas. */
     _lastAdded: null,
@@ -153,7 +153,9 @@ const Bildgenerator = {
      * @param {Object} [options]
      * @param {string} [options.color]      value from options().textColors
      * @param {string} [options.fontStyle]  id from options().fontStyles
-     * @param {string} [options.align]      left | center | right
+     * @param {string} [options.align]      left | center | right — how the lines
+     *                                        sit inside the text block. To move
+     *                                        the block itself, use place().
      * @param {string} [options.lineHeight] value from options().lineHeights
      * @param {number} [options.shadow]     shadow depth
      */
@@ -252,13 +254,19 @@ const Bildgenerator = {
      */
     async addQRCode(spec) {
         const opts = spec || {};
-        if (!opts.text) throw new Error("addQRCode() needs { text }");
+        const payload = opts.text || this.qrPayload(opts);
+        if (!payload) {
+            throw new Error(
+                "addQRCode() needs { text }, or a { type } of " +
+                "text | url | email | vcard with its fields"
+            );
+        }
 
         this._openSection("qr-section", "#show-qr-section");
 
         if (opts.color) jQuery("#qr-color").val(opts.color);
         await this._addTracking(function () {
-            jQuery("#qr-text").val(opts.text);
+            jQuery("#qr-text").val(payload);
             jQuery("#add-qr-code").trigger("click");
         }, "QR code to be added to the canvas");
         return this;
@@ -287,16 +295,41 @@ const Bildgenerator = {
             throw new Error("place() needs an element that was added first");
         }
 
-        const valid = this.options().positions;
-        if (!valid.includes(position)) {
-            throw new Error(
-                `Unknown position "${position}". Available: ${valid.join(", ")}`
-            );
-        }
-
         const margin = this.protectiveMargin();
         const width = target.getScaledWidth();
         const height = target.getScaledHeight();
+
+        // Free positioning: { x, y } as fractions of the canvas, 0 = left/top
+        // edge of the usable area, 1 = right/bottom. Still clamped to the
+        // protective margin, because that is a brand rule and not a default.
+        if (position && typeof position === "object") {
+            const inRange = function (v) {
+                return v === undefined || (typeof v === "number" && v >= 0 && v <= 1);
+            };
+            if (!inRange(position.x) || !inRange(position.y)) {
+                throw new Error(
+                    "place({ x, y }) takes fractions between 0 and 1; the " +
+                    "protective margin is not optional"
+                );
+            }
+            const usableWidth = canvas.width - 2 * margin - width;
+            const usableHeight = canvas.height - 2 * margin - height;
+            target.set({
+                left: margin + Math.max(0, usableWidth) * (position.x || 0),
+                top: margin + Math.max(0, usableHeight) * (position.y || 0),
+            });
+            target.setCoords();
+            canvas.renderAll();
+            return this;
+        }
+
+        const valid = this.options().positions;
+        if (!valid.includes(position)) {
+            throw new Error(
+                `Unknown position "${position}". Available: ${valid.join(", ")}, ` +
+                `or { x, y } with values between 0 and 1`
+            );
+        }
 
         // The logo is placed by the app at the bottom; keep clear of it.
         let bottomLimit = canvas.height - margin;
@@ -318,6 +351,53 @@ const Bildgenerator = {
         }[row];
 
         target.set({ left: left, top: top });
+        target.setCoords();
+        canvas.renderAll();
+        return this;
+    },
+
+    /**
+     * Scale an element. The wizard exposes this as a slider on the selected
+     * object; there is no font-size field, so this is how text gets bigger or
+     * smaller too.
+     *
+     * A new text object is scaled to fit 80 % of the canvas width, so 1 is
+     * "as added". The UI slider allows 0.1 to 2.
+     *
+     * @param {number} factor absolute scale, not a multiplier
+     * @param {Object} [options]
+     * @param {fabric.Object} [options.target] default: the last element added
+     */
+    async resize(factor, options) {
+        const opts = options || {};
+        const target = opts.target || this.lastAdded();
+        if (!target) throw new Error("resize() needs an element that was added first");
+        if (typeof factor !== "number" || factor <= 0) {
+            throw new Error("resize() needs a positive number");
+        }
+        target.scale(factor).setCoords();
+        canvas.renderAll();
+        return this;
+    },
+
+    /**
+     * Rotate an element. The wizard offers this as the rotation handle on a
+     * selected object, and while dragging it snaps to 0, 90, 180 and 270
+     * degrees within a 2 degree tolerance. Programmatic rotation sets the
+     * angle exactly and does not snap — pass the right angle.
+     *
+     * @param {number} degrees clockwise, absolute (not relative)
+     * @param {Object} [options]
+     * @param {fabric.Object} [options.target] default: the last element added
+     */
+    async rotate(degrees, options) {
+        const opts = options || {};
+        const target = opts.target || this.lastAdded();
+        if (!target) throw new Error("rotate() needs an element that was added first");
+        if (typeof degrees !== "number" || !isFinite(degrees)) {
+            throw new Error("rotate() needs a number of degrees");
+        }
+        target.rotate(((degrees % 360) + 360) % 360);
         target.setCoords();
         canvas.renderAll();
         return this;
@@ -371,6 +451,151 @@ const Bildgenerator = {
         return [row, column];
     },
 
+    // ------------------------------------------------- inspect and edit what is there
+
+    /**
+     * Everything currently on the canvas, in stacking order (last = in front).
+     *
+     * Without this a caller is blind: it can add elements but never check what
+     * it built, and it cannot address anything but the most recent element.
+     * `index` is what select(), remove(), update() and the *target* options
+     * take.
+     */
+    objects() {
+        const margin = this.protectiveMargin();
+        const logoObject = this._logoObject();
+        return canvas.getObjects().map(function (o, index) {
+            return {
+                index: index,
+                type: o.type,
+                role: o === logoObject ? "logo"
+                    : o === contentImage ? "background"
+                    : o.type === "rect" ? "canvas"
+                    : o.type,
+                text: o.type === "text" ? o.text : undefined,
+                color: o.fill,
+                left: Math.round(o.left),
+                top: Math.round(o.top),
+                width: Math.round(o.getScaledWidth()),
+                height: Math.round(o.getScaledHeight()),
+                angle: Math.round(o.angle || 0),
+                scale: Math.round((o.scaleX || 1) * 1000) / 1000,
+                insideMargin: o.left >= margin - 0.5 && o.top >= margin - 0.5,
+                editable: o !== logoObject && o !== contentImage && o.type !== "rect",
+            };
+        });
+    },
+
+    /**
+     * Make an element the active one and the target of the next edit.
+     * Accepts the index from objects(), or a fabric object.
+     */
+    select(which) {
+        const target = this._resolveTarget(which);
+        canvas.setActiveObject(target);
+        canvas.renderAll();
+        this._lastAdded = target;
+        return this;
+    },
+
+    /**
+     * Change properties of an element that is already on the canvas.
+     *
+     * The wizard does this by selecting an object and touching the colour,
+     * alignment, line-height or shadow control; the handlers write straight
+     * onto the active object. Without this a caller has to delete and rebuild
+     * an element to change its colour.
+     *
+     * @param {Object} changes  text, color, align, lineHeight, shadow, fontStyle
+     * @param {Object} [options]
+     * @param {number|Object} [options.target] index from objects(), or object
+     */
+    async update(changes, options) {
+        const opts = options || {};
+        const target = this._resolveTarget(
+            opts.target !== undefined ? opts.target : this.lastAdded()
+        );
+        const spec = changes || {};
+
+        if (spec.text !== undefined) {
+            const validation = ValidationUtils.validateTextInput(spec.text);
+            if (!validation.isValid) throw new Error(`Invalid text: ${validation.error}`);
+            target.set("text", spec.text);
+        }
+        if (spec.color !== undefined) target.set("fill", spec.color);
+        if (spec.align !== undefined) target.set("textAlign", spec.align);
+        if (spec.lineHeight !== undefined) target.set("lineHeight", parseFloat(spec.lineHeight));
+        if (spec.shadow !== undefined) target.set("shadow", createShadow("#000000", spec.shadow));
+        if (spec.fontStyle !== undefined) {
+            const option = AppConstants.FONTS.OPTIONS.find(function (o) {
+                return o.id === spec.fontStyle;
+            });
+            if (!option) {
+                throw new Error(
+                    `Unknown fontStyle "${spec.fontStyle}". ` +
+                    `Available: ${AppConstants.FONTS.OPTIONS.map((o) => o.id).join(", ")}`
+                );
+            }
+            target.set({
+                fontFamily: option.family,
+                fontWeight: option.weight,
+                fontStyle: option.style,
+            });
+        }
+
+        // Text caches its metrics, so a changed string or font needs a
+        // re-measure or the old dimensions stick.
+        if (typeof target.initDimensions === "function") {
+            target.dirty = true;
+            target.initDimensions();
+        }
+        target.setCoords();
+        canvas.renderAll();
+        return this;
+    },
+
+    /**
+     * Remove an element. The organisation logo and the background image are
+     * protected, exactly as the wizard's delete button protects them.
+     */
+    async remove(which) {
+        const target = this._resolveTarget(which !== undefined ? which : this.lastAdded());
+        if (target === this._logoObject()) {
+            throw new Error("The organisation logo cannot be removed; use setLogoEnabled(false)");
+        }
+        if (target === contentImage) {
+            throw new Error("The background image cannot be removed; set a different one");
+        }
+        canvas.remove(target);
+        if (this._lastAdded === target) this._lastAdded = null;
+        canvas.renderAll();
+        return this;
+    },
+
+    /** Move an element to the front of the stack. */
+    async bringToFront(which) {
+        const target = this._resolveTarget(which !== undefined ? which : this.lastAdded());
+        canvas.bringToFront(target);
+        // The organisation logo is meant to stay on top.
+        CanvasUtils.bringLogoToFront();
+        canvas.renderAll();
+        return this;
+    },
+
+    _resolveTarget(which) {
+        if (which && typeof which === "object") return which;
+        if (typeof which === "number") {
+            const target = canvas.getObjects()[which];
+            if (!target) {
+                throw new Error(
+                    `No element at index ${which}. See Bildgenerator.objects().`
+                );
+            }
+            return target;
+        }
+        throw new Error("Expected an index from objects(), or an element that was added first");
+    },
+
     // ----------------------------------------------------------- step 4: export
 
     /**
@@ -412,15 +637,22 @@ const Bildgenerator = {
      * @param {string}   [spec.background]  data: URL or absolute URL
      * @param {string}   [spec.logo]        from logos()
      * @param {boolean}  [spec.logoEnabled] false to leave the logo off
-     * @param {string}   [spec.text]        headline
+     * @param {string}   [spec.text]        a single headline
+     * @param {Array}    [spec.texts]       several texts, each
+     *                                      { text, color, fontStyle, align,
+     *                                        lineHeight, shadow, size, rotate,
+     *                                        position }
      * @param {string}   [spec.textColor]   from options().textColors
      * @param {string}   [spec.fontStyle]   from options().fontStyles
-     * @param {string}   [spec.align]       left | center | right
+     * @param {string}   [spec.align]       left | center | right — alignment
+     *                                      WITHIN the text block, not on the canvas
      * @param {string}   [spec.lineHeight]  from options().lineHeights
      * @param {number}   [spec.shadow]      shadow depth
+     * @param {number}   [spec.textSize]    scale, 1 = as added
+     * @param {number}   [spec.textRotate]  degrees clockwise
      * @param {string}   [spec.textPosition] from options().positions
      * @param {Array}    [spec.shapes]      names from options().shapes, or
-     *                                      { kind, position } objects
+     *                                      { kind, position, size, rotate } objects
      * @param {Array}    [spec.images]      URLs, or { url, position } objects
      * @param {Object}   [spec.qr]          { text, color, position }
      * @param {string}   [spec.format='png']
@@ -447,21 +679,39 @@ const Bildgenerator = {
         for (const shape of spec.shapes || []) {
             const kind = typeof shape === "string" ? shape : shape.kind;
             await this.addShape(kind);
+            if (typeof shape.rotate === "number") await this.rotate(shape.rotate);
+            if (typeof shape.size === "number") await this.resize(shape.size);
             if (shape.position) await this.place(shape.position);
         }
         if (spec.qr) {
             await this.addQRCode(spec.qr);
             if (spec.qr.position) await this.place(spec.qr.position);
         }
-        if (spec.text) {
-            await this.addText(spec.text, {
-                color: spec.textColor,
-                fontStyle: spec.fontStyle,
-                align: spec.align,
-                lineHeight: spec.lineHeight,
-                shadow: spec.shadow,
-            });
-            if (spec.textPosition) await this.place(spec.textPosition);
+        // One headline via `text`, or several via `texts`. Each entry carries
+        // its own colour, size and position — a second text would otherwise
+        // land centred on top of the first.
+        const texts = spec.texts
+            ? spec.texts.slice()
+            : (spec.text
+                ? [{
+                    text: spec.text,
+                    color: spec.textColor,
+                    fontStyle: spec.fontStyle,
+                    align: spec.align,
+                    lineHeight: spec.lineHeight,
+                    shadow: spec.shadow,
+                    position: spec.textPosition,
+                    size: spec.textSize,
+                    rotate: spec.textRotate,
+                }]
+                : []);
+
+        for (const entry of texts) {
+            const item = typeof entry === "string" ? { text: entry } : entry;
+            await this.addText(item.text, item);
+            if (typeof item.size === "number") await this.resize(item.size);
+            if (typeof item.rotate === "number") await this.rotate(item.rotate);
+            if (item.position) await this.place(item.position);
         }
         return this.export({
             format: spec.format,
@@ -485,10 +735,16 @@ const Bildgenerator = {
      */
     async renderQRCode(spec) {
         const opts = spec || {};
-        if (!opts.data) throw new Error("renderQRCode() needs { data }");
+        const data = opts.data || this.qrPayload(opts);
+        if (!data) {
+            throw new Error(
+                "renderQRCode() needs { data }, or a { type } of " +
+                "text | url | email | vcard with its fields"
+            );
+        }
 
         const element = await generateQRCode(
-            opts.data,
+            data,
             opts.color || "#000000",
             opts.background || "#FFFFFF"
         );
@@ -497,6 +753,33 @@ const Bildgenerator = {
             width: element.width,
             height: element.height,
         };
+    },
+
+    /**
+     * Build the payload string for one of the four content types the QR wizard
+     * offers. Without this a caller has to hand-assemble mailto: query strings
+     * and vCard records — error-prone, and the formatting rules already live
+     * in the app.
+     *
+     * @param {Object} spec { type: 'text'|'url'|'email'|'vcard', ...fields }
+     * @returns {string|null}
+     */
+    qrPayload(spec) {
+        const opts = spec || {};
+        switch (opts.type) {
+            case "text":
+                return opts.text || null;
+            case "url":
+                return opts.url ? QRFormatHelpers.formatURL(opts.url) : null;
+            case "email":
+                return opts.email
+                    ? QRFormatHelpers.formatEmail(opts.email, opts.subject || "", opts.body || "")
+                    : null;
+            case "vcard":
+                return QRFormatHelpers.formatVCard(opts);
+            default:
+                return null;
+        }
     },
 
     // ----------------------------------------------------------- housekeeping

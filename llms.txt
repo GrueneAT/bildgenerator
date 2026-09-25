@@ -49,7 +49,7 @@ weitere Freigabe.
 
 Seite laden, warten bis `window.Bildgenerator` existiert, dann aufrufen.
 Alle Methoden sind asynchron und liefern erst zurück, wenn das Canvas seine
-Ruhelage erreicht hat. Aktuelle Schnittstellenversion: `Bildgenerator.VERSION === 3`.
+Ruhelage erreicht hat. Aktuelle Schnittstellenversion: `Bildgenerator.VERSION === 6`.
 
 ```js
 const bild = await window.Bildgenerator.render({
@@ -85,14 +85,17 @@ Bildgenerator.options()    // alle übrigen Auswahlmöglichkeiten
 | `background` | Hintergrundbild als `data:`-URL oder absolute URL |
 | `logo` | Organisation aus `logos()`, z. B. `'HERZOGENBURG'` |
 | `logoEnabled` | `false`, um ganz ohne Organisationslogo zu arbeiten |
-| `text` | Schlagzeile |
+| `text` | eine einzelne Schlagzeile |
+| `texts` | **mehrere Texte** mit eigener Farbe, Größe und Position — siehe unten |
 | `textColor` | aus `options().textColors` |
 | `fontStyle` | aus `options().fontStyles` — `'standard'` oder `'accent'` (kursive Akzentschrift) |
-| `align` | `left` \| `center` \| `right` |
+| `align` | `left` \| `center` \| `right` — Ausrichtung **innerhalb** des Textblocks |
+| `textSize` | Skalierung des Textblocks, `1` = wie eingefügt |
+| `textRotate` | Drehung in Grad |
 | `lineHeight` | aus `options().lineHeights` |
 | `shadow` | Schattentiefe als Zahl |
 | `textPosition` | aus `options().positions` |
-| `shapes` | Liste aus `options().shapes` — `'pinkCircle'`, `'cross'` (Wahlkreuz). Auch `{ kind, position }` |
+| `shapes` | Liste aus `options().shapes` — `'pinkCircle'`, `'cross'` (Wahlkreuz). Auch `{ kind, position, size, rotate }` |
 | `images` | Liste weiterer Bilder. Auch `{ url, position }` |
 | `qr` | `{ text, color, position }` — QR-Code auf dem Bild |
 | `format` | `'png'` (Standard) oder `'jpeg'` |
@@ -116,11 +119,19 @@ Objekt zurück, sind also verkettbar.
 | `setLogo(name)` | Organisationslogo setzen |
 | `setLogoEnabled(false)` | Organisationslogo entfernen |
 | `setBackground(url)` | Hintergrundbild setzen |
-| `addText(text, opts)` | Schlagzeile hinzufügen |
+| `addText(text, opts)` | Text hinzufügen, beliebig oft — Optionen siehe unten |
 | `addShape(kind)` | `'pinkCircle'` oder `'cross'` hinzufügen |
 | `addImage(url)` | weiteres Bild auf das Motiv legen |
 | `addQRCode({text, color})` | QR-Code auf das Bild setzen |
 | `place(position)` | das zuletzt hinzugefügte Element positionieren |
+| `resize(faktor)` | das zuletzt hinzugefügte Element vergrößern oder verkleinern |
+| `rotate(grad)` | das zuletzt hinzugefügte Element drehen |
+| `objects()` | alles auflisten, was auf dem Bild liegt |
+| `select(index)` | ein Element ansprechen |
+| `update(änderungen)` | ein gesetztes Element ändern |
+| `remove(index)` | ein Element löschen |
+| `bringToFront(index)` | ein Element nach vorne holen |
+| `qrPayload(spec)` | QR-Inhalt für `url`, `email`, `vcard` bauen |
 | `clipToCircle(size)` | das zuletzt hinzugefügte Objekt kreisrund beschneiden |
 | `lastAdded()` | das zuletzt hinzugefügte Objekt |
 | `protectiveMargin()` | die Schutzzone M in Pixeln |
@@ -130,6 +141,129 @@ Objekt zurück, sind also verkettbar.
 **Zu `clipToCircle`:** Der Knopf heißt in der Oberfläche „Kreis", fügt aber
 nichts hinzu — er beschneidet. Der Kreis, den man hinzufügen kann, ist
 `addShape('pinkCircle')`.
+
+## Text im Detail
+
+Der häufigste Stolperstein. Text ist das einzige Element mit vielen Optionen,
+und zwei davon werden regelmäßig verwechselt.
+
+### Alle Optionen von `addText(text, optionen)`
+
+| Option | Werte | Bedeutung |
+|---|---|---|
+| `color` | aus `options().textColors` | `'#FFFFFF'` weiß, `'#FFED00'` gelb, `'#000000'` schwarz |
+| `fontStyle` | aus `options().fontStyles` | `'standard'` oder `'accent'` (kursiv, nur für Zitate und Hervorhebungen) |
+| `align` | `left`, `center`, `right` | Ausrichtung **innerhalb** des Blocks |
+| `lineHeight` | aus `options().lineHeights` | `'1.0'`, `'1.15'`, `'1.35'` |
+| `shadow` | Zahl | Schattentiefe, `0` = kein Schatten |
+
+Zeilenumbrüche setzt du mit `\n` im Text selbst.
+
+### `align` ist nicht Positionierung
+
+Das ist die Verwechslung, die am meisten Zeit kostet:
+
+- **`align`** bestimmt, wie die Zeilen *innerhalb* des Textblocks stehen. Bei
+  einzeiligem Text ist es wirkungslos.
+- **`place()`** bewegt den Block *auf dem Bild*.
+
+Linksbündig am linken Bildrand heißt also beides: `addText(t, { align: 'left' })`
+**und** `place('left')`.
+
+### Größe
+
+Es gibt kein Schriftgrößenfeld. Ein neuer Text wird automatisch auf 80 % der
+Bildbreite skaliert — je mehr Wörter, desto kleiner wird er.
+
+`resize(faktor)` ändert das nachträglich: `1` ist die eingefügte Größe, `0.5`
+die Hälfte, `2` das Doppelte. Der Regler in der Oberfläche erlaubt 0,1 bis 2;
+darüber hinaus wird es unbrauchbar.
+
+Für eine kleine Subline unter einer großen Headline ist etwa `0.4` bis `0.5`
+ein brauchbarer Ausgangswert.
+
+### Mehrere Texte
+
+`addText()` kann beliebig oft aufgerufen werden. **Jeder neue Text landet
+zentriert** — ohne `place()` liegt der zweite auf dem ersten.
+
+In `render()` geht das über `texts`:
+
+```js
+await window.Bildgenerator.render({
+  template: 'artikel_23',
+  logo: 'HERZOGENBURG',
+  texts: [
+    { text: 'Windpark\nkommt',
+      color: '#FFED00', position: 'top' },
+    { text: 'Gemeinderat beschließt Standort',
+      color: '#FFFFFF', size: 0.35, position: 'center' },
+  ],
+});
+```
+
+Einzeln geht dasselbe so:
+
+```js
+const B = window.Bildgenerator;
+await B.setTemplate('artikel_23');
+await B.setLogo('HERZOGENBURG');
+
+await B.addText('Windpark\nkommt', { color: '#FFED00', align: 'left' });
+await B.place('top-left');
+
+await B.addText('Gemeinderat beschließt Standort', { color: '#FFFFFF' });
+await B.resize(0.35);
+await B.place({ x: 0, y: 0.45 });
+
+const bild = await B.export();
+```
+
+### Freie Positionierung
+
+`place()` nimmt neben den neun Feldern auch Koordinaten:
+
+```js
+const B = window.Bildgenerator;
+await B.setTemplate('artikel_23');
+await B.addText('Frei platziert');
+await B.resize(0.4);
+await B.place({ x: 0, y: 0.45 });   // linker Rand, knapp oberhalb der Mitte
+```
+
+`x` und `y` laufen von `0` (links beziehungsweise oben) bis `1` (rechts
+beziehungsweise unten), jeweils innerhalb der Schutzzone. `{ x: 0.5, y: 0.5 }`
+ist die Mitte. Werte außerhalb von 0 bis 1 werden nicht akzeptiert — die
+Schutzzone gilt immer.
+
+### Drehen
+
+`rotate(grad)` dreht das zuletzt hinzugefügte Element im Uhrzeigersinn. Der
+Wert ist absolut, nicht relativ.
+
+```js
+const B = window.Bildgenerator;
+await B.setTemplate('feed_post_45');
+await B.addShape('cross');
+await B.rotate(15);
+await B.place('top-right');
+```
+
+In der Oberfläche rastet der Drehgriff bei 0, 90, 180 und 270 Grad ein; über
+die Schnittstelle wird der Winkel exakt gesetzt, ohne Einrasten.
+
+Sparsam einsetzen. Gedrehte Headlines sind im Erscheinungsbild nicht
+vorgesehen — für Störer und Wahlkreuz ist eine leichte Schräge dagegen üblich.
+
+### Was nicht geht
+
+- **Keine freie Schriftgröße in Punkt** — Größe entsteht ausschließlich über
+  `resize()`, relativ zur eingefügten Größe.
+- **Keine freien Farben** — nur die Werte aus `options().textColors`
+  beziehungsweise `options().qrColors`.
+- **Kein Textrahmen und keine Hintergrundfläche hinter dem Text.**
+
+Wenn eine Anforderung das braucht, sag es, statt etwas Ähnliches zu liefern.
 
 ## QR-Code-Generator
 
@@ -147,9 +281,29 @@ const qr = await window.Bildgenerator.renderQRCode({
 
 | Feld | Bedeutung |
 |---|---|
-| `data` | **Pflicht.** Inhalt — URL, Text, `mailto:` oder vCard |
+| `data` | fertiger Inhalt als Zeichenkette |
+| `type` | statt `data`: `text`, `url`, `email` oder `vcard` — dann kommen die Felder dazu |
 | `color` | aus `options().qrColors` |
 | `background` | aus `options().qrBackgrounds`, `'transparent'` erlaubt |
+
+Die vier Inhaltstypen sind dieselben, die der QR-Assistent in der Oberfläche
+anbietet. Bau `mailto:`-Zeichenketten oder vCards **nicht selbst** zusammen —
+die Formatierungsregeln stecken im Werkzeug:
+
+```js
+const B = window.Bildgenerator;
+
+await B.renderQRCode({ type: 'url', url: 'gruene.at' });
+await B.renderQRCode({ type: 'email', email: 'buero@gruene.at', subject: 'Anfrage' });
+await B.renderQRCode({
+  type: 'vcard',
+  firstname: 'Anna', lastname: 'Muster',
+  email: 'anna.muster@gruene.at', phone: '+43 1 234567',
+});
+```
+
+`qrPayload(spec)` gibt dieselbe Zeichenkette zurück, ohne zu rendern. Dieselben
+Typangaben funktionieren auch bei `addQRCode()` für den QR auf dem Bild.
 
 Vorder- und Hintergrundfarbe müssen sich unterscheiden, sonst wird der Aufruf
 abgelehnt.
@@ -255,6 +409,84 @@ wegfallen.
 
 Beim Facebook-Header schneidet Facebook auf Mobilgeräten seitlich zu. Auch
 dort gehört alles Wichtige in die Mitte.
+
+## Ändern, was schon da ist
+
+Bis hierher ging es ums Hinzufügen. Alles, was liegt, lässt sich auch wieder
+ansehen, ändern, verschieben oder löschen — genau wie in der Oberfläche, wo man
+ein Objekt anklickt und dann die Regler bedient.
+
+### Nachsehen, was auf dem Bild liegt
+
+```js
+const B = window.Bildgenerator;
+await B.setTemplate('artikel_23');
+await B.setLogo('HERZOGENBURG');
+await B.addText('Windpark kommt');
+console.log(B.objects());
+```
+
+`objects()` liefert für jedes Element:
+
+| Feld | Bedeutung |
+|---|---|
+| `index` | die Nummer, mit der `select`, `update`, `remove`, `bringToFront` es ansprechen |
+| `type` | `text`, `image`, `circle`, `rect` |
+| `role` | `canvas` (grüne Fläche), `background` (Foto), `logo`, sonst wie `type` |
+| `text` | der Inhalt, bei Textelementen |
+| `color`, `left`, `top`, `width`, `height`, `angle`, `scale` | Zustand |
+| `editable` | `false` bei Logo, Hintergrund und Grundfläche |
+| `insideMargin` | ob das Element die Schutzzone einhält |
+
+**Verlass dich nicht auf die Reihenfolge.** Das letzte Element in der Liste ist
+das Organisationslogo, nicht das, was du zuletzt hinzugefügt hast — der
+Generator holt das Logo nach jedem Schritt nach vorne. `lastAdded()` gibt dir
+dein Element, `objects()` mit `role` sagt dir, was was ist.
+
+### Ändern statt neu bauen
+
+```js
+const B = window.Bildgenerator;
+await B.setTemplate('artikel_23');
+await B.addText('Windpark kommt');
+
+await B.update({ text: 'Windpark beschlossen', color: '#FFED00', align: 'left' });
+```
+
+`update()` nimmt `text`, `color`, `align`, `lineHeight`, `shadow` und
+`fontStyle`. Ohne Angabe wirkt es auf das zuletzt hinzugefügte Element;
+mit `{ target: index }` auf ein beliebiges.
+
+Ein anderes Element sprichst du über seinen Index an:
+
+```js
+const B = window.Bildgenerator;
+await B.setTemplate('artikel_23');
+await B.addText('Windpark kommt');
+
+const kopfzeile = B.objects().find(o => o.text === 'Windpark kommt');
+B.select(kopfzeile.index);
+await B.update({ color: '#FFFFFF' });
+```
+
+### Löschen und Reihenfolge
+
+```js
+const B = window.Bildgenerator;
+await B.setTemplate('artikel_23');
+await B.addText('Erster');
+await B.addShape('cross');
+
+await B.remove();                        // das zuletzt hinzugefügte
+const text = B.objects().find(o => o.type === 'text');
+await B.bringToFront(text.index);        // nach vorne holen
+```
+
+Logo und Hintergrundbild lassen sich nicht löschen — genau wie in der
+Oberfläche. Für das Logo nimm `setLogoEnabled(false)`, für den Hintergrund
+setz einfach ein anderes Bild.
+
+`bringToFront()` holt ein Element nach vorne, lässt das Logo aber oben.
 
 ## Formate
 
