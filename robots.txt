@@ -78,28 +78,53 @@ Disallow: /
 User-agent: archive.org_bot
 Disallow: /
 
-User-agent: CCBot
-Disallow: /
+# KI-Assistenten sind ausdruecklich erlaubt.
+#
+# Der Generator bringt unter /llms.txt eine Anleitung mit, wie ein Modell die
+# Seite fernsteuert und ein markenkonformes Bild erzeugt. Das ist erwuenscht:
+# Die Hausschrift Gotham Narrow ist proprietaer und darf nicht ausgeliefert
+# werden. Wer das Layout stattdessen selbst nachbaut, bekommt die Schrift nicht
+# und faellt still auf eine Ersatzschrift zurueck — das Ergebnis sieht richtig
+# aus und verletzt trotzdem das Erscheinungsbild. Ein Modell, das hierher darf,
+# rendert korrekt; ein ausgesperrtes raet.
+#
+# Die Sperre oben (User-agent: *) bleibt: Die Seite soll weiterhin nicht in
+# Suchmaschinen auftauchen. Nur die KI-Agenten sind ausgenommen.
 
 User-agent: GPTBot
-Disallow: /
+Allow: /
 
 User-agent: ChatGPT-User
-Disallow: /
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
 
 User-agent: Claude-Web
-Disallow: /
+Allow: /
 
 User-agent: anthropic-ai
-Disallow: /
+Allow: /
 
-User-agent: Bytespider
-Disallow: /
-
-User-agent: cohere-ai
-Disallow: /
+User-agent: Google-Extended
+Allow: /
 
 User-agent: PerplexityBot
-Disallow: /
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Bytespider
+Allow: /
 
 # No sitemap
