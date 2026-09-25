@@ -522,6 +522,36 @@ test.describe('Bildgenerator facade', () => {
     expect(angles.cross).toBe(20);
   });
 
+  test('a text can be fitted onto the Stoerer, as the brand guide shows it', async ({ page }) => {
+    const result = await page.evaluate(async () => {
+      const B = window.Bildgenerator;
+      await B.setTemplate('feed_post_45');
+      await B.setLogoEnabled(false);
+      await B.addShape('pinkCircle');
+      await B.place('top-right');
+
+      const kreis = B.objects().find((o) => o.type === 'circle');
+      await B.addText('31.8.');
+      const raw = B.lastAdded().getScaledWidth();
+      await B.fitInto(kreis.index);
+      await B.place({ onto: kreis.index });
+
+      const text = B.lastAdded();
+      const circle = canvas.getObjects()[kreis.index];
+      return {
+        raw,
+        circle: { w: circle.getScaledWidth(), cx: circle.left + circle.getScaledWidth() / 2 },
+        text: { w: text.getScaledWidth(), cx: text.left + text.getScaledWidth() / 2 },
+      };
+    });
+
+    // Inserted far wider than the circle, then shrunk to sit inside it.
+    expect(result.raw).toBeGreaterThan(result.circle.w);
+    expect(result.text.w).toBeLessThan(result.circle.w);
+    // And centred on it.
+    expect(result.text.cx).toBeCloseTo(result.circle.cx, 0);
+  });
+
   // --------------------------------------------------------------- failures
 
   test('rejects an unknown template by name and lists the valid ones', async ({ page }) => {

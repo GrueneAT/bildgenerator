@@ -31,7 +31,7 @@
  * breakage surfaces in e2e/api.spec.js instead of in somebody else's script.
  */
 const Bildgenerator = {
-    VERSION: 7,
+    VERSION: 8,
 
     /** The object the most recent add* call put on the canvas. */
     _lastAdded: null,
@@ -302,6 +302,21 @@ const Bildgenerator = {
         // Free positioning: { x, y } as fractions of the canvas, 0 = left/top
         // edge of the usable area, 1 = right/bottom. Still clamped to the
         // protective margin, because that is a brand rule and not a default.
+        // Centre on another element — the Stoerer pattern from the brand guide
+        // is a magenta circle with a short text on it, which needs exactly
+        // this and nothing else.
+        if (position && typeof position === "object" && position.onto !== undefined) {
+            const host = this._resolveTarget(position.onto);
+            if (host === target) throw new Error("place({ onto }) needs a different element");
+            target.set({
+                left: host.left + (host.getScaledWidth() - width) / 2,
+                top: host.top + (host.getScaledHeight() - height) / 2,
+            });
+            target.setCoords();
+            canvas.renderAll();
+            return this;
+        }
+
         if (position && typeof position === "object") {
             const inRange = function (v) {
                 return v === undefined || (typeof v === "number" && v >= 0 && v <= 1);
@@ -388,6 +403,26 @@ const Bildgenerator = {
         }
         const base = target._gatBaseScale || target.scaleX || 1;
         target.scale(base * factor).setCoords();
+        canvas.renderAll();
+        return this;
+    },
+
+    /**
+     * Scale an element so it fits inside another one, leaving a little air.
+     * Pairs with place({ onto }) for the Stoerer pattern.
+     *
+     * @param {number|Object} host   index from objects(), or an element
+     * @param {number} [ratio=0.6]   share of the host's width to occupy
+     */
+    async fitInto(host, ratio) {
+        const target = this.lastAdded();
+        if (!target) throw new Error("fitInto() needs an element that was added first");
+        const into = this._resolveTarget(host);
+        const share = typeof ratio === "number" ? ratio : 0.6;
+        const current = target.getScaledWidth();
+        if (!current) throw new Error("fitInto() cannot measure the element");
+        const wanted = into.getScaledWidth() * share;
+        target.scale((target.scaleX || 1) * (wanted / current)).setCoords();
         canvas.renderAll();
         return this;
     },
