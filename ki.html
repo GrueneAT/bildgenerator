@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bildgenerator mit KI nutzen – Grüner Bildgenerator</title>
+<meta name="description" content="Wie eine KI den Grünen Bildgenerator fernsteuert und markenkonforme Bilder erzeugt.">
+<link rel="icon" href="resources/favicon/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="resources/favicon/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="resources/favicon/favicon-32x32.png">
+<link rel="icon" type="image/svg+xml" href="https://design-system.gruene.at/assets/gruene-logo.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="resources/favicon/apple-touch-icon.png">
+<!-- Grüne AT Design System (gehostet). Lädt die Web-Schriften des DS + Vollkorn
+     selbst und liefert die gat-Komponenten + --gat-*-Tokens. -->
+<link rel="stylesheet" href="https://design-system.gruene.at/design-system.css">
+<style>
+  /* design-system.css setzt bewusst KEINE Tag-Defaults — das body-Grundlayout
+     muss die konsumierende Seite selbst aus den --gat-*-Tokens setzen. */
+  body {
+    margin: 0;
+    background: var(--gat-color-surface);
+    color: var(--gat-color-text);
+    font-family: var(--gat-font-copy);
+  }
+  /* Das DS hat keine Code-Komponente. Diese seitenlokale Regel hält den
+     Beispielprompt und den Codeblock lesbar und kopierbar. */
+  .ki-code {
+    display: block;
+    white-space: pre-wrap;
+    overflow-x: auto;
+    padding: var(--gat-space-3);
+    margin-top: var(--gat-space-3);
+    background: var(--gat-color-surface-alt, rgba(0,0,0,.04));
+    border: 1px solid var(--gat-web-hairline, rgba(0,0,0,.12));
+    border-radius: var(--gat-web-radius-card, 6px);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--gat-text-small, .9rem);
+    line-height: 1.5;
+  }
+  .ki-hosts {
+    margin-top: var(--gat-space-3);
+    padding-left: var(--gat-space-4);
+  }
+  .ki-hosts li { margin-bottom: var(--gat-space-2); }
+  .ki-hosts code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+</style>
+</head>
+<body>
+
+  <header class="gat-header">
+    <div class="gat-header__inner">
+      <a class="gat-header__brand" href="index.html">
+        <img class="gat-header__logo"
+             src="https://design-system.gruene.at/assets/gruene-logo.svg"
+             alt="Die Grünen">
+        <span class="gat-header__wordmark">Grüner Bildgenerator</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- ============ INTRO ============ -->
+  <section class="gat-section" id="start">
+    <div class="gat-container">
+      <h1 class="gat-headline">Bildgenerator mit KI nutzen</h1>
+      <p class="gat-subline">
+        Statt selbst zu klicken, kannst du eine KI den Bildgenerator bedienen
+        lassen — und bekommst ein fertiges Bild zurück.
+      </p>
+      <p class="gat-fliesstext">
+        Der Bildgenerator bringt eine Schnittstelle mit, über die ein
+        KI-Assistent die Seite fernsteuert: Format wählen, Logo setzen, Text
+        einfügen, Bild exportieren. Du beschreibst, was draufstehen soll; die
+        KI bedient den Generator und liefert das Bild.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ WARUM SO ============ -->
+  <section class="gat-section" id="warum">
+    <div class="gat-container">
+      <div class="gat-section-head">
+        <h2 class="gat-headline">Warum die KI nicht einfach selbst zeichnet</h2>
+      </div>
+      <p class="gat-fliesstext">
+        Weil sie unsere Schrift nicht hat. <strong>Gotham Narrow</strong> ist
+        eine gekaufte Schrift und darf nicht weitergegeben werden. Sie liegt
+        nur auf dieser Seite.
+      </p>
+      <p class="gat-fliesstext">
+        Baut ein Modell das Layout selbst nach, fehlt ihm die Schrift — und
+        Browser ersetzen eine fehlende Schrift stillschweigend durch eine
+        andere. Das Ergebnis sieht auf den ersten Blick richtig aus und
+        entspricht trotzdem nicht dem Erscheinungsbild. Genau das ist uns beim
+        Ausprobieren passiert.
+      </p>
+      <aside class="gat-callout gat-callout--info">
+        Deshalb der Umweg über die Seite: Hier sind Schrift, Logos und Layout
+        schon da. Die KI entscheidet nur noch, was draufsteht.
+      </aside>
+    </div>
+  </section>
+
+  <!-- ============ SO GEHTS ============ -->
+  <section class="gat-section" id="anleitung">
+    <div class="gat-container">
+      <div class="gat-section-head">
+        <h2 class="gat-headline">So funktioniert es</h2>
+      </div>
+      <div class="gat-grid">
+        <article class="gat-card gat-card--primary">
+          <h3 class="gat-card__title">1. Voraussetzung prüfen</h3>
+          <p class="gat-card__body">
+            Deine KI muss Code in einem echten Browser ausführen können. Bei
+            Claude heißt das Code-Ausführung oder Analyse-Werkzeug. Ein reines
+            Chatfenster ohne Browser genügt nicht.
+          </p>
+        </article>
+        <article class="gat-card">
+          <h3 class="gat-card__title">2. Beschreiben, was du willst</h3>
+          <p class="gat-card__body">
+            Format, Organisation und Text — mehr braucht es nicht. Ein
+            Hintergrundfoto kannst du mitgeben, musst du aber nicht.
+          </p>
+        </article>
+        <article class="gat-card">
+          <h3 class="gat-card__title">3. Bild bekommen</h3>
+          <p class="gat-card__body">
+            Die KI lädt die Seite, bedient sie und gibt dir das fertige PNG
+            zum Herunterladen.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BEISPIELPROMPT ============ -->
+  <section class="gat-section" id="prompt">
+    <div class="gat-container">
+      <div class="gat-section-head">
+        <h2 class="gat-headline">Beispiel zum Kopieren</h2>
+      </div>
+      <p class="gat-fliesstext">
+        Dieser Text reicht als Auftrag. Organisation, Format und Schlagzeile
+        tauschst du gegen deine eigenen aus.
+      </p>
+      <code class="ki-code">Öffne https://bildgenerator.gruene.at mit einem Headless-Browser
+und lies dort zuerst https://bildgenerator.gruene.at/llms.txt.
+
+Erzeuge dann ein Artikelbild im Format 2:3 für die Organisation
+HERZOGENBURG mit der Schlagzeile „Rückenwind für Herzogenburg!"
+und gib mir das PNG zum Download.</code>
+      <p class="gat-fliesstext">
+        Der Hinweis auf <code>llms.txt</code> ist wichtig: Dort steht für die
+        KI, wie die Schnittstelle heißt und welche Formate es gibt.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ DOMAINS ============ -->
+  <section class="gat-section" id="domains">
+    <div class="gat-container">
+      <div class="gat-section-head">
+        <h2 class="gat-headline">Falls die KI nicht ins Netz darf</h2>
+      </div>
+      <p class="gat-fliesstext">
+        Manche KI-Umgebungen sperren Netzwerkzugriffe und fragen nach, welche
+        Adressen erlaubt sein sollen. Gebraucht werden diese vier:
+      </p>
+      <ul class="ki-hosts">
+        <li><code>bildgenerator.gruene.at</code> — der Generator selbst</li>
+        <li><code>design-system.gruene.at</code> — Gestaltung und Kopfbereich</li>
+        <li><code>fonts.googleapis.com</code> — Schriftverzeichnis</li>
+        <li><code>fonts.gstatic.com</code> — die Schriftdateien dazu</li>
+      </ul>
+      <p class="gat-fliesstext">
+        Ohne <code>design-system.gruene.at</code> funktioniert das Bild
+        weiterhin, nur die Seite selbst sieht unfertig aus.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ GRENZEN ============ -->
+  <section class="gat-section" id="grenzen">
+    <div class="gat-container">
+      <div class="gat-section-head">
+        <h2 class="gat-headline">Was du trotzdem selbst prüfen musst</h2>
+      </div>
+      <p class="gat-fliesstext">
+        Die Schnittstelle sorgt dafür, dass Schrift, Logo und Format stimmen.
+        Für alles andere bist weiter du verantwortlich.
+      </p>
+      <div class="gat-grid">
+        <article class="gat-card">
+          <h3 class="gat-card__title">Bildrechte</h3>
+          <p class="gat-card__body">
+            Hintergrundfotos müssen rechtlich geklärt sein. KI-erzeugte
+            Hintergründe gehören als „Symbolfoto — KI-generiert"
+            gekennzeichnet.
+          </p>
+        </article>
+        <article class="gat-card">
+          <h3 class="gat-card__title">Inhalt</h3>
+          <p class="gat-card__body">
+            Eine KI formuliert überzeugend auch dann, wenn die Aussage nicht
+            stimmt. Zahlen und Behauptungen vor der Veröffentlichung prüfen.
+          </p>
+        </article>
+        <article class="gat-card">
+          <h3 class="gat-card__title">Impressum</h3>
+          <p class="gat-card__body">
+            Bei Druckmaterialien ist je nach Verwendung ein Impressum nötig.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ABSCHLUSS ============ -->
+  <section class="gat-section" id="los">
+    <div class="gat-container">
+      <div class="gat-section-head">
+        <h2 class="gat-headline">Lieber selbst klicken?</h2>
+      </div>
+      <p class="gat-fliesstext">
+        Geht natürlich weiter. Der Generator bleibt ein ganz normales Werkzeug
+        zum Bedienen — die KI-Schnittstelle ist ein zusätzlicher Weg, kein
+        Ersatz.
+      </p>
+      <p class="gat-fliesstext">
+        <a class="gat-btn gat-btn--primary" href="index.html">Zum Bildgenerator</a>
+      </p>
+    </div>
+  </section>
+
+</body>
+</html>

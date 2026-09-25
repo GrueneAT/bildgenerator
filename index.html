@@ -1327,6 +1327,8 @@
     <footer class="border-t border-gray-200 mt-10">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 text-xs text-gray-500 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <div class="flex items-center gap-3">
+          <a href="ki.html" class="hover:text-gruene-primary hover:underline">Mit KI nutzen</a>
+          <span class="text-gray-300">|</span>
           <a href="impressum.html" class="hover:text-gruene-primary hover:underline">Impressum</a>
           <span class="text-gray-300">|</span>
           <a href="https://gruene.at/datenschutzerklarung/" target="_blank" rel="noopener" class="hover:text-gruene-primary hover:underline">Datenschutz</a>
@@ -1368,6 +1370,12 @@
     <script src="resources/js/qrcode/qrcode-helpers.js"></script>
     <script src="resources/js/qrcode/qrcode-generator.js"></script>
     <script src="resources/js/qrcode/qrcode-wizard.js"></script>
+    <!-- Programmatic entry point (window.Bildgenerator). Must stay inside this
+         block: build.js folds everything from "Core utilities" up to and
+         including qrcode-handlers.js into app.min.js, and a tag placed after it
+         would be served separately from a stale copy. -->
+    <script src="resources/js/api.js"></script>
     <script src="resources/js/qrcode/qrcode-handlers.js"></script>
+
   </body>
 </html>

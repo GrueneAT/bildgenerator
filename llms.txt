@@ -1,0 +1,139 @@
+# Grüner Bildgenerator
+
+> Browserbasiertes Werkzeug, das markenkonforme Grafiken der österreichischen
+> Grünen erzeugt — Social Media, Website-Artikelbilder und Druckformate.
+> Läuft vollständig im Browser, ohne Server und ohne Anmeldung.
+
+Diese Datei richtet sich an KI-Assistenten, die ein Bild erzeugen sollen.
+Sie beschreibt, wie die Seite ferngesteuert wird — nicht, wie man das
+Erscheinungsbild nachbaut.
+
+## Der wichtigste Punkt zuerst
+
+**Bau das Layout nicht nach. Steuere diese Seite.**
+
+Die Hausschrift ist Gotham Narrow. Sie ist proprietär und darf nicht
+weitergegeben werden; sie liegt ausschließlich auf dieser Seite und wird von
+dort per `@font-face` geladen. Es gibt keine öffentliche Webfont-URL, und es
+wird keine geben.
+
+Wer das Layout in eigenem HTML, Canvas-Code oder einer Grafikbibliothek
+nachbaut, bekommt die Schrift nicht und fällt still auf eine Ersatzschrift
+zurück. Das Ergebnis sieht auf den ersten Blick richtig aus und verletzt
+trotzdem das Erscheinungsbild. **Wenn du diese Seite nicht laden kannst,
+liefere kein Bild aus — sag, dass es nicht ging.** Ein Bild mit Ersatzschrift
+ist schlechter als kein Bild.
+
+Dasselbe gilt für Logos: Die Organisationslogos von Bundesländern, Bezirken,
+Gebieten, Klubs und Gemeinden liegen hier, korrekt skaliert und positioniert.
+Nachbauen ist weder nötig noch erlaubt.
+
+## Voraussetzungen
+
+Du brauchst eine Umgebung, die JavaScript in einer echten Browser-Seite
+ausführt — etwa Playwright oder Puppeteer in einer Code-Sandbox.
+
+Falls deine Umgebung Netzwerkzugriffe freischalten muss, werden diese Hosts
+gebraucht:
+
+- `bildgenerator.gruene.at` — die Anwendung selbst
+- `design-system.gruene.at` — Stylesheet und Kopfbereich
+- `fonts.googleapis.com`, `fonts.gstatic.com` — Vollkorn, die kursive Akzentschrift
+
+Gotham Narrow kommt von `bildgenerator.gruene.at` selbst und braucht keine
+weitere Freigabe.
+
+## Schnittstelle
+
+Seite laden, warten bis `window.Bildgenerator` existiert, dann aufrufen.
+Alle Methoden sind asynchron und liefern erst zurück, wenn das Canvas seine
+Ruhelage erreicht hat.
+
+```js
+const bild = await window.Bildgenerator.render({
+  template: 'artikel_23',
+  logo: 'HERZOGENBURG',
+  text: 'Rückenwind für Herzogenburg!',
+  dpi: 200,
+});
+// → { dataURL, width, height, dpi }
+```
+
+### render(spec)
+
+| Feld | Pflicht | Bedeutung |
+|---|---|---|
+| `template` | ja | Name aus `Bildgenerator.templates()` |
+| `logo` | nein | Wert aus `Bildgenerator.logos()`, z. B. `'HERZOGENBURG'` |
+| `text` | nein | Schlagzeile |
+| `background` | nein | `data:`-URL oder absolute Bild-URL |
+| `textColor` | nein | `'#FFFFFF'` weiß, `'#FFED00'` gelb, `'#000000'` schwarz |
+| `fontStyle` | nein | `'standard'` (Gotham Narrow) oder `'accent'` (Vollkorn, kursiv) |
+| `align` | nein | `left` \| `center` \| `right` |
+| `dpi` | nein | Standard 200. Bei 72 entspricht der Export exakt den Canvas-Maßen |
+| `format` | nein | Standard `'png'` |
+
+Rückgabe: `{ dataURL, width, height, dpi }`. `dataURL` ist ein
+`data:image/png;base64,…`-String.
+
+### Einzelschritte
+
+Wenn du mehr Kontrolle brauchst, geht auch jeder Schritt für sich —
+`setTemplate`, `setBackground`, `setLogo`, `addText`, `export`. Die Reihenfolge
+ist nicht beliebig: Der Template-Wechsel baut das Canvas neu und verwirft alles
+darauf, der Hintergrund gehört nach hinten, Text wird gegen das Vorhandene
+zentriert.
+
+### Nachschlagen
+
+- `Bildgenerator.templates()` — alle gültigen Template-Namen
+- `Bildgenerator.logos()` — alle wählbaren Organisationen
+- `Bildgenerator.VERSION` — derzeit `1`
+
+## Formate
+
+| Name | Maße | Wofür |
+|---|---|---|
+| `feed_post_45` | 1080×1350 | Instagram- und Facebook-Post |
+| `story` | 1080×1920 | Story, hochkant |
+| `event` | 1920×1005 | Veranstaltungs-Header |
+| `facebook_header` | 820×360 | Facebook-Titelbild |
+| `artikel_23` | 1080×1620 | Artikelbild für Gemeinde- und Bezirksseiten |
+| `a4`, `a4_quer` | 2480×3508 | A4, hoch und quer |
+| `a5`, `a5_quer` | 1748×2480 | A5, hoch und quer |
+| `a6`, `a6_quer` | 1240×1748 | A6, hoch und quer |
+
+Die angegebenen Maße sind die Canvas-Maße. Der Export skaliert sie mit
+`dpi/72` — bei den Standardwerten wird aus `artikel_23` also ein Bild mit
+3000×4500 Pixeln.
+
+**Zu `artikel_23`:** Die Gemeinde- und Bezirksseiten liefern Bilder über
+Cloudflare Image Resizing aus und schneiden je nach Block auf ein anderes
+Seitenverhältnis zu — immer aus der Mitte heraus. Text und wichtige Bildteile
+gehören deshalb in die Mitte, nicht an den oberen oder unteren Rand.
+
+## Was du nicht selbst machen musst
+
+Die folgenden vier Eigenheiten der Oberfläche nimmt dir `window.Bildgenerator`
+ab. Sie stehen hier, damit du gar nicht erst versuchst, die Bedienelemente
+direkt anzusprechen:
+
+1. `#meme-input` ist der Datei-Upload für das Hintergrundbild, kein Textfeld.
+2. Text läuft über `#text` und wird mit `#add-text` übernommen — der Abschnitt
+   ist anfangs zugeklappt.
+3. `#logo-selection` ist ein verstecktes `<select>` hinter einem Suchfeld, das
+   selbst ein `change`-Ereignis auslöst. Ein zusätzliches legt zwei Logos
+   übereinander.
+4. `CanvasUtils.exportCanvas()` liefert ein Objekt, keinen String.
+
+## Inhaltliche Hinweise
+
+- Verwendete Hintergrundfotos müssen rechtlich geklärt sein. KI-erzeugte
+  Hintergründe werden als „Symbolfoto — KI-generiert" gekennzeichnet.
+- Bei Druckformaten ist je nach Verwendung ein Impressum nötig.
+
+## Weiteres
+
+- Anleitung für Menschen: https://bildgenerator.gruene.at/ki.html
+- Welche Schrift wofür: https://bildgenerator.gruene.at/schriften.html
+- Quellcode: https://github.com/GrueneAT/bildgenerator

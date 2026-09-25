@@ -39,6 +39,7 @@ const JS_FILES_ORDER = [
   "resources/js/qrcode/qrcode-generator.js",
   "resources/js/qrcode/qrcode-wizard.js",
   "resources/js/qrcode/qrcode-handlers.js",
+  "resources/js/api.js",
 ];
 
 async function buildVendorBundle() {
