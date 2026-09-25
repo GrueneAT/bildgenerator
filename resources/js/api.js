@@ -31,7 +31,7 @@
  * breakage surfaces in e2e/api.spec.js instead of in somebody else's script.
  */
 const Bildgenerator = {
-    VERSION: 3,
+    VERSION: 4,
 
     /** The object the most recent add* call put on the canvas. */
     _lastAdded: null,
@@ -153,7 +153,9 @@ const Bildgenerator = {
      * @param {Object} [options]
      * @param {string} [options.color]      value from options().textColors
      * @param {string} [options.fontStyle]  id from options().fontStyles
-     * @param {string} [options.align]      left | center | right
+     * @param {string} [options.align]      left | center | right — how the lines
+     *                                        sit inside the text block. To move
+     *                                        the block itself, use place().
      * @param {string} [options.lineHeight] value from options().lineHeights
      * @param {number} [options.shadow]     shadow depth
      */
@@ -287,16 +289,41 @@ const Bildgenerator = {
             throw new Error("place() needs an element that was added first");
         }
 
-        const valid = this.options().positions;
-        if (!valid.includes(position)) {
-            throw new Error(
-                `Unknown position "${position}". Available: ${valid.join(", ")}`
-            );
-        }
-
         const margin = this.protectiveMargin();
         const width = target.getScaledWidth();
         const height = target.getScaledHeight();
+
+        // Free positioning: { x, y } as fractions of the canvas, 0 = left/top
+        // edge of the usable area, 1 = right/bottom. Still clamped to the
+        // protective margin, because that is a brand rule and not a default.
+        if (position && typeof position === "object") {
+            const inRange = function (v) {
+                return v === undefined || (typeof v === "number" && v >= 0 && v <= 1);
+            };
+            if (!inRange(position.x) || !inRange(position.y)) {
+                throw new Error(
+                    "place({ x, y }) takes fractions between 0 and 1; the " +
+                    "protective margin is not optional"
+                );
+            }
+            const usableWidth = canvas.width - 2 * margin - width;
+            const usableHeight = canvas.height - 2 * margin - height;
+            target.set({
+                left: margin + Math.max(0, usableWidth) * (position.x || 0),
+                top: margin + Math.max(0, usableHeight) * (position.y || 0),
+            });
+            target.setCoords();
+            canvas.renderAll();
+            return this;
+        }
+
+        const valid = this.options().positions;
+        if (!valid.includes(position)) {
+            throw new Error(
+                `Unknown position "${position}". Available: ${valid.join(", ")}, ` +
+                `or { x, y } with values between 0 and 1`
+            );
+        }
 
         // The logo is placed by the app at the bottom; keep clear of it.
         let bottomLimit = canvas.height - margin;
@@ -319,6 +346,30 @@ const Bildgenerator = {
 
         target.set({ left: left, top: top });
         target.setCoords();
+        canvas.renderAll();
+        return this;
+    },
+
+    /**
+     * Scale an element. The wizard exposes this as a slider on the selected
+     * object; there is no font-size field, so this is how text gets bigger or
+     * smaller too.
+     *
+     * A new text object is scaled to fit 80 % of the canvas width, so 1 is
+     * "as added". The UI slider allows 0.1 to 2.
+     *
+     * @param {number} factor absolute scale, not a multiplier
+     * @param {Object} [options]
+     * @param {fabric.Object} [options.target] default: the last element added
+     */
+    async resize(factor, options) {
+        const opts = options || {};
+        const target = opts.target || this.lastAdded();
+        if (!target) throw new Error("resize() needs an element that was added first");
+        if (typeof factor !== "number" || factor <= 0) {
+            throw new Error("resize() needs a positive number");
+        }
+        target.scale(factor).setCoords();
         canvas.renderAll();
         return this;
     },
@@ -412,12 +463,17 @@ const Bildgenerator = {
      * @param {string}   [spec.background]  data: URL or absolute URL
      * @param {string}   [spec.logo]        from logos()
      * @param {boolean}  [spec.logoEnabled] false to leave the logo off
-     * @param {string}   [spec.text]        headline
+     * @param {string}   [spec.text]        a single headline
+     * @param {Array}    [spec.texts]       several texts, each
+     *                                      { text, color, fontStyle, align,
+     *                                        lineHeight, shadow, size, position }
      * @param {string}   [spec.textColor]   from options().textColors
      * @param {string}   [spec.fontStyle]   from options().fontStyles
-     * @param {string}   [spec.align]       left | center | right
+     * @param {string}   [spec.align]       left | center | right — alignment
+     *                                      WITHIN the text block, not on the canvas
      * @param {string}   [spec.lineHeight]  from options().lineHeights
      * @param {number}   [spec.shadow]      shadow depth
+     * @param {number}   [spec.textSize]    scale, 1 = as added
      * @param {string}   [spec.textPosition] from options().positions
      * @param {Array}    [spec.shapes]      names from options().shapes, or
      *                                      { kind, position } objects
@@ -453,15 +509,29 @@ const Bildgenerator = {
             await this.addQRCode(spec.qr);
             if (spec.qr.position) await this.place(spec.qr.position);
         }
-        if (spec.text) {
-            await this.addText(spec.text, {
-                color: spec.textColor,
-                fontStyle: spec.fontStyle,
-                align: spec.align,
-                lineHeight: spec.lineHeight,
-                shadow: spec.shadow,
-            });
-            if (spec.textPosition) await this.place(spec.textPosition);
+        // One headline via `text`, or several via `texts`. Each entry carries
+        // its own colour, size and position — a second text would otherwise
+        // land centred on top of the first.
+        const texts = spec.texts
+            ? spec.texts.slice()
+            : (spec.text
+                ? [{
+                    text: spec.text,
+                    color: spec.textColor,
+                    fontStyle: spec.fontStyle,
+                    align: spec.align,
+                    lineHeight: spec.lineHeight,
+                    shadow: spec.shadow,
+                    position: spec.textPosition,
+                    size: spec.textSize,
+                }]
+                : []);
+
+        for (const entry of texts) {
+            const item = typeof entry === "string" ? { text: entry } : entry;
+            await this.addText(item.text, item);
+            if (typeof item.size === "number") await this.resize(item.size);
+            if (item.position) await this.place(item.position);
         }
         return this.export({
             format: spec.format,

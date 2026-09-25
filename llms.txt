@@ -49,7 +49,7 @@ weitere Freigabe.
 
 Seite laden, warten bis `window.Bildgenerator` existiert, dann aufrufen.
 Alle Methoden sind asynchron und liefern erst zurück, wenn das Canvas seine
-Ruhelage erreicht hat. Aktuelle Schnittstellenversion: `Bildgenerator.VERSION === 3`.
+Ruhelage erreicht hat. Aktuelle Schnittstellenversion: `Bildgenerator.VERSION === 4`.
 
 ```js
 const bild = await window.Bildgenerator.render({
@@ -85,10 +85,12 @@ Bildgenerator.options()    // alle übrigen Auswahlmöglichkeiten
 | `background` | Hintergrundbild als `data:`-URL oder absolute URL |
 | `logo` | Organisation aus `logos()`, z. B. `'HERZOGENBURG'` |
 | `logoEnabled` | `false`, um ganz ohne Organisationslogo zu arbeiten |
-| `text` | Schlagzeile |
+| `text` | eine einzelne Schlagzeile |
+| `texts` | **mehrere Texte** mit eigener Farbe, Größe und Position — siehe unten |
 | `textColor` | aus `options().textColors` |
 | `fontStyle` | aus `options().fontStyles` — `'standard'` oder `'accent'` (kursive Akzentschrift) |
-| `align` | `left` \| `center` \| `right` |
+| `align` | `left` \| `center` \| `right` — Ausrichtung **innerhalb** des Textblocks |
+| `textSize` | Skalierung des Textblocks, `1` = wie eingefügt |
 | `lineHeight` | aus `options().lineHeights` |
 | `shadow` | Schattentiefe als Zahl |
 | `textPosition` | aus `options().positions` |
@@ -116,11 +118,12 @@ Objekt zurück, sind also verkettbar.
 | `setLogo(name)` | Organisationslogo setzen |
 | `setLogoEnabled(false)` | Organisationslogo entfernen |
 | `setBackground(url)` | Hintergrundbild setzen |
-| `addText(text, opts)` | Schlagzeile hinzufügen |
+| `addText(text, opts)` | Text hinzufügen, beliebig oft — Optionen siehe unten |
 | `addShape(kind)` | `'pinkCircle'` oder `'cross'` hinzufügen |
 | `addImage(url)` | weiteres Bild auf das Motiv legen |
 | `addQRCode({text, color})` | QR-Code auf das Bild setzen |
 | `place(position)` | das zuletzt hinzugefügte Element positionieren |
+| `resize(faktor)` | das zuletzt hinzugefügte Element vergrößern oder verkleinern |
 | `clipToCircle(size)` | das zuletzt hinzugefügte Objekt kreisrund beschneiden |
 | `lastAdded()` | das zuletzt hinzugefügte Objekt |
 | `protectiveMargin()` | die Schutzzone M in Pixeln |
@@ -130,6 +133,110 @@ Objekt zurück, sind also verkettbar.
 **Zu `clipToCircle`:** Der Knopf heißt in der Oberfläche „Kreis", fügt aber
 nichts hinzu — er beschneidet. Der Kreis, den man hinzufügen kann, ist
 `addShape('pinkCircle')`.
+
+## Text im Detail
+
+Der häufigste Stolperstein. Text ist das einzige Element mit vielen Optionen,
+und zwei davon werden regelmäßig verwechselt.
+
+### Alle Optionen von `addText(text, optionen)`
+
+| Option | Werte | Bedeutung |
+|---|---|---|
+| `color` | aus `options().textColors` | `'#FFFFFF'` weiß, `'#FFED00'` gelb, `'#000000'` schwarz |
+| `fontStyle` | aus `options().fontStyles` | `'standard'` oder `'accent'` (kursiv, nur für Zitate und Hervorhebungen) |
+| `align` | `left`, `center`, `right` | Ausrichtung **innerhalb** des Blocks |
+| `lineHeight` | aus `options().lineHeights` | `'1.0'`, `'1.15'`, `'1.35'` |
+| `shadow` | Zahl | Schattentiefe, `0` = kein Schatten |
+
+Zeilenumbrüche setzt du mit `\n` im Text selbst.
+
+### `align` ist nicht Positionierung
+
+Das ist die Verwechslung, die am meisten Zeit kostet:
+
+- **`align`** bestimmt, wie die Zeilen *innerhalb* des Textblocks stehen. Bei
+  einzeiligem Text ist es wirkungslos.
+- **`place()`** bewegt den Block *auf dem Bild*.
+
+Linksbündig am linken Bildrand heißt also beides: `addText(t, { align: 'left' })`
+**und** `place('left')`.
+
+### Größe
+
+Es gibt kein Schriftgrößenfeld. Ein neuer Text wird automatisch auf 80 % der
+Bildbreite skaliert — je mehr Wörter, desto kleiner wird er.
+
+`resize(faktor)` ändert das nachträglich: `1` ist die eingefügte Größe, `0.5`
+die Hälfte, `2` das Doppelte. Der Regler in der Oberfläche erlaubt 0,1 bis 2;
+darüber hinaus wird es unbrauchbar.
+
+Für eine kleine Subline unter einer großen Headline ist etwa `0.4` bis `0.5`
+ein brauchbarer Ausgangswert.
+
+### Mehrere Texte
+
+`addText()` kann beliebig oft aufgerufen werden. **Jeder neue Text landet
+zentriert** — ohne `place()` liegt der zweite auf dem ersten.
+
+In `render()` geht das über `texts`:
+
+```js
+await window.Bildgenerator.render({
+  template: 'artikel_23',
+  logo: 'HERZOGENBURG',
+  texts: [
+    { text: 'Windpark\nkommt',
+      color: '#FFED00', position: 'top' },
+    { text: 'Gemeinderat beschließt Standort',
+      color: '#FFFFFF', size: 0.35, position: 'center' },
+  ],
+});
+```
+
+Einzeln geht dasselbe so:
+
+```js
+const B = window.Bildgenerator;
+await B.setTemplate('artikel_23');
+await B.setLogo('HERZOGENBURG');
+
+await B.addText('Windpark\nkommt', { color: '#FFED00', align: 'left' });
+await B.place('top-left');
+
+await B.addText('Gemeinderat beschließt Standort', { color: '#FFFFFF' });
+await B.resize(0.35);
+await B.place({ x: 0, y: 0.45 });
+
+const bild = await B.export();
+```
+
+### Freie Positionierung
+
+`place()` nimmt neben den neun Feldern auch Koordinaten:
+
+```js
+const B = window.Bildgenerator;
+await B.setTemplate('artikel_23');
+await B.addText('Frei platziert');
+await B.resize(0.4);
+await B.place({ x: 0, y: 0.45 });   // linker Rand, knapp oberhalb der Mitte
+```
+
+`x` und `y` laufen von `0` (links beziehungsweise oben) bis `1` (rechts
+beziehungsweise unten), jeweils innerhalb der Schutzzone. `{ x: 0.5, y: 0.5 }`
+ist die Mitte. Werte außerhalb von 0 bis 1 werden nicht akzeptiert — die
+Schutzzone gilt immer.
+
+### Was nicht geht
+
+- **Keine freie Schriftgröße in Punkt** — nur `resize()` relativ zur
+  eingefügten Größe.
+- **Keine freien Farben** — nur die drei aus `options().textColors`.
+- **Kein Textrahmen und keine Hintergrundfläche hinter dem Text.**
+- **Keine Drehung.**
+
+Wenn eine Anforderung das braucht, sag es, statt etwas Ähnliches zu liefern.
 
 ## QR-Code-Generator
 

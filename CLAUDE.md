@@ -150,6 +150,11 @@ controls and handlers a person does; it is NOT a second rendering path.
   Colours, fonts and logo placement need no documenting; "Typografie steht
   immer in Kombination mit Grün" and the protective margin M = 0.06 x short
   edge do.
+- `e2e/llms-examples.spec.js` executes every ```js block in `llms.txt` against
+  the page. A worked example that does not work is worse than none: the model
+  follows it, hits an error it cannot interpret, and improvises — the failure
+  this interface exists to prevent. Keep examples complete and runnable, not
+  fragments.
 - `lastAdded()` exists because `canvas.getObjects()` ends with the organisation
   LOGO, not with the element just added — `addLogo()` and the QR handler both
   call `bringLogoToFront()`. Anything that operates on "the last object" moves

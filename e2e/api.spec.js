@@ -34,7 +34,7 @@ test.describe('Bildgenerator facade', () => {
       version: window.Bildgenerator.VERSION,
     }));
 
-    expect(version).toBe(3);
+    expect(version).toBe(4);
     expect(templates).toContain('artikel_23');
     expect(templates).toContain('feed_post_45');
     expect(logos).toContain('HERZOGENBURG');
@@ -336,6 +336,23 @@ test.describe('Bildgenerator facade', () => {
     expect(result.after).toEqual(result.before);
   });
 
+  test('rejects free coordinates outside the canvas', async ({ page }) => {
+    const message = await page.evaluate(async () => {
+      await window.Bildgenerator.setTemplate('feed_post_45');
+      await window.Bildgenerator.addShape('cross');
+      try {
+        await window.Bildgenerator.place({ x: 1.5, y: 0 });
+        return null;
+      } catch (error) {
+        return error.message;
+      }
+    });
+
+    // llms.txt promises these are rejected; silently clamping would make the
+    // document a lie and put elements somewhere the caller did not ask for.
+    expect(message).toContain('between 0 and 1');
+  });
+
   test('rejects an unknown position and lists the valid ones', async ({ page }) => {
     const message = await page.evaluate(async () => {
       await window.Bildgenerator.setTemplate('feed_post_45');
@@ -350,6 +367,95 @@ test.describe('Bildgenerator facade', () => {
 
     expect(message).toContain('oben-links');
     expect(message).toContain('top-left');
+  });
+
+  // -------------------------------------------------- several texts, sizing
+
+  test('renders several texts with their own colour, size and position', async ({ page }) => {
+    const result = await page.evaluate(async () => {
+      await window.Bildgenerator.render({
+        template: 'artikel_23',
+        logoEnabled: false,
+        texts: [
+          { text: 'Windpark', color: '#FFED00', position: 'top' },
+          { text: 'kommt', color: '#FFFFFF', size: 0.5, position: 'bottom' },
+        ],
+        dpi: 72,
+      });
+      const texts = canvas.getObjects().filter((o) => o.type === 'text');
+      return texts.map((t) => ({
+        text: t.text,
+        fill: t.fill,
+        scale: Math.round(t.scaleX * 100) / 100,
+        top: Math.round(t.top),
+      }));
+    });
+
+    expect(result).toHaveLength(2);
+    expect(result[0].fill).toBe('#FFED00');
+    expect(result[1].fill).toBe('#FFFFFF');
+    // Two texts must not end up stacked on the same spot.
+    expect(result[0].top).not.toBe(result[1].top);
+    expect(result[1].top).toBeGreaterThan(result[0].top);
+  });
+
+  test('resize() changes an element without moving it off the canvas', async ({ page }) => {
+    const result = await page.evaluate(async () => {
+      await window.Bildgenerator.setTemplate('feed_post_45');
+      await window.Bildgenerator.addText('Test');
+      const before = window.Bildgenerator.lastAdded().getScaledWidth();
+      await window.Bildgenerator.resize(0.4);
+      const after = window.Bildgenerator.lastAdded().getScaledWidth();
+      return { before, after };
+    });
+
+    expect(result.after).toBeLessThan(result.before);
+  });
+
+  test('place() accepts free coordinates and still honours the margin', async ({ page }) => {
+    const result = await page.evaluate(async () => {
+      await window.Bildgenerator.setTemplate('feed_post_45');
+      await window.Bildgenerator.setLogoEnabled(false);
+      await window.Bildgenerator.addShape('pinkCircle');
+      await window.Bildgenerator.place({ x: 0, y: 0 });
+      const atOrigin = { ...window.Bildgenerator.lastAdded() };
+      const o = window.Bildgenerator.lastAdded();
+      const topLeft = { left: o.left, top: o.top };
+
+      await window.Bildgenerator.place({ x: 1, y: 1 });
+      const bottomRight = {
+        right: o.left + o.getScaledWidth(),
+        bottom: o.top + o.getScaledHeight(),
+      };
+      return {
+        topLeft,
+        bottomRight,
+        margin: window.Bildgenerator.protectiveMargin(),
+        canvas: { w: canvas.width, h: canvas.height },
+      };
+    });
+
+    expect(result.topLeft.left).toBeCloseTo(result.margin, 1);
+    expect(result.topLeft.top).toBeCloseTo(result.margin, 1);
+    expect(result.bottomRight.right).toBeCloseTo(result.canvas.w - result.margin, 1);
+    expect(result.bottomRight.bottom).toBeCloseTo(result.canvas.h - result.margin, 1);
+  });
+
+  test('text alignment and block placement are different things', async ({ page }) => {
+    const result = await page.evaluate(async () => {
+      await window.Bildgenerator.setTemplate('feed_post_45');
+      await window.Bildgenerator.setLogoEnabled(false);
+      await window.Bildgenerator.addText('Zeile eins\nZeile zwei', { align: 'right' });
+      const text = window.Bildgenerator.lastAdded();
+      const centred = text.left;
+      await window.Bildgenerator.place('left');
+      return { textAlign: text.textAlign, centred, placed: text.left };
+    });
+
+    // align='right' sets the lines inside the block; the block itself only
+    // moves through place(). Confusing the two is the most common mistake.
+    expect(result.textAlign).toBe('right');
+    expect(result.placed).toBeLessThan(result.centred);
   });
 
   // --------------------------------------------------------------- failures
