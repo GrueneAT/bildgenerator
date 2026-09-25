@@ -1,8 +1,9 @@
 # Grüner Bildgenerator
 
-> Browserbasiertes Werkzeug, das markenkonforme Grafiken der österreichischen
-> Grünen erzeugt — Social Media, Website-Artikelbilder und Druckformate.
-> Läuft vollständig im Browser, ohne Server und ohne Anmeldung.
+> Browserbasiertes Werkzeug der österreichischen Grünen. Zwei Werkzeuge in einer
+> Seite: ein Bildgenerator für Social Media, Website-Artikelbilder und Druck,
+> und ein eigenständiger QR-Code-Generator. Läuft vollständig im Browser, ohne
+> Server und ohne Anmeldung.
 
 Diese Datei richtet sich an KI-Assistenten, die ein Bild erzeugen sollen.
 Sie beschreibt, wie die Seite ferngesteuert wird — nicht, wie man das
@@ -43,97 +44,176 @@ gebraucht:
 Gotham Narrow kommt von `bildgenerator.gruene.at` selbst und braucht keine
 weitere Freigabe.
 
-## Schnittstelle
+## Einstieg
 
 Seite laden, warten bis `window.Bildgenerator` existiert, dann aufrufen.
 Alle Methoden sind asynchron und liefern erst zurück, wenn das Canvas seine
-Ruhelage erreicht hat.
+Ruhelage erreicht hat. Aktuelle Schnittstellenversion: `Bildgenerator.VERSION === 2`.
 
 ```js
 const bild = await window.Bildgenerator.render({
   template: 'artikel_23',
   logo: 'HERZOGENBURG',
   text: 'Rückenwind für Herzogenburg!',
-  dpi: 200,
 });
 // → { dataURL, width, height, dpi }
 ```
 
-### render(spec)
+## Nachschlagen — frag die Seite, rate nicht
 
-| Feld | Pflicht | Bedeutung |
-|---|---|---|
-| `template` | ja | Name aus `Bildgenerator.templates()` |
-| `logo` | nein | Wert aus `Bildgenerator.logos()`, z. B. `'HERZOGENBURG'` |
-| `text` | nein | Schlagzeile |
-| `background` | nein | `data:`-URL oder absolute Bild-URL |
-| `textColor` | nein | `'#FFFFFF'` weiß, `'#FFED00'` gelb, `'#000000'` schwarz |
-| `fontStyle` | nein | `'standard'` (Gotham Narrow) oder `'accent'` (Vollkorn, kursiv) |
-| `align` | nein | `left` \| `center` \| `right` |
-| `dpi` | nein | Standard 200. Bei 72 entspricht der Export exakt den Canvas-Maßen |
-| `format` | nein | Standard `'png'` |
+Alle gültigen Werte kommen aus der Seite selbst. Verwende diese Listen, statt
+Werte aus dieser Datei abzuschreiben; sie können sich ändern.
 
-Rückgabe: `{ dataURL, width, height, dpi }`. `dataURL` ist ein
-`data:image/png;base64,…`-String.
+```js
+Bildgenerator.templates()  // alle Formatnamen
+Bildgenerator.logos()      // alle wählbaren Organisationen
+Bildgenerator.options()    // alle übrigen Auswahlmöglichkeiten
+```
+
+`options()` liefert: `textColors`, `fontStyles`, `lineHeights`, `alignments`,
+`shapes`, `clipSizes`, `qrColorsOnImage`, `qrColors`, `qrBackgrounds`,
+`formats`.
+
+## Bildgenerator
+
+### render(spec) — alles auf einmal
+
+| Feld | Bedeutung |
+|---|---|
+| `template` | **Pflicht.** Name aus `templates()` |
+| `background` | Hintergrundbild als `data:`-URL oder absolute URL |
+| `logo` | Organisation aus `logos()`, z. B. `'HERZOGENBURG'` |
+| `logoEnabled` | `false`, um ganz ohne Organisationslogo zu arbeiten |
+| `text` | Schlagzeile |
+| `textColor` | aus `options().textColors` |
+| `fontStyle` | aus `options().fontStyles` — `'standard'` (Gotham Narrow) oder `'accent'` (Vollkorn, kursiv) |
+| `align` | `left` \| `center` \| `right` |
+| `lineHeight` | aus `options().lineHeights` |
+| `shadow` | Schattentiefe als Zahl |
+| `shapes` | Liste aus `options().shapes` — `'pinkCircle'`, `'cross'` (Wahlkreuz) |
+| `images` | Liste weiterer Bilder, die auf das Motiv gelegt werden |
+| `qr` | `{ text, color }` — QR-Code auf dem Bild |
+| `format` | `'png'` (Standard) oder `'jpeg'` |
+| `quality` | 0–1, nur bei JPEG wirksam |
+| `dpi` | Standard 200 |
+
+Rückgabe: `{ dataURL, width, height, dpi }`.
+
+Die Reihenfolge liegt fest und ist nicht beliebig: Das Format baut das Canvas
+neu und verwirft alles darauf, der Hintergrund gehört nach hinten, Text kommt
+zuletzt, damit er über den Elementen liegt.
 
 ### Einzelschritte
 
-Wenn du mehr Kontrolle brauchst, geht auch jeder Schritt für sich —
-`setTemplate`, `setBackground`, `setLogo`, `addText`, `export`. Die Reihenfolge
-ist nicht beliebig: Der Template-Wechsel baut das Canvas neu und verwirft alles
-darauf, der Hintergrund gehört nach hinten, Text wird gegen das Vorhandene
-zentriert.
+Wenn `render()` nicht reicht, geht jeder Schritt einzeln. Alle liefern das
+Objekt zurück, sind also verkettbar.
 
-### Nachschlagen
+| Aufruf | Wirkung |
+|---|---|
+| `setTemplate(name)` | Format wählen; baut das Canvas neu |
+| `setLogo(name)` | Organisationslogo setzen |
+| `setLogoEnabled(false)` | Organisationslogo entfernen |
+| `setBackground(url)` | Hintergrundbild setzen |
+| `addText(text, opts)` | Schlagzeile hinzufügen |
+| `addShape(kind)` | `'pinkCircle'` oder `'cross'` hinzufügen |
+| `addImage(url)` | weiteres Bild auf das Motiv legen |
+| `addQRCode({text, color})` | QR-Code auf das Bild setzen |
+| `clipToCircle(size)` | das zuletzt hinzugefügte Objekt kreisrund beschneiden |
+| `export(opts)` | Bild erzeugen: `{ dataURL, width, height, dpi }` |
+| `reset()` | zurück auf einen leeren Entwurf |
 
-- `Bildgenerator.templates()` — alle gültigen Template-Namen
-- `Bildgenerator.logos()` — alle wählbaren Organisationen
-- `Bildgenerator.VERSION` — derzeit `1`
+**Zu `clipToCircle`:** Der Knopf heißt in der Oberfläche „Kreis", fügt aber
+nichts hinzu — er beschneidet. Der Kreis, den man hinzufügen kann, ist
+`addShape('pinkCircle')`.
+
+## QR-Code-Generator
+
+Das zweite Werkzeug der Seite erzeugt einen QR-Code für sich, ohne Bild
+drumherum.
+
+```js
+const qr = await window.Bildgenerator.renderQRCode({
+  data: 'https://noe.gruene.at/gemeinden/herzogenburg/',
+  color: '#257639',
+  background: 'transparent',
+});
+// → { dataURL, width, height }
+```
+
+| Feld | Bedeutung |
+|---|---|
+| `data` | **Pflicht.** Inhalt — URL, Text, `mailto:` oder vCard |
+| `color` | aus `options().qrColors` |
+| `background` | aus `options().qrBackgrounds`, `'transparent'` erlaubt |
+
+Vorder- und Hintergrundfarbe müssen sich unterscheiden, sonst wird der Aufruf
+abgelehnt.
+
+Soll der QR-Code *auf* ein Bild, ist `addQRCode()` beziehungsweise
+`render({ qr })` der richtige Weg — nicht dieser hier.
 
 ## Formate
 
-| Name | Maße | Wofür |
+| Name | Canvas | Wofür |
 |---|---|---|
 | `feed_post_45` | 1080×1350 | Instagram- und Facebook-Post |
 | `story` | 1080×1920 | Story, hochkant |
 | `event` | 1920×1005 | Veranstaltungs-Header |
 | `facebook_header` | 820×360 | Facebook-Titelbild |
 | `artikel_23` | 1080×1620 | Artikelbild für Gemeinde- und Bezirksseiten |
-| `a4`, `a4_quer` | 2480×3508 | A4, hoch und quer |
-| `a5`, `a5_quer` | 1748×2480 | A5, hoch und quer |
-| `a6`, `a6_quer` | 1240×1748 | A6, hoch und quer |
+| `a4` / `a4_quer` | 2480×3508 | A4 hoch / quer |
+| `a5` / `a5_quer` | 1748×2480 | A5 hoch / quer |
+| `a6` / `a6_quer` | 1240×1748 | A6 hoch / quer |
 
-Die angegebenen Maße sind die Canvas-Maße. Der Export skaliert sie mit
-`dpi/72` — bei den Standardwerten wird aus `artikel_23` also ein Bild mit
-3000×4500 Pixeln.
+Angegeben sind die Canvas-Maße. Der Export skaliert sie mit `dpi/72` — bei den
+Standardwerten wird aus `artikel_23` also ein Bild mit 3000×4500 Pixeln.
 
 **Zu `artikel_23`:** Die Gemeinde- und Bezirksseiten liefern Bilder über
 Cloudflare Image Resizing aus und schneiden je nach Block auf ein anderes
 Seitenverhältnis zu — immer aus der Mitte heraus. Text und wichtige Bildteile
 gehören deshalb in die Mitte, nicht an den oberen oder unteren Rand.
 
+## Schriften
+
+Zwei Schriften stehen zur Wahl, beide bereits geladen:
+
+- `'standard'` — Gotham Narrow, die Hausschrift. Für Schlagzeilen und Fließtext,
+  also fast immer.
+- `'accent'` — Vollkorn, kursiv. Nur für Zitate und einzelne Akzente, bewusst
+  und sparsam.
+
+Ausführlich: https://bildgenerator.gruene.at/schriften.html
+
 ## Was du nicht selbst machen musst
 
-Die folgenden vier Eigenheiten der Oberfläche nimmt dir `window.Bildgenerator`
-ab. Sie stehen hier, damit du gar nicht erst versuchst, die Bedienelemente
-direkt anzusprechen:
+Diese Eigenheiten der Oberfläche nimmt dir `window.Bildgenerator` ab. Sie
+stehen hier, damit du gar nicht erst versuchst, die Bedienelemente direkt
+anzusprechen:
 
 1. `#meme-input` ist der Datei-Upload für das Hintergrundbild, kein Textfeld.
 2. Text läuft über `#text` und wird mit `#add-text` übernommen — der Abschnitt
-   ist anfangs zugeklappt.
+   ist anfangs zugeklappt, ebenso die Bereiche für Elemente und QR-Codes.
 3. `#logo-selection` ist ein verstecktes `<select>` hinter einem Suchfeld, das
    selbst ein `change`-Ereignis auslöst. Ein zusätzliches legt zwei Logos
    übereinander.
 4. `CanvasUtils.exportCanvas()` liefert ein Objekt, keinen String.
+5. `#add-circle` fügt keinen Kreis hinzu, sondern beschneidet das ausgewählte
+   Objekt.
+6. `#add-image` erwartet ein `File`, keine URL.
+7. Der Knopf „Von vorne beginnen" fragt per `confirm()` nach — im
+   Headless-Betrieb beantwortet das niemand. Nimm `reset()`.
 
 ## Inhaltliche Hinweise
 
 - Verwendete Hintergrundfotos müssen rechtlich geklärt sein. KI-erzeugte
   Hintergründe werden als „Symbolfoto — KI-generiert" gekennzeichnet.
 - Bei Druckformaten ist je nach Verwendung ein Impressum nötig.
+- Eine KI formuliert auch dann überzeugend, wenn die Aussage nicht stimmt.
+  Zahlen und Behauptungen gehören vor der Veröffentlichung geprüft.
 
 ## Weiteres
 
 - Anleitung für Menschen: https://bildgenerator.gruene.at/ki.html
 - Welche Schrift wofür: https://bildgenerator.gruene.at/schriften.html
+- Impressum: https://bildgenerator.gruene.at/impressum.html
 - Quellcode: https://github.com/GrueneAT/bildgenerator
