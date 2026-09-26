@@ -60,6 +60,81 @@ const bild = await window.Bildgenerator.render({
 // → { dataURL, width, height, dpi }
 ```
 
+## Grundgerüst zum Kopieren
+
+Jeder Aufrufer schreibt sonst dieselben fünfzehn Zeilen. Dieses Gerüst prüft
+die Schrift, bevor es ein Bild ausliefert — der wahrscheinliche Fehlerfall ist
+nicht „Seite lädt nicht", sondern „Seite lädt, Schrift nicht":
+
+```python
+from playwright.sync_api import sync_playwright
+import base64
+
+FONT_CHECK = """async () => {
+    await document.fonts.ready;
+    return document.fonts.check('40px "Gotham Narrow"');
+}"""
+
+RENDER = """async () => await window.Bildgenerator.render({
+    template: 'artikel_23',
+    logo: 'HERZOGENBURG',
+    text: 'Beispiel',
+    format: 'jpeg',
+})"""
+
+with sync_playwright() as p:
+    browser = p.chromium.launch()
+    page = browser.new_page(viewport={"width": 1400, "height": 1000})
+    page.goto("https://bildgenerator.gruene.at/", wait_until="networkidle", timeout=90000)
+    page.wait_for_function("() => !!window.Bildgenerator", timeout=30000)
+
+    if not page.evaluate(FONT_CHECK):
+        raise SystemExit("Hausschrift nicht geladen — kein Bild ausliefern")
+
+    bild = page.evaluate(RENDER)
+
+    if not bild["quality"]["ok"]:
+        print("Hinweise:", [f["message"] for f in bild["quality"]["findings"]])
+
+    with open("bild.jpg", "wb") as f:
+        f.write(base64.b64decode(bild["dataURL"].split(",", 1)[1]))
+    browser.close()
+```
+
+### Zwei Fallen beim Messen
+
+**Gib keine Fabric-Objekte aus `evaluate` zurück.** `lastAdded()` liefert eine
+Fabric-Instanz mit Ringbezügen. Wer sie direkt zurückgibt, bekommt `nan` statt
+Zahlen — stillschweigend, ohne Fehler. Lies die Werte **innerhalb** von
+`evaluate` aus:
+
+```js
+const B = window.Bildgenerator;
+await B.setTemplate('artikel_23');
+await B.addText('Beispiel');
+const o = B.lastAdded();
+
+// richtig: einfache Zahlen zurückgeben
+const messwert = { breite: Math.round(o.getScaledWidth()) };
+// falsch wäre: das Objekt selbst zurückgeben — liefert nan
+```
+
+`objects()` ist davon nicht betroffen, es gibt bereits einfache Zahlen zurück.
+
+**Prüf das Ergebnis an der ausgelieferten Datei**, nicht an einem
+Seiten-Screenshot oder einer verkleinerten Vorschau. Mehr als ein vermeintlicher
+Fehler war am Ende ein Messfehler: Text, der in der Verkleinerung zu klein
+wirkte, ein Zeichen, das im Ausschnitt abgeschnitten aussah.
+
+### Eine Konsolenwarnung, die nichts bedeutet
+
+```
+The provided value 'alphabetical' is not a valid enum value of type CanvasTextBaseline.
+```
+
+Die kommt aus Fabric.js, läuft bei jedem Textobjekt durch und ist harmlos.
+Nicht danach suchen.
+
 ## Nachschlagen — frag die Seite, rate nicht
 
 Alle gültigen Werte kommen aus der Seite selbst. Verwende diese Listen, statt
@@ -773,10 +848,43 @@ bedeutet.
 Angegeben sind die Canvas-Maße. Der Export skaliert sie mit `dpi/72` — bei den
 Standardwerten wird aus `artikel_23` also ein Bild mit 3000×4500 Pixeln.
 
-**Zu `artikel_23`:** Die Gemeinde- und Bezirksseiten liefern Bilder über
-Cloudflare Image Resizing aus und schneiden je nach Block auf ein anderes
-Seitenverhältnis zu — immer aus der Mitte heraus. Text und wichtige Bildteile
-gehören deshalb in die Mitte, nicht an den oberen oder unteren Rand.
+### Artikelbilder: keine Schlagzeile ins Bild
+
+**Der teuerste Fallstrick, und er kostete bereits eine ganze Runde von acht
+Bildern.**
+
+Gemeinde- und Bezirksseiten legen den Artikeltitel **selbst als Text über das
+Bild** — auf der Übersichtskarte wie auf der Artikelseite, dort als `<h1>`.
+Ein Bild mit eingebrannter Schlagzeile zeigt den Titel damit zweimal, und auf
+schmalen Schirmen kollidieren die beiden.
+
+Für `artikel_23` gilt deshalb: **keine Schlagzeile im Bild.** Was trägt, ist
+etwas, das der Titel *nicht* schon sagt:
+
+- ein reines Motiv ohne Text, oder
+- eine Faktengrafik — große Kernzahl, darunter eine kurze Erklärzeile.
+
+Das ist keine Eigenheit des Generators, sondern der Zielsysteme. Ein Modell,
+das nur den Generator kennt, kann es nicht wissen — deshalb steht es hier.
+
+Für Social-Media-Formate gilt das **nicht**: Dort trägt das Bild die Aussage
+allein, und eine Schlagzeile gehört hinein.
+
+### Wie `artikel_23` auf der Zielseite beschnitten wird
+
+Die Seiten liefern Bilder über Cloudflare Image Resizing aus und schneiden je
+nach Block anders zu — immer aus der Mitte (`fit=cover, gravity=0.5x0.5`).
+Gemessen an einer ausgelieferten Artikelseite:
+
+| Ort | Zuschnitt | Was von einer 2:3-Quelle bleibt |
+|---|---|---|
+| Übersichtskarte | nahe 2:3 | fast alles |
+| **Artikelseite** | **2:1** (`1600×800`) | **nur 33 % bis 67 % der Höhe** |
+
+Ein Bild, das auf der Karte perfekt sitzt, kann auf der Artikelseite oben und
+unten beschnitten sein. Wer für beides baut, hält **alles Wesentliche im
+mittleren Drittel** — bei der Faktengrafik also die Kernzahl mittig, die
+Erklärzeile darunter als das, was notfalls wegfallen darf.
 
 ## Schriften
 
