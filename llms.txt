@@ -49,7 +49,7 @@ weitere Freigabe.
 
 Seite laden, warten bis `window.Bildgenerator` existiert, dann aufrufen.
 Alle Methoden sind asynchron und liefern erst zurück, wenn das Canvas seine
-Ruhelage erreicht hat. Aktuelle Schnittstellenversion: `Bildgenerator.VERSION === 14`.
+Ruhelage erreicht hat. Aktuelle Schnittstellenversion: `Bildgenerator.VERSION === 15`.
 
 ```js
 const bild = await window.Bildgenerator.render({
@@ -178,6 +178,44 @@ Das ist die Verwechslung, die am meisten Zeit kostet:
 
 Linksbündig am linken Bildrand heißt also beides: `addText(t, { align: 'left' })`
 **und** `place('left')`.
+
+### Wie lang darf eine Schlagzeile sein
+
+**Text bricht nicht automatisch um.** Eine lange Zeile wird stattdessen
+kleiner skaliert, bis sie hineinpasst — und irgendwann liest sie sich nicht
+mehr wie eine Schlagzeile.
+
+Gemessen für `artikel_23` (Export 3000 px breit):
+
+| Zeichen in einer Zeile | Schriftgröße im Export |
+|---|---|
+| 20 | 248 px |
+| 30 | 166 px |
+| 40 | 124 px |
+| 60 | 83 px |
+| 80 | 62 px |
+
+**Bis etwa 40 Zeichen pro Zeile** bleibt es eine Schlagzeile. Darüber gehört
+ein Umbruch hinein — von Hand, mit `\n`:
+
+```js
+const B = window.Bildgenerator;
+await B.setTemplate('artikel_23');
+await B.setLogoEnabled(false);
+
+// Nicht so — 76 Zeichen auf einer Zeile:
+// await B.addText('Warum wir gegen die verbindliche Bürgerbefragung zur Windkraft stimmten');
+
+// Sondern so:
+await B.addText('Warum wir gegen die\nBürgerbefragung\nstimmten');
+```
+
+Drei Zeilen sind das Maximum. Passt ein Titel auch dann nicht, gehört er
+gekürzt — `check()` warnt bei einer einzeiligen Schlagzeile über 45 Zeichen.
+
+Die Zahlen gelten für die 1080 px breiten Vorlagen (`artikel_23`,
+`feed_post_45`, `story`). Bei den Druckformaten ist absolut mehr Platz, das
+Verhältnis bleibt aber dasselbe.
 
 ### Größe
 
