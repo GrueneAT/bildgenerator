@@ -31,7 +31,7 @@
  * breakage surfaces in e2e/api.spec.js instead of in somebody else's script.
  */
 const Bildgenerator = {
-    VERSION: 14,
+    VERSION: 15,
 
     /** The object the most recent add* call put on the canvas. */
     _lastAdded: null,
@@ -180,19 +180,72 @@ const Bildgenerator = {
         // Set before the image loads: positionBackgroundImage() reads it.
         CanvasUtils.setBackgroundFocus(focus(opts.focusX), focus(opts.focusY));
 
+        // Turn a remote URL into a data: URL first.
+        //
+        // A cross-origin image loaded straight into the canvas is blocked by
+        // CORS, and fabric still calls its callback — with an image that has
+        // no dimensions. processMeme() then assigns it, so every check for
+        // "is there a background now" says yes and the export comes back a
+        // plausible size with the photo simply absent. A field report of the
+        // first production use caught exactly that: three images, each one a
+        // blank green surface, and nothing anywhere said so.
+        //
+        // Fetching first either works — then the image really is embedded —
+        // or fails loudly here, where the caller can act on it.
+        const source = url.startsWith("data:") ? url : await this._asDataURL(url);
+
         // Wait for a DIFFERENT image, not merely for one to exist.
         // contentImage is a one-shot latch: replaceCanvas() and resetWizard()
         // dispose the canvas without clearing it, so after a template change
         // it is still truthy and a replacement would return immediately —
         // before the new photo had loaded.
         const previous = contentImage;
-        processMeme({ url: url });
+        processMeme({ url: source });
         await this._waitFor(
             () => !!contentImage && contentImage !== previous,
             "background image to load"
         );
+        // fabric hands back an image with no dimensions when the load failed.
+        if (!contentImage.width || !contentImage.height) {
+            throw new Error(
+                "Das Hintergrundbild wurde angenommen, enthält aber keine Bilddaten. " +
+                "Bei einer fremden URL liegt das meist an CORS."
+            );
+        }
         await this._waitUntilQuiet();
         return this;
+    },
+
+    /**
+     * Fetch a remote image and return it as a data: URL.
+     *
+     * Throws with the reason rather than letting a blocked request end as a
+     * silently empty background — the failure mode this whole interface
+     * exists to prevent, applied to images instead of fonts.
+     */
+    async _asDataURL(url) {
+        let response;
+        try {
+            response = await fetch(url, { mode: "cors" });
+        } catch (error) {
+            throw new Error(
+                `Das Bild von ${url} konnte nicht geladen werden (${error.message}). ` +
+                `Fremde Server müssen CORS erlauben — übergib das Bild sonst als data:-URL.`
+            );
+        }
+        if (!response.ok) {
+            throw new Error(`Das Bild von ${url} antwortete mit HTTP ${response.status}.`);
+        }
+        const blob = await response.blob();
+        if (!String(blob.type).startsWith("image/")) {
+            throw new Error(`${url} lieferte ${blob.type || "keinen Bildtyp"}, kein Bild.`);
+        }
+        return await new Promise(function (resolve, reject) {
+            const reader = new FileReader();
+            reader.onload = function () { resolve(reader.result); };
+            reader.onerror = function () { reject(new Error(`${url} ließ sich nicht lesen.`)); };
+            reader.readAsDataURL(blob);
+        });
     },
 
     // ----------------------------------------------------------- step 3: design

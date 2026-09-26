@@ -198,6 +198,18 @@ const QualityCheck = {
             }
 
             const lines = String(o.text || "").split("\n").filter(function (l) { return l.trim(); });
+
+            // A long headline on ONE line does not wrap — it shrinks. At 80
+            // characters an artikel_23 headline renders around 62 px on a
+            // 3000 px wide image, which reads as body copy, not a headline.
+            // The break has to be put in by hand with \n.
+            if (lines.length === 1 && lines[0].length > 45) {
+                self._add(findings, self.SEVERITY.WARNING, "headlineLength",
+                    `Eine Schlagzeile mit ${lines[0].length} Zeichen steht auf einer Zeile ` +
+                    `und schrumpft dadurch — mit \n umbrechen`,
+                    { characters: lines[0].length });
+            }
+
             if (lines.length > 3) {
                 self._add(findings, self.SEVERITY.WARNING, "textLines",
                     `Ein Textblock hat ${lines.length} Zeilen — drei sind das Maximum`,

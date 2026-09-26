@@ -187,6 +187,25 @@ controls and handlers a person does; it is NOT a second rendering path.
   `app.min.js` (from "Core utilities" through `qrcode-handlers.js`). A tag
   after it is served separately and goes stale.
 
+### Silent background failures
+
+`setBackground()` converts a remote URL to a data: URL via `fetch` before
+handing it to `processMeme()`. A cross-origin image loaded straight into the
+canvas is blocked by CORS, and **fabric still calls its callback** — with an
+image that has no dimensions. Every check for "is there a background now" then
+says yes, and the export comes back a plausible size with the photo simply
+absent.
+
+That is not hypothetical: the first production use shipped three article
+images as blank green surfaces and nothing anywhere said so
+(`wordpress-herzogenburg/content/bildgenerator-befund.md`). Fetching first
+either works, or fails loudly where the caller can act on it. A second guard
+checks the loaded image actually has dimensions.
+
+Known cosmetic noise, not ours to fix: fabric 5.3.0 sets the canvas text
+baseline to `alphabetical` instead of `alphabetic`, so every text render logs
+a warning. Patching a vendored minified library would be worse than the noise.
+
 ### Determinism and the export gate
 
 - `addText()` sets EVERY control, not only the named ones. The handler reads
