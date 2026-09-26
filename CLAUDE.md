@@ -187,6 +187,22 @@ controls and handlers a person does; it is NOT a second rendering path.
   `app.min.js` (from "Core utilities" through `qrcode-handlers.js`). A tag
   after it is served separately and goes stale.
 
+### What llms.txt must say about the TARGET sites
+
+Two things a model driving only the generator cannot know, both learned the
+expensive way (`wordpress-herzogenburg/content/bildgenerator-offene-punkte.md`):
+
+- **Gemeinde/Bezirks sites put the article title over the image themselves**,
+  on the card and as the `<h1>` of the article page. An image with a burnt-in
+  headline shows the title twice. Cost a full round of eight images.
+  Social-media formats are the opposite case — there the image carries the
+  message alone.
+- **The article page crops `artikel_23` to 2:1 from the centre**
+  (`width=1600,height=800,fit=cover,gravity=0.5x0.5`, verified on a live
+  article). From a 2:3 source only 33 %–67 % of the height survives, while the
+  overview card keeps nearly everything. Anything essential belongs in the
+  middle third.
+
 ### Silent background failures
 
 `setBackground()` converts a remote URL to a data: URL via `fetch` before
